@@ -1,0 +1,26 @@
+{
+  "name": "mono-studio-vue",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cesium": "1.117.0",
+    "three": "^0.175.0",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^5.4.14",
+    "vite-plugin-static-copy": "^2.3.0"
+  },
+  "overrides": {
+    "@cesium/engine": "9.1.0",
+    "@cesium/widgets": "6.1.0",
+    "@zip.js/zip.js": "2.7.34"
+  }
+}
