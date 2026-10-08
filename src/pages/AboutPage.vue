@@ -1,0 +1,18 @@
+<script setup>
+import PageHeading from "../components/site/PageHeading.vue";
+import ContactBanner from "../components/site/ContactBanner.vue";
+import { services } from "../content/services.js";
+import SiteIcon from "../components/site/SiteIcon.vue";
+import logo from "../assets/brand-logo.jpg";
+const principles = [
+  { number: "01", title: "从问题出发", description: "先理解使用场景与目标，再选择技术。不是功能越多越好，而是让关键问题得到解决。" },
+  { number: "02", title: "让复杂变清晰", description: "清晰的模块、明确的数据流与自然的交互，让软件更容易使用，也更容易维护。" },
+  { number: "03", title: "重视沟通与验证", description: "通过阶段成果交流，而不只依赖描述。把分歧尽早看见，把细节逐步打磨。" },
+  { number: "04", title: "为长期使用而构建", description: "关注交付之后的实际运行，让软件能够随着需求变化继续迭代。" },
+];
+</script>
+<template><PageHeading eyebrow="ABOUT GUANGNIAN" title="保持好奇，也保持务实。" current="关于光年" description="我们关注技术的可能性，更关注技术能为真实工作带来什么改变。" /><section class="container about-intro"><div class="about-logo" data-reveal><img :src="logo" width="440" height="183" alt="光年数智网络科技工作室 Logo" /><span>SOFTWARE · PRODUCTS · DEVELOPMENT</span></div><div data-reveal data-reveal-delay="120"><p class="eyebrow">光年数智网络科技工作室</p><h2>让想法走向实现，<br />让软件融入日常。</h2><p>光年数智是一家专注软件开发的工作室。我们构建自己的软件产品，也围绕不同业务的具体需求提供定制开发服务。</p><p>从工具软件到业务系统，我们希望用合适的技术、清晰的结构与易用的界面，把复杂问题转化为可使用的解决方案。</p></div></section><section class="section section-soft"><div class="container"><div class="section-heading" data-reveal><div><p class="eyebrow">WHAT WE BELIEVE</p><h2>我们如何看待软件开发。</h2></div></div><div class="principle-grid"><article v-for="(item, index) in principles" :key="item.number" data-reveal :data-reveal-delay="index % 2 * 100"><span class="step-number">{{ item.number }}</span><h3>{{ item.title }}</h3><p>{{ item.description }}</p></article></div></div></section><section class="section container"><div class="section-heading" data-reveal><div><p class="eyebrow">OUR FOCUS</p><h2>用不同形式，服务同一个目标。</h2><p class="section-description">让软件适合场景，让工具帮助工作。</p></div></div><div class="focus-grid"><div v-for="service in services" :key="service.id"><SiteIcon :name="service.icon" /><h3>{{ service.title }}</h3></div></div></section><ContactBanner /></template>
+<style scoped>
+.about-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding-bottom: 80px; }.about-logo { min-height: 300px; border: 1px solid var(--line); border-radius: 16px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; }.about-logo img { width: 100%; height: auto; max-width: 440px; }.about-logo span { font: 9px/1.5 ui-monospace, monospace; letter-spacing: .16em; color: var(--muted); margin-top: 24px; }.about-intro h2 { margin-bottom: 24px; }.about-intro p:not(.eyebrow) { color: var(--muted); font-size: 14px; line-height: 1.95; margin-top: 16px; }.principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }.principle-grid article { background: white; border: 1px solid var(--line); padding: 30px; border-radius: 12px; }.principle-grid h3 { margin: 22px 0 12px; }.principle-grid p { font-size: 14px; color: var(--muted); line-height: 1.9; }.focus-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }.focus-grid > div { display: flex; align-items: center; gap: 12px; padding: 24px 0; border-top: 1px solid var(--line); }.focus-grid svg { width: 23px; height: 23px; color: var(--accent); }.focus-grid h3 { font-size: 14px; }
+@media (max-width: 760px) { .about-intro { grid-template-columns: 1fr; gap: 32px; padding-bottom: 56px; }.about-logo { min-height: 240px; }.principle-grid { grid-template-columns: 1fr; gap: 16px; }.focus-grid { grid-template-columns: 1fr 1fr; gap: 12px; }.focus-grid h3 { font-size: 12px; } }
+</style>

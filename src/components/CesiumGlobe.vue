@@ -1,6 +1,6 @@
 <script setup>
 /*
- * 第二屏 Cesium 三维场景
+ * 独立演示的 Cesium 三维场景
  * 负责商用 3D Tiles / ion 数据源加载、空间数据叠加、镜头切换和 Viewer 生命周期清理。
  */
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
@@ -14,6 +14,7 @@ import {
   createOsmBuildingsAsync,
   createWorldTerrainAsync,
   DistanceDisplayCondition,
+  GeographicTilingScheme,
   ImageryLayer,
   Ion,
   IonWorldImageryStyle,
@@ -24,6 +25,7 @@ import {
   TileMapServiceImageryProvider,
   VerticalOrigin,
   Viewer,
+  WebMapTileServiceImageryProvider,
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import { cesiumSource } from "../config/cesiumSources";
@@ -44,6 +46,47 @@ const container = useTemplateRef("container");
 let viewer;
 let disposed = false;
 let overviewEntities = [];
+let visibilityObserver;
+let inViewport = true;
+
+function syncRenderLoop() {
+  if (!viewer || viewer.isDestroyed()) return;
+  const running = inViewport && !document.hidden;
+  viewer.useDefaultRenderLoop = running;
+  if (running) viewer.scene.requestRender();
+}
+
+function releasePrimitive(primitive) {
+  if (primitive && !primitive.isDestroyed()) primitive.destroy();
+}
+// Google 实景瓦片引用：地球总览需临时隐藏它以露出天地图中文底图，故需持有以便按镜头切换显隐。
+let googleTileset;
+
+// 天地图子域，分摊瓦片请求；经纬度（EPSG:4326）瓦片矩阵与 Cesium GeographicTilingScheme 对齐。
+const TIANDITU_SUBDOMAINS = Object.freeze(["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"]);
+// Cesium level 0 对应天地图 4326 的 TileMatrix "1"，逐级 +1，用标签表显式映射避免整体错位。
+const TIANDITU_MATRIX_LABELS = Object.freeze(Array.from({ length: 18 }, (_, i) => String(i + 1)));
+
+/**
+ * 构造天地图 WMTS 影像图层提供者（经纬度 EPSG:4326）
+ * @param {string} layer 图层代号，如 img（影像底图）、cia（影像中文注记）
+ * @param {string} token 天地图密钥 tk
+ * @returns {WebMapTileServiceImageryProvider} 可加入 imageryLayers 的提供者
+ */
+function createTiandituProvider(layer, token) {
+  return new WebMapTileServiceImageryProvider({
+    url: `https://{s}.tianditu.gov.cn/${layer}_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=${layer}&tileMatrixSet=c&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${token}`,
+    layer,
+    style: "default",
+    format: "tiles",
+    tileMatrixSetID: "c",
+    tileMatrixLabels: [...TIANDITU_MATRIX_LABELS],
+    subdomains: [...TIANDITU_SUBDOMAINS],
+    tilingScheme: new GeographicTilingScheme(),
+    // 天地图 4326 注记最深 18 级，对应 Cesium level 17。
+    maximumLevel: 17,
+  });
+}
 
 // 城市视角以新加坡为默认落点：Google 摄影测量覆盖稳定，天际线和滨海区域的展示层次更完整。
 const CAMERA_VIEWS = Object.freeze({
@@ -87,7 +130,7 @@ const CITY_SENSORS = Object.freeze([
  * @returns {void}
  */
 function reportStatus(state, source, message = "") {
-  emit("status", { state, source, message });
+  if (!disposed) emit("status", { state, source, message });
 }
 
 /**
@@ -150,10 +193,15 @@ async function loadGooglePhotorealistic(targetViewer) {
     },
   );
 
-  if (disposed || !targetViewer || targetViewer.isDestroyed()) return cesiumSource.label;
+  if (disposed || !targetViewer || targetViewer.isDestroyed()) {
+    releasePrimitive(tileset);
+    return cesiumSource.label;
+  }
 
   targetViewer.scene.primitives.add(tileset);
-  targetViewer.scene.globe.show = false;
+  googleTileset = tileset;
+  // globe 显隐交由 applySourceVisibility 按镜头控制：无中文注记时全程隐藏椭球（原表现），
+  // 有注记时地球总览改露天地图中文底图，故此处不再一次性隐藏。
   return cesiumSource.label;
 }
 
@@ -166,14 +214,22 @@ async function loadGooglePhotorealistic(targetViewer) {
 async function loadIonWorld(targetViewer) {
   Ion.defaultAccessToken = cesiumSource.ionAccessToken;
 
-  const [terrainProvider, buildings] = await Promise.all([
+  // 等待两条请求都结束；其中一条失败时，仍需回收另一条已经创建的图元。
+  const [terrain, building] = await Promise.allSettled([
     createWorldTerrainAsync({ requestWaterMask: true, requestVertexNormals: true }),
     createOsmBuildingsAsync({ maximumScreenSpaceError: 5 }),
   ]);
+  const buildings = building.status === "fulfilled" ? building.value : undefined;
+  if (disposed || !targetViewer || targetViewer.isDestroyed()) {
+    releasePrimitive(buildings);
+    return cesiumSource.label;
+  }
+  if (terrain.status === "rejected" || building.status === "rejected") {
+    releasePrimitive(buildings);
+    throw terrain.status === "rejected" ? terrain.reason : building.reason;
+  }
 
-  if (disposed || !targetViewer || targetViewer.isDestroyed()) return cesiumSource.label;
-
-  targetViewer.terrainProvider = terrainProvider;
+  targetViewer.terrainProvider = terrain.value;
   targetViewer.imageryLayers.add(
     ImageryLayer.fromWorldImagery({ style: IonWorldImageryStyle.AERIAL_WITH_LABELS }),
   );
@@ -233,6 +289,7 @@ async function loadSceneSource(targetViewer) {
       message: "未配置商用数据密钥，当前为本地预览底图",
     };
   } catch (error) {
+    if (disposed || targetViewer.isDestroyed()) throw error;
     console.error("商用 Cesium 数据源加载失败，已切换本地预览。", error);
     targetViewer.imageryLayers.removeAll();
     const source = await loadLocalPreview(targetViewer);
@@ -242,6 +299,47 @@ async function loadSceneSource(targetViewer) {
       message: "远程数据源加载失败，请检查 API Key、域名限制和服务配额",
     };
   }
+}
+
+/**
+ * 叠加天地图中文注记（未配置 tk 时直接跳过）
+ * Google/Bing 实景瓦片的地名文字烘焙在影像里、无法切换语言，故用天地图 WMTS 另铺一层中文注记。
+ * Google 源在地球总览会隐藏实景网格，此时 globe 无底图，需一并铺天地图影像作背景；
+ * ion / local 源本身已有影像底图，仅叠注记即可。
+ * @param {Viewer} targetViewer Cesium Viewer 实例
+ * @returns {void}
+ */
+function addChineseLabels(targetViewer) {
+  if (!cesiumSource.hasChineseLabels) return;
+
+  const token = cesiumSource.tiandituToken;
+  if (cesiumSource.provider === "google") {
+    targetViewer.imageryLayers.addImageryProvider(createTiandituProvider("img", token));
+  }
+  // 注记层最后加入，保证叠在所有底图之上。
+  targetViewer.imageryLayers.addImageryProvider(createTiandituProvider("cia", token));
+}
+
+/**
+ * 按镜头模式切换 Google 实景与天地图中文底图的显隐
+ * 仅 Google 源需要切换：总览露中文注记地图、近景回到摄影测量实景；未配置 tk 时维持原本的全程实景。
+ * ion / local 源全程显示 globe 与叠加注记，无需在此干预。
+ * @param {"earth"|"city"} mode 目标镜头模式
+ * @returns {void}
+ */
+function applySourceVisibility(mode) {
+  if (cesiumSource.provider !== "google" || !googleTileset || !viewer) return;
+
+  const { globe } = viewer.scene;
+  if (!cesiumSource.hasChineseLabels) {
+    googleTileset.show = true;
+    globe.show = false;
+    return;
+  }
+
+  const cityView = mode === "city";
+  googleTileset.show = cityView;
+  globe.show = !cityView;
 }
 
 /**
@@ -411,7 +509,8 @@ function flyToView(mode, duration = 1.8) {
 
   const resolvedMode = CAMERA_VIEWS[mode] ? mode : "earth";
   syncOverviewVisibility(resolvedMode);
-  viewer.camera.flyTo({ ...CAMERA_VIEWS[resolvedMode], duration });
+  applySourceVisibility(resolvedMode);
+  viewer.camera.flyTo({ ...CAMERA_VIEWS[resolvedMode], duration: matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : duration });
 }
 
 /**
@@ -437,13 +536,22 @@ async function initializeViewer() {
     baseLayer: false,
     requestRenderMode: true,
     maximumRenderTimeChange: Infinity,
+    shouldAnimate: false,
   });
 
+  visibilityObserver = new IntersectionObserver(([entry]) => {
+    inViewport = entry.isIntersecting;
+    syncRenderLoop();
+  });
+  visibilityObserver.observe(container.value);
+  document.addEventListener("visibilitychange", syncRenderLoop);
+  syncRenderLoop();
   configureRenderQuality(viewer);
   const result = await loadSceneSource(viewer);
 
   if (disposed || !viewer || viewer.isDestroyed()) return;
 
+  addChineseLabels(viewer);
   addNetworkData(viewer);
   flyToView(props.viewMode, 2.4);
   reportStatus(result.degraded ? "degraded" : "ready", result.source, result.message);
@@ -456,6 +564,7 @@ watch(
 
 onMounted(() => {
   initializeViewer().catch((error) => {
+    if (disposed) return;
     console.error("Cesium 场景初始化失败。", error);
     reportStatus("error", cesiumSource.label, "三维场景初始化失败，请检查浏览器 WebGL 支持");
   });
@@ -463,6 +572,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   disposed = true;
+  visibilityObserver?.disconnect();
+  document.removeEventListener("visibilitychange", syncRenderLoop);
+  overviewEntities = [];
+  googleTileset = undefined;
   if (viewer && !viewer.isDestroyed()) viewer.destroy();
 });
 </script>

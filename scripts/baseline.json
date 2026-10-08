@@ -1,0 +1,13 @@
+{
+  "kind": "pre-redesign-build",
+  "node": "24.11.1",
+  "vite": "5.4.21",
+  "sizes": "uncompressed bytes, Vite build rounded kB output",
+  "entryJavaScriptKB": 48.2,
+  "vueVendorKB": 68.54,
+  "threeVendorKB": 473.45,
+  "entryCssKB": 47.45,
+  "cesiumAsyncJavaScriptKB": 3514.32,
+  "cesiumAsyncCssKB": 25.19,
+  "runtimeMeasurement": "Unavailable: preview listen EPERM on 127.0.0.1:4176. These sizes do not measure frame rate, CPU cost or startup timing."
+}
