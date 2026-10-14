@@ -60,7 +60,9 @@ test("咨询链接和邮件标题使用同一内容，方案与产品身份不�
 });
 
 test("公开页面与产品路径完整，404 不进入 sitemap", () => {
-  assert.equal(prerenderPaths.length, 7 + products.length);
+  assert.equal(prerenderPaths.length, publicPaths.length + 3);
+  assert.ok(!publicPaths.includes("/checkout/"));
+  assert.ok(!publicPaths.includes("/orders/"));
   assert.equal(new Set(prerenderPaths).size, prerenderPaths.length);
   assert.ok(prerenderPaths.includes("/404/"));
   assert.ok(!publicPaths.includes("/404/"));

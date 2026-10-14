@@ -1,0 +1,18 @@
+{
+  "source": "NASA Earth Observatory / Visible Earth",
+  "captured": "2026-10-14",
+  "imagery": "历史卫星合成影像，非实时",
+  "day": {
+    "url": "https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57730/land_ocean_ice_8192.png",
+    "sourceSha256": "aaddcd967a9f09fb2d7ef50ff452bebfcf10192c520465d5eb1ad8446c716e98",
+    "derivedSha256": "a20d632e92ca6fcf993cebc5259646fa9e750379dbbb7be42850a7523c417762",
+    "processing": "FFmpeg 8.0.1 等比降采样至 4096×2048、JPEG q=2"
+  },
+  "clouds": {
+    "url": "https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57747/cloud_combined_2048.jpg",
+    "sha256": "daddaad84d7a33bbbc86cdda3f591099f57cee8607b7bcf3b67eb7e4f7a1c793"
+  },
+  "credit": "NASA Earth Observatory",
+  "endorsement": false,
+  "usageGuideline": "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+}

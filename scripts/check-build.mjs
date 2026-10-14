@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { prerenderPaths } from "../src/content/paths.js";
+import { prerenderPaths, publicPaths, noindexPaths } from "../src/content/paths.js";
+import { serviceOffers, centsToAmount } from "../shared/commerce.js";
 import { products } from "../src/content/products.js";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
@@ -60,8 +61,21 @@ for (const route of prerenderPaths) {
       for (const text of content) assert.ok(html.includes(text), `${route} 未预渲染详情内容：${text}`);
     }
   }
-  if (route === "/404/") assert.match(html, /noindex/);
-  if (metadata.origin && route !== "/404/") assert.ok(html.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`), `${route} 缺少正式 canonical。`);
+  if (route === "/shop/") for (const offer of serviceOffers) {
+    assert.ok(html.includes(offer.name) && html.includes(offer.scope), `商城未预渲染 ${offer.name} 的名称或范围。`);
+    if (metadata.commerce?.provider === "shopxo") {
+      const href = metadata.commerce.products[offer.id].replaceAll("&", "&amp;");
+      assert.ok(html.includes(`href="${href}"`), `商城缺少 ${offer.name} 的订单中心入口。`);
+      assert.ok(!html.includes(centsToAmount(offer.priceCents)), "订单中心模式不应展示旧静态报价。");
+    } else assert.ok(html.includes(centsToAmount(offer.priceCents)), `商城缺少 ${offer.name} 的价格。`);
+  }
+  if (metadata.commerce?.provider === "shopxo" && route === "/orders/") {
+    assert.ok(html.includes(`href="${metadata.commerce.ordersUrl.replaceAll("&", "&amp;")}"`) && html.includes("同一账号"), "缺少跨设备账户订单入口。");
+    assert.ok(!html.includes("当前浏览器还没有订单"), "订单中心模式不应继续展示旧浏览器查询流程。");
+  }
+  if (metadata.commerce?.provider === "shopxo" && route === "/checkout/") assert.ok(html.includes("本页面不创建另一笔订单"), "订单中心模式缺少唯一交易系统说明。");
+  if (noindexPaths.includes(route)) assert.match(html, /noindex/);
+  if (metadata.origin && publicPaths.includes(route)) assert.ok(html.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`), `${route} 缺少正式 canonical。`);
 }
 await stat(path.join(dist, "favicon.png"));
 await stat(path.join(dist, "cesium/Workers"));
@@ -69,6 +83,6 @@ await stat(path.join(dist, "cesium/Assets/Textures/NaturalEarthII"));
 if (metadata.origin) {
   const sitemap = await load("sitemap.xml");
   assert.ok(!sitemap.includes("/404/"));
-  for (const route of metadata.paths.filter(item => item !== "/404/")) assert.ok(sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`));
+  for (const route of publicPaths) assert.ok(sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`));
 }
 console.log(`构建检查通过：${prerenderPaths.length} 个预渲染页面；启动资源无 3D 引擎；主入口静态 JS/CSS ${(firstLoadBytes / 1024).toFixed(1)} KiB（不含页面动态块与图片）。`);

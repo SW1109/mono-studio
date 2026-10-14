@@ -12,11 +12,11 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
 </script>
 
 <template>
-  <PageHeading eyebrow="SOFTWARE & SOLUTIONS" title="从业务场景，找到合适的软件。" current="软件产品" description="从品牌官网到业务系统，从小程序到智能工具，了解常见的软件开发方向，以及每个方向可以解决什么问题、交付哪些内容。" />
+  <PageHeading eyebrow="SOFTWARE & SOLUTIONS" title="企业应用与软件工具" current="软件产品" description="涵盖企业网站、业务管理、移动服务与自动化等开发方向。功能模块、支持平台及交付范围依据项目需求确认。" />
   <section class="container catalog-intro" aria-label="软件展示说明" data-reveal>
     <div class="catalog-intro-copy">
       <span class="icon-tile"><SiteIcon name="layers" /></span>
-      <div><h2>先找到方向，再一起定义细节。</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。</p></div>
+      <div><h2>定制方案与适用范围</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。</p></div>
     </div>
     <dl class="catalog-counts">
       <div><dt>开发方向</dt><dd>{{ solutions.length }}<small>个方案</small></dd></div>
@@ -39,33 +39,42 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
   <section id="existing-tools" class="section section-soft" aria-labelledby="tools-title">
     <div class="container">
       <div class="section-heading" data-reveal>
-        <div><p class="eyebrow">SOFTWARE TOOLS</p><h2 id="tools-title">也有面向日常的效率工具。</h2><p class="section-description">原有工具继续保留，功能、平台支持和获取方式请进入详情后咨询确认。</p></div>
+        <div><p class="eyebrow">SOFTWARE TOOLS</p><h2 id="tools-title">桌面与办公效率工具</h2><p class="section-description">工具功能、支持平台及获取方式请查阅详情，并通过产品咨询确认。</p></div>
         <span class="tag">{{ existingProducts.length }} 款现有工具</span>
       </div>
       <div class="product-grid"><ProductCard v-for="(product, index) in existingProducts" :key="product.slug" :product="product" :reveal-delay="index * 75" /></div>
     </div>
   </section>
-  <ContactBanner :title="'不必套用现成流程，\n让软件适应你的业务。'" description="可以从一个核心模块开始，也可以组合多个方向。先确认要解决的问题，再确定开发范围。" />
+  <ContactBanner :title="'业务需求沟通\n与定制方案评估'" description="提供现有流程、核心功能与系统对接要求，便于评估开发范围和实施安排。" />
 </template>
 
 <style scoped>
-.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 40px; padding: 28px 32px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 60px; }
-.catalog-intro-copy { display: flex; gap: 20px; max-width: 690px; }
+.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 48px; padding: 32px 40px; background: var(--surface); border-radius: var(--radius-card); margin-bottom: 72px; }
+.catalog-intro-copy { display: flex; gap: 24px; max-width: 730px; }
 .catalog-intro-copy .icon-tile { flex-shrink: 0; }
-.catalog-intro h2 { font-size: 18px; margin-bottom: 10px; }
-.catalog-intro p { color: var(--muted); font-size: 12px; line-height: 1.9; }
-.catalog-counts { display: flex; gap: 30px; flex-shrink: 0; }
-.catalog-counts dt { color: var(--muted); font-size: 10px; }
-.catalog-counts dd { color: var(--accent); font-size: 30px; font-weight: 600; line-height: 1.5; }
-.catalog-counts small { font-size: 10px; font-weight: 400; color: var(--muted); display: block; }
-.product-catalog { padding-bottom: 72px; }
-.catalog-heading { margin-bottom: 28px; }
-.filter-list { display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
-.filter-list button { min-height: 44px; background: var(--surface); border: 1px solid var(--line); border-radius: 7px; font-size: 12px; padding: 9px 16px; transition: color .2s, border-color .2s, background .2s, transform .2s; }
-.filter-list button.selected { background: var(--accent); color: white; border-color: var(--accent); }
-.filter-list button:active { transform: scale(.97); }
-.filter-list button:not(.selected):hover { background: var(--accent-soft); border-color: #b9cef1; color: var(--accent); }
-.filter-status { color: var(--muted); font-size: 11px; margin: 18px 0 26px; }
-@media (max-width: 1000px) { .catalog-intro { gap: 24px; padding: 26px; }.catalog-counts { gap: 20px; } }
-@media (max-width: 760px) { .catalog-intro { flex-direction: column; align-items: start; margin-bottom: 42px; padding: 24px; }.catalog-intro-copy { gap: 14px; }.catalog-counts { gap: 40px; padding-left: 56px; }.product-catalog { padding-bottom: 48px; } }
+.catalog-intro h2 { font-size: 21px; margin-bottom: 12px; }
+.catalog-intro p { color: var(--muted); font-size: 14px; line-height: 1.8; }
+.catalog-counts { display: flex; gap: 32px; flex-shrink: 0; }
+.catalog-counts dt { color: var(--muted); font-size: 12px; }
+.catalog-counts dd { color: var(--ink); font-size: 36px; font-weight: 600; line-height: 1.5; }
+.catalog-counts small { font-size: 12px; font-weight: 400; color: var(--muted); display: block; }
+.product-catalog { padding-bottom: 96px; }
+.catalog-heading { margin-bottom: 32px; }
+.filter-list { display: flex; gap: 10px; flex-wrap: wrap; }
+.filter-list button { min-height: 44px; background: var(--canvas); color: var(--muted); border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: 14px; padding: 10px 18px; transition: color .2s, border-color .2s, background .2s; }
+.filter-list button.selected { background: var(--accent); color: var(--canvas); border-color: var(--accent); }
+.filter-list button:not(.selected):hover { border-color: var(--accent); color: var(--accent); }
+.filter-status { font-size: 13px; color: var(--muted); margin-block: 24px 28px; }
+#existing-tools { scroll-margin-top: 96px; }
+@media (max-width: 1040px) { .catalog-intro { gap: 32px; padding: 32px; }.catalog-counts { gap: 24px; } }
+@media (max-width: 760px) {
+  .catalog-intro { flex-direction: column; align-items: start; gap: 28px; padding: 28px; margin-bottom: 48px; }
+  .catalog-intro-copy { gap: 16px; }
+  .catalog-intro h2 { font-size: 20px; }
+  .catalog-counts { width: 100%; padding-top: 24px; border-top: 1px solid var(--line); gap: 48px; }
+  .catalog-counts dd { font-size: 32px; }
+  .product-catalog { padding-bottom: 64px; }
+  .filter-list { gap: 8px; }
+  .filter-list button { font-size: 13px; padding-inline: 16px; }
+}
 </style>

@@ -1,0 +1,25 @@
+[Unit]
+Description=Mono Studio order API and website
+After=network.target
+
+[Service]
+Type=simple
+User=mono-studio
+Group=mono-studio
+WorkingDirectory=/opt/mono-studio/current
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/mono-studio/payment.env
+# 以目标机实际 Node 路径为准；宝塔的 Node 路径可能不在 /usr/bin。
+ExecStart=/usr/bin/node /opt/mono-studio/current/server/index.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/mono-studio
+
+[Install]
+WantedBy=multi-user.target

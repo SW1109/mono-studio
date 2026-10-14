@@ -2,8 +2,8 @@
 const definitions = [
   {
     slug: "business-website", name: "企业官网与内容管理", category: "网站与内容", icon: "web", accent: "blue", featured: true,
-    headline: "让品牌展示与内容更新，都有自己的阵地。",
-    summary: "面向企业与服务品牌的响应式官网，结合内容后台、产品展示与咨询入口，让网站不仅能展示，也方便持续维护。",
+    headline: "企业网站与内容管理",
+    summary: "响应式企业官网，包含品牌介绍、产品展示、咨询入口与内容管理后台，支持日常内容更新与维护。",
     description: "适合正在建立品牌网站，或希望替换难以维护的旧站点的企业。先梳理访客需要了解的信息，再组织页面、内容与咨询路径，避免网站上线后每改一段文字都要找开发。",
     audience: "中小企业、专业服务机构、制造与贸易企业、个人品牌",
     platforms: ["电脑与手机网页", "内容管理后台"],
@@ -33,8 +33,8 @@ const definitions = [
   },
   {
     slug: "customer-crm", name: "客户与销售管理系统", category: "业务管理", icon: "users", accent: "violet", featured: true,
-    headline: "从一条线索，到一段有记录的客户关系。",
-    summary: "围绕线索、客户、跟进与商机建立轻量 CRM，把散落在表格和聊天记录里的销售资料整理成可协作的业务流程。",
+    headline: "客户关系与销售过程管理",
+    summary: "围绕线索、客户、跟进记录与商机建立轻量 CRM，集中管理销售资料与协作流程。",
     description: "当客户资料由多人维护、跟进主要靠聊天和记忆时，容易出现重复联系、交接遗漏与状态不清。系统可以先覆盖客户档案与跟进，再按需要扩展销售阶段、合同与回款记录。",
     audience: "销售团队、咨询服务机构、渠道业务、项目型服务企业",
     platforms: ["网页管理后台", "移动端适配"],
@@ -64,8 +64,8 @@ const definitions = [
   },
   {
     slug: "inventory-management", name: "进销存与订单管理系统", category: "业务管理", icon: "package", accent: "green", featured: false,
-    headline: "让采购、库存与订单，对得上同一套数据。",
-    summary: "面向商品与物料流转的轻量管理系统，串联采购入库、销售出库、库存盘点和订单记录，减少多份表格反复核对。",
+    headline: "采购、库存与订单协同管理",
+    summary: "面向商品及物料流转，管理采购入库、销售出库、库存盘点与订单记录，统一业务数据口径。",
     description: "适合业务已经形成固定采购和出入库流程，但还没有合适系统的团队。先明确商品、仓库与单据规则，再建立库存变化记录，让每次调整都有来源和可核对的凭据。",
     audience: "商贸企业、小型仓储、连锁门店、耗材与物料管理团队",
     platforms: ["网页管理后台", "移动端盘点页面"],
@@ -95,8 +95,8 @@ const definitions = [
   },
   {
     slug: "booking-miniapp", name: "预约与服务小程序", category: "小程序与交易", icon: "calendar", accent: "blue", featured: true,
-    headline: "把咨询、预约与到店服务，连接起来。",
-    summary: "面向门店和服务机构的预约工具，结合服务项目、可约时段、预约确认与核销管理，让用户和工作人员都清楚下一步。",
+    headline: "服务预约与门店业务管理",
+    summary: "面向门店与服务机构，管理服务项目、可约时段、预约确认和核销流程。",
     description: "当预约靠私聊登记，时段冲突、临时取消与到店确认容易占用大量时间。可围绕实际服务流程开发用户端和管理端，从服务选择到完成核销形成清晰闭环。",
     audience: "生活服务门店、咨询机构、场馆、维修与到店服务团队",
     platforms: ["微信小程序或 H5", "预约管理后台"],
@@ -126,8 +126,8 @@ const definitions = [
   },
   {
     slug: "member-commerce", name: "会员商城与订单系统", category: "小程序与交易", icon: "shopping", accent: "orange", featured: false,
-    headline: "把商品、订单与会员运营，放在同一条流程里。",
-    summary: "围绕商品展示、下单支付、订单履约与会员权益设计独立商城，适合业务边界明确的品牌零售与门店线上经营。",
+    headline: "商品、订单与会员运营管理",
+    summary: "为品牌零售与门店经营设计独立商城，组织商品展示、下单支付、订单履约及会员权益等业务。",
     description: "相比一开始搭建复杂的平台型电商，更适合先做清楚商品、库存、履约与售后规则。用户端和运营后台共用一致的数据与状态，让订单不止于一个支付成功页面。",
     audience: "品牌零售、门店经营、内容周边销售、明确商品业务的中小团队",
     platforms: ["小程序或手机网页", "运营管理后台"],
@@ -157,8 +157,8 @@ const definitions = [
   },
   {
     slug: "office-workflow", name: "办公审批与协作平台", category: "办公协同", icon: "workflow", accent: "violet", featured: false,
-    headline: "让申请、任务与交接，不再散落在聊天里。",
-    summary: "面向内部协作的轻量办公平台，将常用申请、审批、任务和通知集中管理，让处理人、进度和记录都更清楚。",
+    headline: "内部审批与任务协作管理",
+    summary: "面向内部办公，将申请、审批、任务与通知集中管理，明确处理角色、流程状态及业务记录。",
     description: "适合已经有明确内部制度，希望把高频流程从聊天和纸面转为线上处理的团队。先选取最需要的两三类流程，明确角色和流转规则，再逐步扩展到更多协作场景。",
     audience: "中小企业、项目团队、行政与内部服务部门",
     platforms: ["网页工作台", "移动端适配"],
@@ -188,8 +188,8 @@ const definitions = [
   },
   {
     slug: "data-dashboard", name: "经营数据看板与可视化", category: "数据与智能", icon: "chart", accent: "green", featured: false,
-    headline: "把分散的数据，变成能读懂的业务视图。",
-    summary: "围绕经营、订单、服务或设备数据搭建网页看板与展示大屏，统一指标口径，让趋势、异常和关键事项更容易被发现。",
+    headline: "业务数据分析与可视化展示",
+    summary: "根据经营、订单、服务或设备数据设计网页看板与展示大屏，统一指标口径，支持趋势与异常信息展示。",
     description: "看板的价值不在图表数量，而在数据来源可靠、口径一致、更新时间明确。可以从现有表格和接口开始，整理指标与权限，再选择适合管理人员或展示场景的呈现方式。",
     audience: "经营管理、运营团队、门店与项目负责人、展示中心",
     platforms: ["网页数据看板", "展示大屏适配"],
@@ -219,8 +219,8 @@ const definitions = [
   },
   {
     slug: "knowledge-assistant", name: "知识库与 AI 问答助手", category: "数据与智能", icon: "sparkles", accent: "blue", featured: false,
-    headline: "让已有资料，成为查得到、用得上的知识。",
-    summary: "将制度、产品说明和业务文档整理成可检索知识库，按需加入带来源引用的 AI 问答，辅助资料查询与内部支持。",
+    headline: "企业知识库与辅助问答",
+    summary: "整合制度、产品说明与业务文档，建设可检索知识库；按需配置带来源引用的 AI 问答，辅助内部资料查询。",
     description: "适合资料数量增加、重复问题较多，但知识仍分散在文档和聊天中的团队。先把资料整理和访问权限做好，再评估智能问答是否适合具体场景，而不是把所有问题都交给模型自动回答。",
     audience: "内部支持、产品与售后团队、资料密集的中小企业",
     platforms: ["网页知识门户", "问答与管理后台"],
@@ -250,8 +250,8 @@ const definitions = [
   },
   {
     slug: "automation-workbench", name: "桌面工具与流程自动化", category: "工具与自动化", icon: "desktop", accent: "orange", featured: false,
-    headline: "把重复的步骤，整理成可执行、可检查的任务。",
-    summary: "围绕文件整理、表格处理、系统间数据同步和重复办公操作开发专用工具，让自动化流程有输入、有记录，也有异常处理。",
+    headline: "办公自动化与业务流程编排",
+    summary: "面向文件整理、表格处理、数据同步与重复办公操作，设计自动化工具，明确任务输入、运行记录及异常处理。",
     description: "适合已有稳定操作步骤，却需要反复手动执行的业务。优先评估官方接口与结构化数据；只能通过界面操作的部分再考虑桌面自动化，并把人工确认、失败重试和结果核对纳入流程。",
     audience: "运营与行政、资料处理团队、小型业务系统集成场景",
     platforms: ["指定桌面系统", "脚本或网页任务台"],

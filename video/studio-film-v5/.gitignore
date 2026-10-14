@@ -1,0 +1,4 @@
+# 派生音轨和临时封装可重建；保留授权来源与原曲。
+assets/mix.wav
+qa/*.pending.mp4
+qa/decoded-*.wav

@@ -1,0 +1,41 @@
+{
+  "version": 5,
+  "date": "2026-10-14",
+  "duration": 64,
+  "sampleRate": 48000,
+  "visualSource": "../../src/assets/media/studio-film-v4.mp4",
+  "posterSource": "../../src/assets/media/studio-film-v4-poster.webp",
+  "music": {
+    "file": "assets/almost-new-kevin-macleod.mp3",
+    "title": "Almost New",
+    "artist": "Kevin MacLeod",
+    "sourceUrl": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1800008",
+    "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Almost%20New.mp3",
+    "catalogueUrl": "https://incompetech.com/music/royalty-free/pieces.json",
+    "isrc": "USUAN1800008",
+    "instruments": "Piano, Basses",
+    "bpm": 80,
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sha256": "3cb29102881aa9cb56292753dfa6c92004eddf4e0ad367e979c7292b0e1ac1a0",
+    "attribution": "Almost New by Kevin MacLeod (incompetech.com) — CC BY 4.0. Edited for length, EQ, loudness and fades.",
+    "bytes": 6483966,
+    "downloadVerified": "2026-10-14; original MP3 title and artist match the official catalogue"
+  },
+  "mix": {
+    "sourceStartSeconds": 0,
+    "fadeInSeconds": 2.5,
+    "fadeOutSeconds": 4,
+    "highpassHz": 45,
+    "lowpassHz": 6500,
+    "presenceEqHz": 3000,
+    "presenceEqDb": -2,
+    "integratedLUFS": -24,
+    "truePeakDBTP": -6,
+    "loudnessRangeLU": 7,
+    "websiteVolume": 0.35,
+    "sfx": false
+  },
+  "intent": "移除原合成持续长音与全部转场音；使用轻柔钢琴配乐，保留 V4 所有画面与时间线。",
+  "reviewBoundary": "音频响度、峰值、编码和页面音量可自动核验；人工听感与真实扬声器需用户试听确认。"
+}

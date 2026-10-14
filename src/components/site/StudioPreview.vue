@@ -1,112 +1,195 @@
 <script setup>
-import { ref } from "vue";
+import { computed, shallowRef } from "vue";
 import SiteIcon from "./SiteIcon.vue";
 
-const paused = ref(false);
+const selected = shallowRef("workspace");
+const previews = [
+  { id: "workspace", label: "业务工作台", icon: "web", title: "业务管理与项目协作", subtitle: "按功能模块组织需求、设计与开发信息。", modules: ["需求与范围", "界面与交互", "开发与验证"] },
+  { id: "mobile", label: "移动端服务", icon: "mobile", title: "移动端服务与预约管理", subtitle: "服务项目展示、预约确认与进度查询。", modules: ["服务展示", "预约流程", "进度查询"] },
+  { id: "automation", label: "自动化流程", icon: "workflow", title: "自动化任务与流程编排", subtitle: "按任务规则组织输入、处理与结果输出。", modules: ["准备输入", "处理任务", "整理结果"] },
+];
+const active = computed(() => previews.find(item => item.id === selected.value));
 </script>
 
 <template>
-  <figure class="studio-preview" data-reveal data-reveal-delay="240" data-motion-scene :data-scene-paused="paused" aria-label="软件工作台设计示意，并非产品截图">
-    <div class="preview-orbit orbit-one motion-loop" aria-hidden="true"><span></span></div>
-    <div class="preview-orbit orbit-two motion-loop" aria-hidden="true"><span></span></div>
-    <div class="preview-blueprint" aria-hidden="true"><span>GN / WORKSPACE</span><span>IDEA → DESIGN → BUILD</span></div>
-    <div class="preview-window motion-loop">
-      <div class="preview-titlebar">
-        <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>guangnian / workspace</span><SiteIcon name="layers" />
+  <figure class="studio-preview" data-reveal aria-label="可切换的软件界面设计示意">
+    <div class="preview-topline">
+      <span class="preview-signature">GUANGNIAN / SOFTWARE ENGINEERING</span>
+      <div class="preview-switcher" role="group" aria-label="切换界面示意">
+        <button v-for="item in previews" :key="item.id" type="button" :aria-pressed="selected === item.id" @click="selected = item.id">{{ item.label }}</button>
       </div>
-      <div class="preview-workspace">
-        <aside aria-hidden="true"><span class="preview-monogram">G.</span><SiteIcon name="web" /><SiteIcon name="workflow" /><SiteIcon name="files" /></aside>
-        <div class="preview-content">
-          <div class="preview-section-label">IDEA → SOFTWARE</div>
-          <h2>构建你的下一步<span class="preview-dot motion-loop" aria-hidden="true"></span></h2>
-          <p>从需求出发，为真实场景创造价值。</p>
-          <div class="preview-modules">
-            <div><SiteIcon name="web" /><strong>用户体验</strong><span>清晰 · 易用</span><i class="module-light motion-loop" aria-hidden="true"></i></div>
-            <div><SiteIcon name="workflow" /><strong>业务流程</strong><span>连接 · 高效</span><i class="module-light motion-loop" aria-hidden="true"></i></div>
+    </div>
+    <div class="preview-stage">
+      <div class="preview-window">
+        <div class="preview-titlebar" aria-hidden="true">
+          <span class="window-dots"><i></i><i></i><i></i></span><span>guangnian.studio / {{ selected }}</span><SiteIcon name="layers" />
+        </div>
+        <div class="preview-workspace" aria-hidden="true">
+          <aside class="preview-sidebar">
+            <span class="preview-monogram">G.</span>
+            <span v-for="item in previews" :key="item.id" class="preview-sidebar-item" :class="{ 'is-selected': selected === item.id }"><SiteIcon :name="item.icon" />{{ item.label }}</span>
+            <span class="preview-sidebar-footer">DESIGN / ENGINEERING</span>
+          </aside>
+          <div class="preview-content">
+            <p class="preview-kicker">APPLICATION INTERFACE</p>
+            <h2>{{ active.title }}</h2>
+            <p class="preview-subtitle">{{ active.subtitle }}</p>
+            <template v-if="selected === 'workspace'">
+              <div class="preview-modules">
+                <div v-for="(label, index) in active.modules" :key="label"><span>0{{ index + 1 }}</span><SiteIcon :name="previews[index].icon" /><strong>{{ label }}</strong><small>{{ ['需求分析', '产品设计', '功能开发'][index] }}</small></div>
+              </div>
+              <div class="preview-list">
+                <div class="preview-list-heading"><strong>项目阶段与任务</strong><span>协作流程示意</span></div>
+                <div v-for="(label, index) in active.modules" :key="label" class="preview-list-row"><span class="preview-row-icon"><SiteIcon name="check" /></span><span>{{ label }}</span><span class="preview-progress"><i :style="{ width: `${92 - index * 22}%` }"></i></span><small>{{ ['规划', '设计', '开发'][index] }}</small></div>
+              </div>
+            </template>
+            <div v-else-if="selected === 'mobile'" class="preview-mobile-flow">
+              <div class="preview-service-tile"><SiteIcon name="mobile" /><strong>移动端服务入口</strong><span>小程序 / H5</span></div>
+              <ol><li v-for="(label, index) in active.modules" :key="label"><span>0{{ index + 1 }}</span><strong>{{ label }}</strong><SiteIcon name="arrow" /></li></ol>
+            </div>
+            <div v-else class="preview-automation">
+              <p><span class="preview-code-label">WORKFLOW</span><span>任务输入、执行与输出</span></p>
+              <div v-for="(label, index) in active.modules" :key="label"><span>0{{ index + 1 }}</span><SiteIcon :name="['files', 'workflow', 'check'][index]" /><strong>{{ label }}</strong><small>{{ ['Input', 'Process', 'Output'][index] }}</small></div>
+              <code><span>await</span> workflow.run();</code>
+            </div>
           </div>
-          <div class="preview-code">
-            <div><span class="code-line-number">01</span><code><span>const</span> idea = <em>"有用的想法"</em>;</code></div>
-            <div><span class="code-line-number">02</span><code><span>await</span> build(idea);<i class="code-cursor motion-loop" aria-hidden="true"></i></code></div>
-            <div><span class="code-line-number">03</span><code class="code-comment">// 为日常，构建更好的工具。</code></div>
-          </div>
-          <div class="preview-flow" aria-label="示意流程：想法、设计、实现">
-            <span><i class="flow-light motion-loop" aria-hidden="true"></i>想法</span><b aria-hidden="true">→</b>
-            <span><i class="flow-light motion-loop" aria-hidden="true"></i>设计</span><b aria-hidden="true">→</b>
-            <span><i class="flow-light motion-loop" aria-hidden="true"></i>实现</span>
-          </div>
-          <div class="preview-status"><span><SiteIcon name="check" />以交付为目标</span><span>从想法到实现 ↗</span></div>
         </div>
       </div>
+      <div class="preview-companion" aria-hidden="true">
+        <div class="preview-phone">
+          <div class="preview-phone-camera"></div>
+          <div class="preview-phone-body">
+            <div class="preview-phone-top"><span>光年服务</span><SiteIcon name="layers" /></div>
+            <p class="preview-phone-kicker">MOBILE SERVICE</p>
+            <strong class="preview-phone-title">移动服务<br />与业务管理</strong>
+            <div class="preview-phone-feature"><SiteIcon :name="active.icon" /><span>{{ active.label }}</span></div>
+            <div class="preview-phone-list"><span v-for="label in active.modules" :key="label">{{ label }}<SiteIcon name="arrow" /></span></div>
+            <span class="preview-phone-action">了解服务 →</span>
+            <div class="preview-phone-navigation"><SiteIcon name="web" /><SiteIcon name="layers" /><SiteIcon name="mobile" /></div>
+          </div>
+          <div class="preview-phone-indicator"></div>
+        </div>
+        <span class="preview-companion-label">同一个想法，多端的体验。</span>
+      </div>
     </div>
-    <div class="preview-floating motion-loop">
-      <div class="floating-icon"><SiteIcon name="check" /></div>
-      <div><strong>让技术，落地成价值</strong><span>Software that makes sense.</span></div>
-    </div>
-    <figcaption>
-      <span>工作台视觉示意 · 非产品截图</span>
-      <button class="preview-motion-toggle" type="button" :aria-pressed="paused" @click="paused = !paused"><span aria-hidden="true">{{ paused ? '▷' : 'Ⅱ' }}</span>{{ paused ? '播放动效' : '暂停动效' }}</button>
-      <span class="reduced-motion-note">已减少动态效果</span>
-    </figcaption>
+    <figcaption><span role="status" aria-live="polite">{{ active.label }} · 界面设计示意，非已上线产品截图</span><span class="preview-caption-note">SOFTWARE INTERFACE CONCEPT.</span></figcaption>
   </figure>
 </template>
 
 <style scoped>
-.studio-preview { position: relative; isolation: isolate; margin: 0; padding: 54px 0 50px 20px; }
-.preview-orbit { position: absolute; border: 1px solid #d5e0f0; border-radius: 50%; pointer-events: none; z-index: -1; }
-.preview-orbit span { position: absolute; left: 50%; top: -4px; width: 8px; height: 8px; background: #8fb3f1; border: 2px solid #f4f8ff; border-radius: 50%; box-shadow: 0 0 0 5px #2563eb0a; }
-.orbit-one { width: 104%; aspect-ratio: 1; top: 0; left: 2%; animation: orbit-turn 28s linear infinite; }
-.orbit-two { width: 85%; aspect-ratio: 1; top: 8%; left: 12%; border-style: dashed; animation: orbit-turn 38s linear infinite reverse; }
-.orbit-two span { background: #8ccdbf; left: 25%; top: 6%; }
-.preview-blueprint { position: absolute; inset: 8px 0 auto 24px; display: flex; justify-content: space-between; color: #7f98bb; font: 8px/1.5 ui-monospace, monospace; letter-spacing: .1em; }
-.preview-window { position: relative; background: white; border: 1px solid #dbe5f2; border-radius: 16px; overflow: hidden; box-shadow: 0 28px 64px -24px #263b683b; transform: rotate(-2deg); animation: workspace-float 8s ease-in-out infinite; }
-.preview-titlebar { height: 44px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: #fbfcfe; border-bottom: 1px solid #edf0f5; color: #798498; font: 10px/1.5 ui-monospace, monospace; }
-.preview-titlebar > svg { width: 16px; height: 16px; }
+.studio-preview { margin: 0; background: var(--surface); border-radius: var(--radius-card); padding: 28px 40px 24px; }
+.preview-topline { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.preview-signature { font: 10px/1.6 var(--font-mono); letter-spacing: .08em; color: var(--muted); }
+.preview-switcher { display: flex; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--surface-inset); }
+.preview-switcher button { min-height: 44px; padding: 8px 18px; border: 0; border-radius: var(--radius-pill); background: transparent; font-size: 13px; color: var(--muted); transition: color .2s, background .2s; }
+.preview-switcher button[aria-pressed="true"] { background: var(--canvas); color: var(--ink); }
+.preview-stage { display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 48px; align-items: center; padding-block: 36px; max-width: 1080px; margin-inline: auto; }
+.preview-window { background: var(--canvas); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 3px 5px 30px rgba(0, 0, 0, .12); }
+.preview-titlebar { height: 38px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--pearl); border-bottom: 1px solid var(--line); color: var(--muted); font: 10px/1.5 var(--font-mono); }
+.preview-titlebar > svg { width: 14px; height: 14px; }
 .window-dots { display: flex; gap: 5px; }
-.window-dots i { width: 6px; height: 6px; border-radius: 50%; background: #ccd5e0; }
-.window-dots i:first-child { background: #e6b3af; }.window-dots i:nth-child(2) { background: #e8d2a3; }.window-dots i:last-child { background: #a9d3c2; }
-.preview-workspace { display: flex; min-height: 355px; }
-.preview-workspace aside { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 22px 13px; background: #fafbfe; border-right: 1px solid #edf0f5; color: #9ba8bc; }
-.preview-workspace aside svg { width: 18px; height: 18px; }
-.preview-monogram { width: 26px; height: 26px; border-radius: 7px; background: #2463eb; color: white; text-align: center; font: 700 17px/26px system-ui; }
-.preview-content { padding: 28px 24px 16px; flex: 1; min-width: 0; }
-.preview-section-label { color: #5b7fa8; font: 9px/1.5 ui-monospace, monospace; letter-spacing: .16em; }
-.preview-content h2 { font-size: 22px; letter-spacing: -.04em; margin: 8px 0; }
-.preview-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2463eb; margin-left: 6px; animation: status-pulse 3s ease-in-out infinite; }
-.preview-content > p { color: #8490a4; font-size: 10px; }
-.preview-modules { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 18px; }
-.preview-modules > div { position: relative; overflow: hidden; display: grid; grid-template-columns: 24px 1fr; gap: 4px 9px; background: #f7f9fe; border: 1px solid #e8eef8; border-radius: 8px; padding: 13px; }
-.preview-modules svg { width: 20px; height: 20px; grid-row: span 2; color: #4b7ccc; }
-.preview-modules strong { font-size: 10px; }.preview-modules span { font-size: 9px; color: #8592a8; }
-.module-light { position: absolute; inset: auto 12px 0; height: 2px; background: #82aaff; transform-origin: left; animation: module-build 6s ease-in-out infinite; }
-.preview-modules > div:nth-child(2) .module-light { animation-delay: -3s; }
-.preview-code { background: #172235; border-radius: 9px; padding: 14px 12px; font: 10px/2.2 ui-monospace, monospace; color: #d5e0f1; white-space: nowrap; }
-.code-line-number { color: #66778d; margin-right: 15px; }.preview-code code span { color: #91b4ff; }.preview-code em { color: #94dbc3; font-style: normal; }.code-comment { color: #8392a6; }
-.code-cursor { display: inline-block; width: 5px; height: 12px; vertical-align: -2px; margin-left: 5px; background: #91b4ff; animation: cursor-blink 1.4s steps(2, jump-none) infinite; }
-.preview-flow { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; gap: 8px; font-size: 9px; color: #6d81a0; }
-.preview-flow > span { display: flex; align-items: center; gap: 6px; }.preview-flow b { font-weight: 400; color: #b9c9df; }
-.flow-light { width: 5px; height: 5px; border-radius: 50%; background: #3c79ec; animation: flow-step 6s ease-in-out infinite; }
-.preview-flow > span:nth-of-type(2) .flow-light { animation-delay: -4s; }.preview-flow > span:nth-of-type(3) .flow-light { animation-delay: -2s; }
-.preview-status { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 9px; color: #8592a5; margin-top: 17px; }
-.preview-status span:first-child { display: flex; align-items: center; gap: 5px; color: #488975; }.preview-status svg { width: 11px; height: 11px; }
-.preview-floating { position: absolute; right: -12px; bottom: 112px; display: flex; align-items: center; gap: 12px; background: white; padding: 15px 20px; border: 1px solid #dce7f6; border-radius: 12px; box-shadow: 0 14px 28px -14px #26497840; animation: badge-float 6s ease-in-out infinite; }
-.floating-icon { width: 34px; height: 34px; padding: 9px; color: #2463eb; background: #eff5ff; border-radius: 50%; }.floating-icon svg { width: 100%; height: 100%; }
-.preview-floating strong { display: block; font-size: 12px; }.preview-floating span { color: #94a0b3; font: 9px/1.8 ui-monospace, monospace; }
-.studio-preview figcaption { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 9px; color: #7c879a; margin: 35px 0 0 10px; }
-.preview-motion-toggle { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #dfe7f3; background: #ffffffad; border-radius: 20px; padding: 5px 10px; font-size: 9px; color: #62789a; min-height: 30px; }
-.preview-motion-toggle:hover { color: var(--accent); border-color: #adc6ef; }.preview-motion-toggle > span { font-size: 12px; }
-.reduced-motion-note { display: none; }
-@keyframes workspace-float { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(-1deg); } }
-@keyframes badge-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
-@keyframes orbit-turn { to { transform: rotate(360deg); } }
-@keyframes status-pulse { 0%, 100% { opacity: .5; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.2); } }
-@keyframes module-build { 0%, 100% { transform: scaleX(.15); opacity: .3; } 50% { transform: scaleX(1); opacity: 1; } }
-@keyframes cursor-blink { 0% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes flow-step { 0%, 36%, 100% { opacity: .3; transform: scale(1); } 16% { opacity: 1; transform: scale(1.4); } }
-@media (max-width: 600px) {
-  .studio-preview { padding: 36px 0 30px; }.preview-content { padding: 22px 16px 16px; }.preview-content h2 { font-size: 19px; }
-  .preview-modules > div { padding: 10px 8px; grid-template-columns: 18px 1fr; }.preview-floating { right: 0; bottom: 88px; padding: 12px 16px; }
-  .preview-window { transform: none; animation-name: badge-float; }.preview-status span:last-child { display: none; }.preview-blueprint { left: 4px; }
-  .studio-preview figcaption { margin-left: 0; }.preview-orbit { max-width: 100%; }
+.window-dots i { width: 6px; height: 6px; background: var(--line); border-radius: 50%; }
+.preview-workspace { display: flex; min-height: 350px; }
+.preview-sidebar { width: 132px; padding: 24px 14px; flex-shrink: 0; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.preview-monogram { font-size: 24px; font-weight: 600; letter-spacing: -.08em; margin-bottom: 20px; color: var(--accent); }
+.preview-sidebar-item { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--muted); padding: 10px 6px; border-radius: 5px; }
+.preview-sidebar-item.is-selected { background: var(--accent-soft); color: var(--accent); }
+.preview-sidebar-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+.preview-sidebar-footer { margin-top: auto; font: 7px/1.8 var(--font-mono); letter-spacing: .04em; color: var(--muted); }
+.preview-content { padding: 30px; flex: 1; min-width: 0; }
+.preview-kicker { font: 8px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--muted); }
+.preview-content h2 { font-size: 22px; margin-top: 8px; letter-spacing: -.04em; }
+.preview-subtitle { color: var(--muted); font-size: 10px; margin-top: 8px; }
+.preview-modules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.preview-modules > div { position: relative; background: var(--surface); border-radius: var(--radius-sm); padding: 14px; }
+.preview-modules > div > span { position: absolute; right: 12px; top: 12px; font: 8px/1 var(--font-mono); color: var(--muted); }
+.preview-modules svg { width: 20px; height: 20px; color: var(--accent); margin-bottom: 12px; }
+.preview-modules strong { display: block; font-size: 11px; font-weight: 600; }
+.preview-modules small { display: block; font-size: 9px; color: var(--muted); margin-top: 4px; }
+.preview-list { margin-top: 24px; }
+.preview-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; font-size: 11px; }
+.preview-list-heading > span { font-size: 8px; color: var(--muted); }
+.preview-list-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 10px; }
+.preview-row-icon svg { width: 12px; height: 12px; color: var(--accent); }
+.preview-progress { margin-left: auto; width: 72px; height: 4px; background: var(--surface); border-radius: 2px; }
+.preview-progress i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.preview-list-row small { width: 32px; font-size: 8px; color: var(--muted); text-align: right; }
+.preview-companion { display: grid; justify-items: center; gap: 16px; }
+/* 手机机身始终等比；只缩放宽度，不单独改变高度或拉伸屏幕。 */
+.preview-phone { width: 164px; aspect-ratio: 9 / 19.5; border: 6px solid var(--dark); border-radius: 26px; padding: 20px 8px 16px; position: relative; background: var(--canvas); box-shadow: 3px 5px 30px rgba(0, 0, 0, .12); }
+.preview-phone-camera { width: 40px; height: 9px; position: absolute; top: 6px; left: calc(50% - 20px); background: var(--dark); border-radius: var(--radius-pill); }
+.preview-phone-body { height: 100%; display: flex; flex-direction: column; }
+.preview-phone-top { display: flex; align-items: center; justify-content: space-between; font-size: 9px; font-weight: 600; }
+.preview-phone-top svg { width: 12px; height: 12px; }
+.preview-phone-kicker { font: 6px/1.5 var(--font-mono); color: var(--muted); margin-top: 16px; }
+.preview-phone-title { font-size: 18px; line-height: 1.4; letter-spacing: -.04em; margin-top: 8px; }
+.preview-phone-feature { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); padding: 10px; border-radius: var(--radius-sm); margin-top: 12px; font-size: 9px; color: var(--accent); }
+.preview-phone-feature svg { width: 16px; height: 16px; }
+.preview-phone-list { display: grid; gap: 8px; margin-block: 12px; }
+.preview-phone-list > span { display: flex; align-items: center; justify-content: space-between; font-size: 8px; color: var(--muted); }
+.preview-phone-list svg { width: 11px; height: 11px; }
+.preview-phone-action { border-radius: var(--radius-pill); background: var(--accent); color: var(--canvas); font-size: 8px; padding: 8px; text-align: center; }
+.preview-phone-navigation { display: flex; justify-content: space-around; border-top: 1px solid var(--line); padding-top: 10px; margin-top: auto; color: var(--muted); }
+.preview-phone-navigation svg { width: 13px; height: 13px; }
+.preview-phone-indicator { position: absolute; width: 48px; height: 3px; bottom: 5px; left: calc(50% - 24px); background: var(--dark); border-radius: var(--radius-pill); }
+.preview-companion-label { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.studio-preview figcaption { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+.preview-caption-note { font: 9px/1.8 var(--font-mono); letter-spacing: .08em; }
+.preview-mobile-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+.preview-service-tile { border-radius: var(--radius-sm); padding: 24px 18px; background: var(--accent-soft); color: var(--accent); display: flex; flex-direction: column; }
+.preview-service-tile svg { width: 32px; height: 32px; margin-bottom: 20px; }
+.preview-service-tile strong { font-size: 15px; }
+.preview-service-tile > span { font-size: 10px; margin-top: 10px; }
+.preview-mobile-flow li { display: flex; align-items: center; gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 11px; }
+.preview-mobile-flow li > span { font: 9px/1.5 var(--font-mono); color: var(--muted); }
+.preview-mobile-flow li > svg { width: 12px; height: 12px; margin-left: auto; color: var(--accent); }
+.preview-automation { background: var(--dark); color: var(--on-dark); border-radius: var(--radius-sm); padding: 18px; margin-top: 24px; }
+.preview-automation > p { display: flex; justify-content: space-between; gap: 12px; font-size: 9px; color: var(--muted-on-dark); margin-bottom: 14px; }
+.preview-code-label { font: 8px/1.8 var(--font-mono); color: var(--accent-on-dark); }
+.preview-automation > div { display: flex; align-items: center; gap: 12px; font-size: 10px; padding: 10px 0; }
+.preview-automation > div > span { color: var(--muted-on-dark); font: 8px/1.5 var(--font-mono); }
+.preview-automation svg { width: 14px; height: 14px; color: var(--accent-on-dark); }
+.preview-automation small { margin-left: auto; color: var(--muted-on-dark); font: 8px/1.5 var(--font-mono); }
+.preview-automation code { display: block; border-top: 1px solid rgba(255, 255, 255, .15); margin-top: 14px; padding-top: 14px; font: 11px/1.5 var(--font-mono); }
+.preview-automation code > span { color: var(--accent-on-dark); }
+@media (max-width: 1120px) {
+  .preview-stage { gap: 28px; grid-template-columns: minmax(0, 1fr) 164px; }
+  .preview-sidebar { width: 112px; padding-inline: 10px; }
+  .preview-content { padding: 24px; }
+  .preview-content h2 { font-size: 20px; }
+}
+@media (max-width: 900px) {
+  .preview-signature { display: none; }
+  .preview-topline { justify-content: center; }
+  .preview-sidebar { width: 60px; align-items: center; }
+  .preview-sidebar-item { font-size: 0; padding: 12px; }
+  .preview-sidebar-footer { display: none; }
+  .preview-content { padding: 24px 18px; }
+  .preview-companion-label { font-size: 9px; }
+  .preview-modules { gap: 8px; }
+  .preview-modules > div { padding: 12px 10px; }
+}
+@media (max-width: 760px) {
+  .studio-preview { padding: 20px 20px 16px; }
+  .preview-stage { grid-template-columns: minmax(0, 1fr); padding-block: 24px; }
+  .preview-companion { display: none; }
+  .preview-caption-note { display: none; }
+  .preview-workspace { min-height: 324px; }
+  .preview-content h2 { font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .studio-preview { padding: 16px 12px; }
+  .preview-switcher button { padding: 8px 12px; font-size: 12px; }
+  .preview-sidebar { display: none; }
+  .preview-content { padding: 22px 16px; }
+  .preview-titlebar { padding-inline: 12px; font-size: 8px; }
+  .preview-subtitle { font-size: 10px; }
+  .preview-content h2 { font-size: 19px; }
+  .preview-modules { gap: 6px; }
+  .preview-modules strong { font-size: 10px; }
+  .studio-preview figcaption { font-size: 10px; }
+  .preview-mobile-flow { gap: 12px; }
+  .preview-service-tile { padding-inline: 14px; }
+  .preview-service-tile strong { font-size: 13px; }
 }
 </style>

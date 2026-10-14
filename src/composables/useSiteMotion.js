@@ -24,11 +24,11 @@ export function useSiteMotion(root) {
       revealObserver?.unobserve(element);
       if (preference.matches || !element.animate) return;
 
-      const delay = Math.min(400, Math.max(0, Number(element.dataset.revealDelay) || 0));
+      const delay = Math.min(180, Math.max(0, Number(element.dataset.revealDelay) || 0));
       const animation = element.animate([
-        { opacity: 0, transform: "translate3d(0, 28px, 0)" },
+        { opacity: 0, transform: "translate3d(0, 16px, 0)" },
         { opacity: 1, transform: "translate3d(0, 0, 0)" },
-      ], { duration: 760, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" });
+      ], { duration: 520, delay, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" });
       animations.set(animation, element);
       if (document.hidden) animation.pause();
       animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));

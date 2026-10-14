@@ -5,3 +5,10 @@ dist/
 .env
 .env.*.local
 !.env.example
+
+# 服务端订单库与支付密钥不得进入仓库或前端产物
+data/
+secrets/
+
+# 发布包仅包含明确允许的运行文件，不提交生成产物
+artifacts/releases/

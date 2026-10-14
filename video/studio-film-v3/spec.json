@@ -1,0 +1,34 @@
+{
+  "version": 3,
+  "created": "2026-10-14",
+  "mode": "自主自由创作",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 64,
+  "palette": {"paper": "#f5f5f7", "ink": "#1d1d1f", "accent": "#0066cc", "night": "#101b2a"},
+  "direction": "明亮、克制的产品发布片；宏观空间、数据字卡、真实官网、多层工程图、流程路径、开放地平线、品牌落定。",
+  "reference": {
+    "name": "Video ShotCraft",
+    "revision": "13c74a707786872a18e3317e48c5c94011027620",
+    "implementation": "自定义镜头，遵循节奏、清晰度、截图与声音规范；不声称复刻 Gallery 变体。",
+    "exceptions": ["结尾采用克制品牌落定，不采用 Q8 群体粒子合影。", "音乐采用原创电子氛围配乐，不采用高密度 tech-house；没有全画面震动。", "本轮自检，不声称独立第三方审阅。"]
+  },
+  "sources": [
+    {"title": "2025年软件业运行情况", "publisher": "工业和信息化部", "published": "2026-01-30", "url": "https://wap.miit.gov.cn/jgsj/yxj/xxfb/art/2026/art_32ce37ee09174bc0bf7add25ebeeb122.html", "revenueYiYuan": 154831, "revenueWanYiYuan": 15.4831, "growthPercent": 13.2, "scope": "2025完整年度中国软件行业统计，并非工作室经营数据"},
+    {"title": "服务范围与合作流程", "paths": ["src/content/services.js", "src/content/site.js", "src/content/solutions.js"], "scope": "官网已列出的服务方向和方案，非客户业绩"},
+    {"title": "工程实践", "paths": ["package.json", "shared/commerce.js", "server/app.mjs", "scripts/site.test.mjs", "scripts/commerce.test.mjs"], "scope": "当前项目的实现方法，非上线交易或认证声明"}
+  ],
+  "shots": [
+    {"id": "context", "start": 0, "duration": 6, "chapter": "时代背景", "title": ["软件，正在成为", "商业运行的基础。"], "caption": "从服务入口，到业务流程与数据协作。", "motion": "单个抽象经纬球体慢速旋转、聚光与归位；标题分行揭示。", "assets": "程序绘制的技术网络球，不代表地理实测数据"},
+    {"id": "industry", "start": 6, "duration": 8, "chapter": "行业规模", "title": ["2025 · 中国软件行业"], "caption": "行业规模持续增长，软件服务走向更广泛的业务场景。", "motion": "数据字卡从收敛数字到稳定读数，正视构图，完整来源常驻。", "assets": "工信部2025年度数据"},
+    {"id": "services", "start": 14, "duration": 8, "chapter": "研发方向", "title": ["设计与工程并重。", "从需求出发。"], "caption": "网站、移动端、桌面应用与自动化。", "motion": "四个服务模块错峰进入各自固定格位，收尾留完整停顿。", "assets": "官网四类服务"},
+    {"id": "experience", "start": 22, "duration": 10, "chapter": "真实界面", "title": ["不同屏幕，统一体验。"], "caption": "当前官网实景 · 桌面与移动端展示", "motion": "真实桌面截图与等比手机屏幕缓入，官网首页切换到服务介绍。", "assets": ["assets/home-desktop.png", "assets/home-mobile.png", "assets/services-desktop.png", "assets/services-mobile.png"]},
+    {"id": "engineering", "start": 32, "duration": 10, "chapter": "工程实践", "title": ["稳定，来自", "清晰的工程结构。"], "caption": "代码规范、接口校验与自动化验证。", "motion": "深石墨反差场景；四个工程层逐层建立连接；工程方法示意标明。", "assets": "依据当前代码组织的工程图，非客户系统截图"},
+    {"id": "delivery", "start": 42, "duration": 8, "chapter": "项目方法", "title": ["每个阶段，都有依据。"], "caption": "明确范围、评审版本、验证功能、完成交付。", "motion": "四阶段路径逐次连通，全流程静止展示。", "assets": "官网合作流程"},
+    {"id": "vision", "start": 50, "duration": 8, "chapter": "长期愿景", "title": ["让专业软件", "成为更多企业的日常。"], "caption": "将共性需求沉淀为可复用产品，降低专业软件的使用门槛。", "motion": "开放地平线缓慢展开，主体文字保持稳定；明确标为长期方向。", "assets": "愿景表达，无虚构目标数字"},
+    {"id": "brand", "start": 58, "duration": 6, "chapter": "光年数智", "title": ["专注软件研发", "设计与工程并重"], "caption": "项目咨询 · 微信 feg1735", "motion": "真实品牌标识缓入落定，保持至少4秒。", "assets": "src/assets/brand-logo.jpg"}
+  ],
+  "audio": {"mode": "原创程序配乐＋低密度电影转场音，无旁白；静音观看可完整理解", "bpm": 90, "sampleRate": 48000, "externalAssets": false, "license": "本项目新创作，不引用第三方音源、旋律或声音样本", "deliver": ["带配乐版", "无配乐版（保留转场音）"]},
+  "exclusions": ["虚构客户、营收、专利、团队规模、上线案例", "未完成的支付联调或交易成功宣称", "变形手机、拉伸截图、霓虹闪烁、镜头抖动"]
+}

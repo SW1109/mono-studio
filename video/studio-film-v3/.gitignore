@@ -1,0 +1,5 @@
+# 中间视频和音轨可由渲染脚本重建，不重复进入源码仓库。
+qa/visual-master.mp4
+qa/decoded-*.wav
+assets/mix.wav
+assets/sfx.wav

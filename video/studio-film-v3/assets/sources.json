@@ -1,0 +1,66 @@
+[
+  {
+    "name": "home-desktop",
+    "publicRoute": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 840,
+      "dpr": 2
+    },
+    "captured": "2026-10-14",
+    "title": "软件研发与产品设计 · 光年数智网络科技工作室",
+    "width": 1440,
+    "height": 840,
+    "brokenImages": [],
+    "heading": "专注软件研发设计与工程并重",
+    "overflow": false
+  },
+  {
+    "name": "home-mobile",
+    "publicRoute": "/",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 2
+    },
+    "captured": "2026-10-14",
+    "title": "软件研发与产品设计 · 光年数智网络科技工作室",
+    "width": 390,
+    "height": 844,
+    "brokenImages": [],
+    "heading": "专注软件研发设计与工程并重",
+    "overflow": false
+  },
+  {
+    "name": "services-desktop",
+    "publicRoute": "/services/",
+    "viewport": {
+      "width": 1440,
+      "height": 840,
+      "dpr": 2
+    },
+    "captured": "2026-10-14",
+    "title": "开发服务 · 光年数智网络科技工作室",
+    "width": 1440,
+    "height": 840,
+    "brokenImages": [],
+    "heading": "软件开发与系统集成",
+    "overflow": false
+  },
+  {
+    "name": "services-mobile",
+    "publicRoute": "/services/",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 2
+    },
+    "captured": "2026-10-14",
+    "title": "开发服务 · 光年数智网络科技工作室",
+    "width": 390,
+    "height": 844,
+    "brokenImages": [],
+    "heading": "软件开发与系统集成",
+    "overflow": false
+  }
+]
