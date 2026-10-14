@@ -5,7 +5,7 @@ import { centsToAmount } from "../../../shared/commerce.js";
 defineProps({ offer: { type: Object, required: true }, checkoutUrl: { type: String, default: "" } });
 </script>
 <template>
-  <article :id="offer.id" class="offer-card" data-reveal>
+  <article :id="offer.id" class="offer-card glass-panel" data-reveal>
     <div class="offer-heading"><span class="icon-tile"><SiteIcon :name="offer.icon" /></span><span class="tag">{{ offer.category }}</span></div>
     <h2>{{ offer.name }}</h2><p class="offer-summary">{{ offer.summary }}</p>
     <p v-if="checkoutUrl" class="offer-external-price">价格及可购买状态以订单中心为准</p>
@@ -19,7 +19,7 @@ defineProps({ offer: { type: Object, required: true }, checkoutUrl: { type: Stri
 </template>
 <style scoped>
 .offer-external-price { margin-block: 24px 16px; font-size: 14px; color: var(--muted); }
-.offer-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-card); padding: 32px; background: var(--canvas); scroll-margin-top: 104px; }
+.offer-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-card); padding: 32px; background: var(--glass-bg); border-color: var(--glass-line); scroll-margin-top: 104px; }
 .offer-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
 .offer-card h2 { font-size: 25px; }
 .offer-summary { margin-top: 16px; color: var(--muted); font-size: 15px; line-height: 1.8; min-height: 81px; }

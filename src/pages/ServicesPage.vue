@@ -29,7 +29,7 @@ import ContactBanner from "../components/site/ContactBanner.vue";
 .service-nav a { display: inline-flex; align-items: center; gap: 16px; border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 10px 18px; font-size: 14px; min-height: 44px; color: var(--muted); }
 .service-nav a:hover { border-color: var(--accent); color: var(--accent); }
 .service-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding-bottom: 96px; }
-.service-detail { display: flex; flex-direction: column; align-items: start; padding: 40px; border-radius: var(--radius-card); background: var(--surface); scroll-margin-top: 104px; }
+.service-detail { display: flex; flex-direction: column; align-items: start; padding: 40px; border-radius: var(--radius-card); background: var(--glass-bg); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); scroll-margin-top: 104px; }
 .service-detail-heading { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 32px; }
 .service-detail .eyebrow { margin-bottom: 14px; }
 .service-detail h2 { font-size: 32px; }

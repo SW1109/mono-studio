@@ -5,27 +5,21 @@ import { featuredProducts } from "../content/products.js";
 import { process } from "../content/site.js";
 import SiteIcon from "../components/site/SiteIcon.vue";
 import StudioPreview from "../components/site/StudioPreview.vue";
+import StudioHero from "../components/site/StudioHero.vue";
 import ProductCard from "../components/site/ProductCard.vue";
 import ContactBanner from "../components/site/ContactBanner.vue";
 import filmPoster from "../assets/media/studio-film-v5-poster.webp";
 </script>
 
 <template>
-  <section class="home-hero">
-    <div class="container hero-copy">
-      <p class="eyebrow" data-reveal>GUANGNIAN · SOFTWARE STUDIO</p>
-      <h1 data-reveal data-reveal-delay="80">专注软件研发<br /><span>设计与工程并重</span></h1>
-      <p class="hero-description" data-reveal data-reveal-delay="160">产品设计、软件研发与系统集成。<br />网站、业务系统、小程序与自动化。</p>
-      <div class="button-row" data-reveal data-reveal-delay="240">
-        <RouterLink class="button button-primary" to="/services/">了解开发服务 <span aria-hidden="true">↗</span></RouterLink>
-        <RouterLink class="button button-secondary" to="/products/">查看软件方案 <span aria-hidden="true">→</span></RouterLink>
-      </div>
+  <StudioHero />
+  <section class="container home-showcase" aria-labelledby="showcase-title">
+    <div class="showcase-heading" data-reveal>
+      <p class="eyebrow">ONE EXPERIENCE. EVERY SCREEN.</p>
+      <h2 id="showcase-title">多端体验，统一设计。</h2>
+      <p class="section-description">从桌面到移动端，让业务流程与使用体验保持一致。</p>
     </div>
-    <div class="container hero-showcase"><StudioPreview /></div>
-    <div class="container hero-bottom">
-      <div class="hero-notes"><span>产品研发</span><span>定制开发</span><span>持续迭代</span></div>
-      <a class="text-link" href="#capabilities">查看服务内容 <span aria-hidden="true">↓</span></a>
-    </div>
+    <StudioPreview />
   </section>
 
   <section id="capabilities" class="section container">
@@ -72,46 +66,31 @@ import filmPoster from "../assets/media/studio-film-v5-poster.webp";
 </template>
 
 <style scoped>
-.home-hero { padding-top: 72px; }
-.hero-copy { text-align: center; }
-.hero-copy .eyebrow { justify-content: center; margin-bottom: 24px; }
-.hero-copy h1 { font-size: clamp(42px, 5.3vw, 72px); line-height: 1.25; font-weight: 600; letter-spacing: -.05em; }
-.hero-copy h1 > span { color: var(--accent); }
-.hero-description { color: var(--muted); font-size: 20px; line-height: 1.8; margin-top: 24px; }
-.hero-copy .button-row { justify-content: center; margin-top: 32px; }
-.hero-showcase { margin-top: 56px; }
-.hero-bottom { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-block: 24px; border-bottom: 1px solid var(--line); }
-.hero-notes { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: 13px; }
-.hero-notes span + span { border-left: 1px solid var(--line); padding-left: 24px; }
-.hero-bottom .text-link { font-size: 13px; }
+.home-showcase { padding-top: 96px; }
+.showcase-heading { text-align: center; margin-bottom: 40px; }
+.showcase-heading .eyebrow { justify-content: center; }
+.showcase-heading h2 { color: var(--accent); font-size: clamp(28px, 2.8vw, 38px); font-weight: 400; }
+.showcase-heading .section-description { margin-inline: auto; }
 .process-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 120px; }
 .process-section .section-description { max-width: 390px; margin: 24px 0; }
-.home-studio-section { background: var(--dark); color: var(--on-dark); }
+.home-studio-section { background: radial-gradient(ellipse at 90% 10%, #494080, transparent 65%), radial-gradient(ellipse at 10% 100%, rgba(49, 83, 164, .24), transparent 55%), var(--dark); color: var(--on-dark); border-radius: 36px; margin-inline: 24px; }
 .home-about { padding-block: 88px; display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: 88px; }
 .home-about .eyebrow, .home-about .section-description { color: var(--muted-on-dark); }
 .home-about .section-description { margin: 24px 0; }
 .home-about .text-link { color: var(--accent-on-dark); }
-.home-film-preview { display: block; min-width: 0; }
+.home-film-preview { display: block; min-width: 0; border-radius: var(--radius-card); overflow: hidden; border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .1); }
 .home-film-preview > img { width: 100%; aspect-ratio: 16 / 9; height: auto; object-fit: contain; }
-.home-film-caption { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-top: 20px; color: var(--on-dark); font-size: 15px; }
+.home-film-caption { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 20px 24px; color: var(--on-dark); font-size: 13px; }
 .home-film-caption > span:first-child { display: flex; align-items: center; gap: 12px; }
 .home-film-caption i { font-style: normal; display: inline-grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--muted-on-dark); border-radius: 50%; }
 @media (max-width: 1040px) {
   .process-section, .home-about { gap: 56px; }
-  .hero-copy h1 { font-size: 60px; }
   .desktop-break { display: none; }
 }
 @media (max-width: 760px) {
-  .home-hero { padding-top: 48px; }
-  .hero-copy h1 { font-size: clamp(38px, 7vw, 52px); }
-  .hero-description { font-size: 16px; margin-top: 20px; }
-  .hero-copy .button-row { margin-top: 28px; gap: 12px; }
-  .hero-copy .button { font-size: 14px; padding-inline: 16px; gap: 10px; }
-  .hero-showcase { margin-top: 40px; width: calc(100% - 24px); }
-  .hero-bottom { gap: 16px; padding-block: 16px; }
-  .hero-notes { gap: 12px; font-size: 11px; }
-  .hero-notes span + span { padding-left: 12px; }
-  .hero-bottom .text-link { font-size: 12px; gap: 8px; }
+  .home-showcase { padding-top: 64px; }
+  .showcase-heading { margin-bottom: 28px; }
+  .home-studio-section { margin-inline: 12px; border-radius: 28px; }
   .process-section, .home-about { grid-template-columns: 1fr; gap: 36px; }
   .home-about { padding-block: 64px; }
   .home-film-caption { font-size: 14px; }

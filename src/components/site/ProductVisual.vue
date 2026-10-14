@@ -36,7 +36,7 @@ const layout = computed(() => {
 
 <style scoped>
 /* 显式宽度避免比例与最小高度反推宽度；窄屏也要完整展示等比机身。 */
-.product-visual { --visual-ink: var(--ink); --visual-muted: var(--muted); --visual-line: var(--line); position: relative; overflow: hidden; display: grid; place-items: center; width: 100%; min-width: 0; min-height: 280px; aspect-ratio: 1.38; background: var(--surface); padding: 40px 36px 32px; }
+.product-visual { --visual-ink: var(--ink); --visual-muted: var(--muted); --visual-line: var(--line); position: relative; overflow: hidden; display: grid; place-items: center; width: 100%; min-width: 0; min-height: 280px; aspect-ratio: 1.38; background: radial-gradient(ellipse at 80% 10%, rgba(191, 180, 245, .4), transparent 70%), rgba(223, 231, 252, .56); padding: 40px 36px 32px; }
 .visual-caption { position: absolute; left: 24px; top: 18px; font: 8px/1.5 var(--font-mono); letter-spacing: .08em; color: var(--visual-muted); }
 .visual-footnote { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; justify-content: space-between; font-size: 10px; color: var(--visual-muted); }
 .visual-footnote > span { font-size: 15px; color: var(--accent); }

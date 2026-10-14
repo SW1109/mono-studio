@@ -21,7 +21,7 @@ useHead(() => ({
   title: `${unknownProduct.value ? "页面未找到" : productTitle.value || route.meta.title} · ${site.name}`,
   meta: [
     { name: "description", content: product.value?.summary || route.meta.description || site.description },
-    { name: "theme-color", content: "#f7f9fc" },
+    { name: "theme-color", content: route.path === "/" ? "#141d37" : "#f7f8ff" },
     { name: "robots", content: route.meta.noindex || unknownProduct.value ? "noindex, follow" : "index, follow" },
     { property: "og:type", content: "website" },
     { property: "og:title", content: `${unknownProduct.value ? "页面未找到" : productTitle.value || route.meta.title} · ${site.shortName}` },
@@ -44,7 +44,7 @@ watch(() => route.fullPath, async () => {
   <SiteHeader />
   <main id="main-content" ref="mainContent" :data-motion="motionMode" tabindex="-1">
     <RouterView v-slot="{ Component }">
-      <div :key="route.path" class="route-page"><component :is="Component" /></div>
+      <div :key="route.path" class="route-page" :class="{ 'route-page--home': route.path === '/' }"><component :is="Component" /></div>
     </RouterView>
   </main>
   <SiteFooter />

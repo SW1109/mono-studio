@@ -13,7 +13,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
 
 <template>
   <PageHeading eyebrow="SOFTWARE & SOLUTIONS" title="企业应用与软件工具" current="软件产品" description="涵盖企业网站、业务管理、移动服务与自动化等开发方向。功能模块、支持平台及交付范围依据项目需求确认。" />
-  <section class="container catalog-intro" aria-label="软件展示说明" data-reveal>
+  <section class="container catalog-intro glass-panel" aria-label="软件展示说明" data-reveal>
     <div class="catalog-intro-copy">
       <span class="icon-tile"><SiteIcon name="layers" /></span>
       <div><h2>定制方案与适用范围</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。</p></div>
@@ -49,7 +49,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
 </template>
 
 <style scoped>
-.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 48px; padding: 32px 40px; background: var(--surface); border-radius: var(--radius-card); margin-bottom: 72px; }
+.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 48px; padding: 32px 40px; background: var(--glass-bg); border-radius: var(--radius-card); margin-bottom: 72px; }
 .catalog-intro-copy { display: flex; gap: 24px; max-width: 730px; }
 .catalog-intro-copy .icon-tile { flex-shrink: 0; }
 .catalog-intro h2 { font-size: 21px; margin-bottom: 12px; }
@@ -61,7 +61,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
 .product-catalog { padding-bottom: 96px; }
 .catalog-heading { margin-bottom: 32px; }
 .filter-list { display: flex; gap: 10px; flex-wrap: wrap; }
-.filter-list button { min-height: 44px; background: var(--canvas); color: var(--muted); border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: 14px; padding: 10px 18px; transition: color .2s, border-color .2s, background .2s; }
+.filter-list button { min-height: 44px; background: var(--glass-bg-strong); color: var(--muted); border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: 14px; padding: 10px 18px; transition: color .2s, border-color .2s, background .2s; }
 .filter-list button.selected { background: var(--accent); color: var(--canvas); border-color: var(--accent); }
 .filter-list button:not(.selected):hover { border-color: var(--accent); color: var(--accent); }
 .filter-status { font-size: 13px; color: var(--muted); margin-block: 24px 28px; }
