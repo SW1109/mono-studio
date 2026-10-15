@@ -46,6 +46,21 @@ const credit = `${plan.music.attribution} Source: ${plan.music.sourceUrl} Licens
 await execute(ffmpeg, ["-y", "-hide_banner", "-loglevel", "error", "-nostdin", "-i", visual, "-i", wav, "-map", "0:v:0", "-map", "1:a:0", "-map_metadata", "-1", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", String(plan.sampleRate), "-t", String(plan.duration), "-movflags", "+faststart", "-metadata", "title=光年数智品牌与研发短片 V5", "-metadata", `comment=${credit}`, pending]);
 await rename(pending, join(project, "src/assets/media/studio-film-v5.mp4"));
 await copyFile(resolve(root, plan.posterSource), join(project, "src/assets/media/studio-film-v5-poster.webp"));
+
+// 网页只按需加载一个清晰度；原片保留用于原画选项，重建配乐时同步派生版本以免声音过期。
+for (const variant of [
+  { height: 720, width: 1280, crf: "24", maxrate: "1400k", bufsize: "2800k", audio: "128k" },
+  { height: 480, width: 854, crf: "25", maxrate: "700k", bufsize: "1400k", audio: "96k" },
+]) {
+  const variantPending = join(root, `qa/studio-film-v5-${variant.height}p.pending.mp4`);
+  await execute(ffmpeg, ["-y", "-hide_banner", "-loglevel", "error", "-nostdin", "-i", join(project, "src/assets/media/studio-film-v5.mp4"),
+    "-map", "0:v:0", "-map", "0:a:0", "-vf", `scale=${variant.width}:${variant.height}:flags=lanczos:out_range=tv,setsar=1`,
+    "-c:v", "libx264", "-preset", "slow", "-crf", variant.crf, "-profile:v", "main", "-level:v", "3.1", "-pix_fmt", "yuv420p", "-color_range", "tv",
+    "-maxrate", variant.maxrate, "-bufsize", variant.bufsize, "-g", "60", "-c:a", "aac", "-b:a", variant.audio,
+    "-movflags", "+faststart", "-map_metadata", "-1", "-metadata", `title=光年数智品牌与研发短片 V5 · ${variant.height}p`, "-metadata", `comment=${credit}`, variantPending]);
+  await rename(variantPending, join(project, `src/assets/media/studio-film-v5-${variant.height}p.mp4`));
+}
+
 const silentPending = join(root, "qa/studio-film-v5-silent.pending.mp4");
 // 另存完全无声版，不保留会让用户感到刺耳的任何旧转场音。
 await execute(ffmpeg, ["-y", "-hide_banner", "-loglevel", "error", "-nostdin", "-i", visual, "-map", "0:v:0", "-map_metadata", "-1", "-c:v", "copy", "-an", "-t", String(plan.duration), "-movflags", "+faststart", silentPending]);

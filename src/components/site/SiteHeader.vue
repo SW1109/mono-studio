@@ -40,7 +40,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <header class="site-header" :class="{ 'site-header--immersive': route.path === '/' }">
+  <header class="site-header">
     <div class="container header-inner">
       <RouterLink class="brand" to="/" :aria-label="`${site.name}首页`">
         <img :src="mark" width="44" height="37" alt="" />

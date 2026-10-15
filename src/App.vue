@@ -21,7 +21,7 @@ useHead(() => ({
   title: `${unknownProduct.value ? "页面未找到" : productTitle.value || route.meta.title} · ${site.name}`,
   meta: [
     { name: "description", content: product.value?.summary || route.meta.description || site.description },
-    { name: "theme-color", content: route.path === "/" ? "#141d37" : "#f7f8ff" },
+    { name: "theme-color", content: route.path === "/" ? "#f6edfc" : "#fcf9ff" },
     { name: "robots", content: route.meta.noindex || unknownProduct.value ? "noindex, follow" : "index, follow" },
     { property: "og:type", content: "website" },
     { property: "og:title", content: `${unknownProduct.value ? "页面未找到" : productTitle.value || route.meta.title} · ${site.shortName}` },

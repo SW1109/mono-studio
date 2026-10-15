@@ -73,7 +73,7 @@ import filmPoster from "../assets/media/studio-film-v5-poster.webp";
 .showcase-heading .section-description { margin-inline: auto; }
 .process-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 120px; }
 .process-section .section-description { max-width: 390px; margin: 24px 0; }
-.home-studio-section { background: radial-gradient(ellipse at 90% 10%, #494080, transparent 65%), radial-gradient(ellipse at 10% 100%, rgba(49, 83, 164, .24), transparent 55%), var(--dark); color: var(--on-dark); border-radius: 36px; margin-inline: 24px; }
+.home-studio-section { background: radial-gradient(ellipse at 90% 10%, #704c88, transparent 65%), radial-gradient(ellipse at 10% 100%, rgba(154, 93, 177, .22), transparent 55%), var(--dark); color: var(--on-dark); border-radius: 36px; margin-inline: 24px; }
 .home-about { padding-block: 88px; display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: 88px; }
 .home-about .eyebrow, .home-about .section-description { color: var(--muted-on-dark); }
 .home-about .section-description { margin: 24px 0; }

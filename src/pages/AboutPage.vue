@@ -15,7 +15,7 @@ const principles = [
 <template>
   <div class="about-opening">
     <PageHeading class="about-heading" eyebrow="ABOUT GUANGNIAN" title="专注软件设计与研发" current="关于光年" description="光年数智网络科技工作室，提供软件产品研发、定制开发与系统集成服务。" />
-    <section class="about-film-stage glass-panel" aria-label="光年数智工作室宣传片">
+    <section class="about-film-stage" aria-label="光年数智工作室宣传片">
       <StudioFilm />
     </section>
   </div>
@@ -50,14 +50,14 @@ const principles = [
 
 <style scoped>
 .about-opening { position: relative; isolation: isolate; }
-.about-opening::before { content: ''; position: absolute; inset: -112px 0 30%; z-index: -1; background: radial-gradient(ellipse at 18% 60%, rgba(166, 184, 247, .27), transparent 50%), radial-gradient(ellipse at 86% 15%, rgba(218, 203, 255, .34), transparent 55%); pointer-events: none; }
+.about-opening::before { content: ''; position: absolute; inset: -112px 0 30%; z-index: -1; background: radial-gradient(ellipse at 18% 60%, rgba(213, 178, 237, .22), transparent 50%), radial-gradient(ellipse at 86% 15%, rgba(239, 214, 246, .32), transparent 55%); pointer-events: none; }
 .about-heading { text-align: center; padding-bottom: 44px; }
 .about-heading :deep(.breadcrumbs) { justify-content: center; margin-bottom: 36px; }
 .about-heading :deep(.eyebrow) { justify-content: center; width: fit-content; margin-inline: auto; padding: 7px 18px; border: 1px solid rgba(255, 255, 255, .9); border-radius: var(--radius-pill); background: rgba(255, 255, 255, .65); color: var(--accent); }
 .about-heading :deep(h1) { font-size: clamp(32px, 3.6vw, 50px); max-width: none; font-weight: 400; color: var(--accent); letter-spacing: -.025em; }
 .about-heading :deep(.page-description) { margin-inline: auto; font-size: 17px; }
-/* 保持大尺寸、完整16:9画面；玻璃只包裹舞台，不裁切影片或改变播放策略。 */
-.about-film-stage { width: min(1560px, calc(100% - 64px)); margin-inline: auto; padding: 8px; border-radius: 36px; }
+/* 控制舞台宽度并去掉视频背后的大面积模糊，保持完整 16:9 和全屏观看能力。 */
+.about-film-stage { width: min(1120px, calc(100% - 64px)); margin-inline: auto; padding: 8px; border: 1px solid var(--glass-line); border-radius: 32px; background: var(--glass-bg-strong); box-shadow: var(--glass-shadow); }
 .about-film-stage :deep(.studio-film) { border: 0; border-radius: 28px; background: transparent; }
 .about-film-stage :deep(figcaption) { padding: 22px 28px; }
 .about-intro { display: grid; grid-template-columns: .9fr 1.1fr; gap: 96px; align-items: center; padding-block: 96px; }
