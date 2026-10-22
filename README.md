@@ -11,15 +11,19 @@ Vue 3 + Vite + Vue Router + Vite SSG 的多页面官网。公开页面在构建�
 
 ## 开发与验证
 
-使用 Node.js 24 LTS（项目要求 Node >=22.13）。依赖已由 `package-lock.json` 锁定，新环境使用 `npm ci`；调整依赖时使用 `npm install` 并同步锁文件。
+使用 Node.js **24.22.1 或该分支的更新补丁版本**，`.nvmrc` / `.node-version` 已固定基线。其他允许分支的最低版本为 22.23.4、26.12.1；运行时检查与 `package.json` 同步。依赖由 `package-lock.json` 锁定，新环境使用 `npm ci`；调整依赖时同步锁文件。
 
 ```bash
-cd "/Users/wxs/yanjiu/shangwen/mono-studio"
-nvm use 24
+cd mono-studio
+nvm use
 npm ci
 npm test
-npm run dev -- --host 127.0.0.1 --port 4176 --strictPort
+npm run dev
 ```
+
+开发服务固定监听 IPv4 `127.0.0.1:5173`，打开 `http://localhost:5173/` 或 `http://127.0.0.1:5173/`。Windows 在项目目录的 PowerShell 中运行 `npm run dev` 即可；保持终端运行。端口被占用时会直接报错，不自动切换到其他端口。
+
+本机 Windows 已在 `artifacts/node-runtime/` 安装并校验官方隔离 Node 24.22.1。项目 npm 命令会使用符合要求的当前 Node，或回退到此隔离版本；不会修改全局 PATH。其他开发机/服务器须安装符合版本要求的 Node；`npm run check:node` 显示项目实际使用版本。生产入口也执行版本检查，不能靠忽略 npm engines 警告绕过。
 
 ```bash
 npm run build
@@ -27,13 +31,14 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 ```
 
 - `npm test`：内容配置、公开路径、Vue 单文件组件 / CSS 编译和源码加载边界回归。不是浏览器交互验收。
+- `npm run test:browser`：隔离端口与模拟订单接口的浏览器交互回归，不创建真实交易。Windows 自动使用已安装 Chrome；其他环境先执行 `npx playwright install chromium`。
 - `npm run build`：SSG 新鲜构建后自动检查所有页面正文、产品详情、SEO 与启动资源隔离。任一检查失败会返回非零状态。
 - `npm run check:build`：单独检查现有产物，不能代替先构建。
 - 依赖变更与更新后的 `package-lock.json` 一起纳入版本管理，发布环境使用 `npm ci`。
 
 ### 本轮验证状态
 
-依赖与锁文件已同步，25 项源码回归及新生产构建通过。构建检查覆盖 12 个预渲染页面、产品正文和启动资源隔离。浏览器已验证首屏动画实际播放与手动暂停、滚动入场与离屏冻结、产品详情入口与分类筛选、移动菜单及系统减少动态效果；首页在 360px、768px、1440px 下无水平溢出，检查期间无 3D 资源请求。
+本轮检查记录见 `deploy/REVIEW-2026-10-22.md`。生产构建覆盖 25 个预渲染页面、产品正文与三维资源隔离；自动浏览器回归覆盖 360px 移动导航、主要页面溢出、网络/数据错误恢复、下单重试和订单切换。以前的手动视觉验收不作为每次变更自动通过的依据。
 
 完整三维演示的启动、失败恢复、反复退出，以及正式部署环境的 HTTP 404 与性能指标仍需发布前验收。原站包体记录保存在 `scripts/baseline.json`，仅代表构建大小，不代表实测加载速度。
 
@@ -123,10 +128,10 @@ location /cesium/ {
 
 ### 服务端与支付边界
 
-- `server/` 是独立 Node 服务，提供订单 API，并可直接托管构建后的官网；需要 Node >=22.13，建议与原项目保持 Node 24 LTS。SQLite 使用 Node 内置 `node:sqlite`，不增加数据库和支付运行时依赖。
+- `server/` 是独立 Node 服务，提供订单 API，并可直接托管构建后的官网；推荐 Node 24.22.1 或该分支更新版本。SQLite 使用 Node 内置 `node:sqlite`，不增加数据库和支付运行时依赖。静态文件采用流式发送，视频只读取所请求的范围，支持 ETag/304，拒绝隐藏文件及指向站点外的链接。
 - `server/payments/alipay.mjs` 实现支付宝 OpenAPI 的 **RSA2 普通公钥模式**：`alipay.trade.page.pay` 收银台参数签名、异步通知验签以及 `alipay.trade.query` 查询响应验签。当前**不支持证书模式**，配置里的支付宝公钥不是应用公钥。
 - 金额由服务端根据商品计算，不采用客户端传入价格；同时核对用户确认的报价，拒绝价格变化后直接扣款，持久化购买时的服务范围快照；订单创建使用幂等请求标识，SQLite 原子记录通知，校验应用、收款方、订单、金额与交易流水。同步回跳只跳转订单页，不能标记付款；已付款状态不会被晚到通知回退。
-- 下单浏览器持有 HttpOnly / SameSite=Lax 会话 Cookie，数据库只保存其哈希；查单须使用同一浏览器。生产 HTTPS 使用 Secure Cookie。写接口校验来源，不开放通用 CORS。订单结果页不进入 sitemap，且 noindex。
+- 下单前通过目录请求建立 HttpOnly / SameSite=Lax 会话 Cookie，创建订单必须带回该 Cookie，避免首次响应丢失后重试变成另一浏览器订单。数据库只保存其哈希；查单须使用同一浏览器。生产 HTTPS 使用 Secure Cookie。写接口校验来源，不开放通用 CORS。订单结果页不进入 sitemap，且 noindex。
 - 支付成功表示收款确认，**不表示服务已经交付**。排期、交付、发票、取消和原渠道退款目前由经营者人工处理；没有自动退款或后台履约管理界面。
 - 支付提供者通过 `createCheckout`、`query`、`verifyNotification`、`toPaymentEvent` 与订单存储分离。当前只接受 `alipay`，没有可点击的虚假微信支付入口；以后接入微信时需要新增真实通道、对应通知校验和平台配置。
 
@@ -137,10 +142,10 @@ cp .env.payment.example .env.payment.local
 # 先保持 PAYMENTS_ENABLED=false；不配置密钥也能浏览商城。
 npm run server
 # 另开终端：Vite 将当前 base 下的 api/commerce 转发到 127.0.0.1:8787。
-npm run dev -- --host 127.0.0.1 --port 4176 --strictPort
+npm run dev
 ```
 
-打开 `http://127.0.0.1:4176/shop/`。若调整支付端口，须同步 `vite.config.js` 的代理目标。原有 `.env.local` 不被支付服务加载或修改；仅 `.env.payment.local` 用于服务端。
+打开 `http://127.0.0.1:5173/shop/`。若调整支付端口，须同步 `vite.config.js` 的代理目标。原有 `.env.local` 不被支付服务加载或修改；仅 `.env.payment.local` 用于服务端。
 
 ### 沙箱联调与正式启用
 
@@ -190,14 +195,20 @@ npm run orders:list -- --status PAID --limit 20
 - 配置 `VITE_SHOPXO_ORIGIN` 与 `VITE_SHOPXO_PRODUCTS` 后，服务卡片进入真实 ShopXO 商品页；订单查询进入其账户订单中心。电脑/手机必须登录同一账号，交易只由订单中心持久化。
 - 未配置仍沿用现有 Node 链路，不会因为新增入口代码就获得跨设备查询能力。旧 Node 订单不会自动归入 ShopXO 账户；不提供未鉴权的同邮箱查单。
 - 官网隐藏 ShopXO 模式下的静态报价，最终价格、主体、交付与条款以订单中心下单确认为准。
+- 服务端设置 `PAYMENT_ORDER_CENTER=shopxo` 后强制关闭旧链路新订单与支付，保留已配置通道的历史通知/查询。同目录托管时启动入口也读取构建清单自动识别 ShopXO；API 与静态站分开部署时必须显式设置此项。
 - 官网侧仍是网页入口，另提供 `npm run orders:prepare` 准备 ShopXO 二开源码：账户订单归上游统一管理，支付宝应用、密钥、沙箱/正式环境在订单后台配置。不含原生 App、小程序、SSO、Vue 内嵌 ShopXO API 或旧库迁移。ShopXO 是否已安装、商品是否上架、手机网站支付是否开通，仍须真实环境验证。
 
 宝塔部署、版本与许可、商品映射和多端验收见 `deploy/shopxo/README.md`。原 Node 链路的经营者 Bearer 鉴权只读接口、systemd/HTTPS 代理、持久数据库与每日备份见 `deploy/linux/README.md`。管理 API 未设置令牌时关闭，示例 Nginx 禁止公网管理访问。
 
 ```bash
-npm run orders:prepare  # 获取锁定的 ShopXO 源码并应用后台支付宝配置补丁；不安装数据库、不启用收款
+npm run orders:prepare  # 校验源码并应用支付/售后修复；移除旧 vendor，按锁安装依赖后再运行
+npm run test:shopxo     # 校验已准备源码、PHP 语法、安装依赖版本与支付边界
 npm run release:package # 构建官网并生成明确允许清单内的发布包，不包含商户秘密或订单库
 npm run orders:backup   # 配置 PAYMENT_BACKUP_DIR 后生成一致性 SQLite 备份
 ```
 
 当前未连接或部署阿里云服务器，收款仍默认关闭；需要提供实际 SSH 目标、登录方式、官网/订单中心域名，以及确认既有宝塔站点后再发布。
+
+本次完善了订单归属、通道开关、并发通知幂等、严格金额核对、退款唯一请求与异常收款处理，并提供 CLI 主动查单、退款查询和异常款回执核对。虚拟服务默认由后台手动交付；升级须保留首次退款方案启用时间。具体运维命令、历史退款处理与验证范围见 `deploy/shopxo/README.md`。
+
+Node 历史通道的通知使用独立限流/并发预算；浏览器请求有超时和取消处理，提交订单不自动重试。SQLite 数据和备份在 Windows 使用受保护 ACL，POSIX 使用私有权限；备份测试覆盖 WAL 与恢复后继续读写。前端构建依赖已更新，并用固定目录复制替换原静态复制插件。

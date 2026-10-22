@@ -1,13 +1,15 @@
 import { DatabaseSync } from "node:sqlite";
-import { existsSync, mkdirSync, chmodSync, openSync, fsyncSync, closeSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, openSync, fsyncSync, closeSync, rmSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { randomBytes } from "node:crypto";
+import { restrictPrivatePath } from "./file-permissions.mjs";
 
 export function backupOrders(filename, directory) {
   const source = resolve(filename), destination = resolve(directory);
   if (!existsSync(source)) throw new Error("订单库不存在，不能用空数据库冒充有效备份。");
   mkdirSync(destination, { recursive: true, mode: 0o700 });
+  restrictPrivatePath(destination, true);
   const target = join(destination, `orders-${new Date().toISOString().replace(/[:.]/g, "-")}-${randomBytes(4).toString("hex")}.sqlite`);
   const previousMask = process.umask(0o077);
   let database;
@@ -15,8 +17,9 @@ export function backupOrders(filename, directory) {
     database = new DatabaseSync(source, { readOnly: true });
     // VACUUM INTO 包含仍在 WAL 中的已提交交易，不能直接复制主库文件。
     database.prepare("VACUUM INTO ?").run(target);
-    chmodSync(target, 0o600);
-    const handle = openSync(target, "r");
+    restrictPrivatePath(target);
+    // Windows FlushFileBuffers requires a handle opened for writing.
+    const handle = openSync(target, "r+");
     try { fsyncSync(handle); } finally { closeSync(handle); }
     const copy = new DatabaseSync(target, { readOnly: true });
     try {

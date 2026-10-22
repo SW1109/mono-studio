@@ -1,11 +1,11 @@
 # 现有 Node 订单 API：单实例 Linux 部署准备
 
-这是原 Node 订单链路的部署方案。若选择 `deploy/shopxo/README.md` 的独立订单中心，官网只需部署静态 `dist/`，不要再开放 Node 新交易来复制 ShopXO 订单。
+这是原 Node 订单链路的部署方案。若选择 `deploy/shopxo/README.md` 的独立订单中心，官网部署静态 `dist/`；旧订单尚未结清时保留 Node 历史通知和查询，并设置 `PAYMENTS_ENABLED=false` 停止新下单。保留原通道凭据核对历史交易，不能直接关闭历史 API。
 
 ## 发布前
 
 - 先确认服务器和域名、现有宝塔站点与数据并备份。此目录仅提供配置模板，没有执行远端命令。
-- 要求 Linux/systemd，Node >=22.13；使用符合该要求且仍受支持的 Node 版本，核对 `command -v node`，再修改两个 service 文件的 `ExecStart`。宝塔 Node 管理器的路径不一定是 `/usr/bin/node`。
+- 要求 Linux/systemd，推荐 Node 24.22.1 或该分支更新补丁版本（其他允许分支最低 22.23.4 / 26.12.1）。核对实际 `node --version`、`command -v node`，再修改两个 service 文件的 `ExecStart`。宝塔 Node 管理器的路径不一定是 `/usr/bin/node`；入口拒绝过期运行时。更新后重启服务使旧进程退出。
 - 运行 `npm run release:package` 在本机生成发布包。包中 Node 后端仅使用内置模块，无需在服务器安装前端编译依赖；不包含密钥、私密配置、SQLite 数据或 node_modules。
 - 后端只能绑定回环 `127.0.0.1:8787`。公网只开放既有 HTTPS 网站；SSH 仅允许运维来源。不要向公网开放 8787 或数据库端口。
 
@@ -23,6 +23,8 @@
 以独立非登录用户 `mono-studio` 运行。程序归 root 所有、服务用户只读；数据和备份目录归服务用户所有、权限 700。环境文件和密钥权限 640，root 所有、组为服务用户；不能放进 Nginx 静态目录。先确认这些路径/用户没有其他业务用途，再创建。不要对现有目录无差别递归改权限。
 
 复制 `payment.env.example` 到服务端固定配置位置，填写实际 HTTPS 域名及真实 base。用 `openssl rand -hex 32` 生成管理令牌；若留空，经营者 HTTP 查询接口关闭。无支付凭据时仍可运行查单/健康检查，但不允许新收费下单。不能用测试订单冒充经营记录。
+
+切换 ShopXO 时设置 `PAYMENT_ORDER_CENTER=shopxo`，即使遗留 `PAYMENTS_ENABLED=true` 也不会继续签发旧链路付款；保留历史通道凭据、通知路由与数据库。API 与静态站分离部署时不能依赖官网构建文件自动识别。
 
 ## 首次启动与代理
 

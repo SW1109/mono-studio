@@ -1,0 +1,72 @@
+name: Commerce checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  website:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, openssl, mbstring
+          ini-values: session.upload_progress.enabled=0
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=moderate
+      - name: Install browser for interaction checks
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium
+      - name: Browser regression
+        if: runner.os == 'Linux'
+        run: npm run test:browser
+  order-center:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: fixture-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pfixture-only-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, openssl, pdo_mysql, mbstring, gd, zip, fileinfo, intl
+          ini-values: session.upload_progress.enabled=0
+          tools: composer:v2
+      - name: Reject vulnerable PHP runtimes
+        run: npm run check:php -- --require-hardening
+      - name: Prepare patched source and install pinned PHP dependencies
+        run: |
+          npm run orders:prepare -- --require-php
+          cd artifacts/order-center/shopxo
+          composer install --no-dev --no-interaction --no-scripts --prefer-dist
+          composer check-platform-reqs --no-dev
+          composer audit --locked --no-dev
+          php think service:discover
+      - run: npm run test:shopxo
+      - name: Database regression
+        run: |
+          mkdir -p artifacts/order-center
+          printf '%s' '{"hostname":"127.0.0.1","hostport":3306,"username":"root","password":"fixture-only-password"}' > artifacts/order-center/ci-db.json
+          SHOPXO_TEST_CONFIG=artifacts/order-center/ci-db.json node --test scripts/shopxo-db.test.mjs

@@ -1,0 +1,688 @@
+--- a/extend/payment/Alipay.php
++++ b/extend/payment/Alipay.php
+@@ -436,7 +436,7 @@
+         }
+ 
+         // 支付状态
+-        if(!empty($data['trade_no']) && isset($data['total_amount']) && $data['total_amount'] > 0)
++        if(!empty($data['trade_no']) && \mono\PaymentGuard::sameAmount($data['total_amount'] ?? null, $data['total_amount'] ?? null))
+         {
+             $status = false;
+             if(isset($data['trade_status']))
+@@ -515,6 +515,10 @@
+         {
+             return DataReturn($error, -1);
+         }
++
++        try { \mono\PaymentGuard::refundRequestId($params); }
++        catch(\InvalidArgumentException $error) { return DataReturn($error->getMessage(), -1); }
++        if(!\mono\PaymentGuard::sameAmount($params['refund_price'], $params['refund_price'])) return DataReturn('退款金额无效', -1);
+ 
+         // 退款原因
+         $refund_reason = empty($params['refund_reason']) ? $params['order_no'].'订单退款'.$params['refund_price'].'元' : $params['refund_reason'];
+@@ -530,7 +534,7 @@
+             'version'               => '1.0',
+         ];
+         $biz_content = [
+-            'out_request_no'        => $params['order_no'].'JE'.str_replace('.', '', $params['refund_price']),
++            'out_request_no'        => \mono\PaymentGuard::refundRequestId($params),
+             'out_trade_no'          => $params['order_no'],
+             'trade_no'              => $params['trade_no'],
+             'refund_amount'         => (string) $params['refund_price'],
+@@ -553,6 +557,11 @@
+             if(!$this->SyncRsaVerify($result, $key))
+             {
+                 return DataReturn('签名验证错误', -1);
++            }
++
++            if(!\mono\PaymentGuard::refundMatches($result[$key], $params))
++            {
++                return DataReturn('退款结果与售后申请不匹配，请查询原退款请求', -1);
+             }
+ 
+             // 统一返回格式
+@@ -567,8 +576,81 @@
+             return DataReturn('退款成功', 0, $data);
+         }
+ 
++        // A timeout may have happened after the gateway processed the refund. Query the
++        // same persistent request identity before returning an uncertain local result.
++        $queried = $this->RefundQuery($params);
++        if($queried['code'] == 0) return $queried;
+         // 网络或网关异常不能被当作已退款，也不把内部响应完整暴露给客户。
+         return DataReturn('支付宝未能确认退款，请在商户后台核对后重试，避免重复退款', -1000);
++    }
++
++    /** Signed query, also usable while new payments are disabled. */
++    public function Query($params = [])
++    {
++        if(empty($params['order_no']) || !is_string($params['order_no'])) return DataReturn('支付单号无效', -1);
++        $ret = $this->VerifiedApiRequest('alipay.trade.query', ['out_trade_no'=>$params['order_no']]);
++        if($ret['code'] != 0) return $ret;
++        $data = $ret['data'];
++        if(($data['out_trade_no'] ?? '') !== $params['order_no'] ||
++            !\mono\PaymentGuard::sameAmount($params['pay_price'] ?? null, $data['total_amount'] ?? null) ||
++            (!empty($data['seller_id']) && $data['seller_id'] !== $this->config['seller_id']) ||
++            (!empty($data['trans_currency']) && $data['trans_currency'] !== 'CNY'))
++        {
++            return DataReturn('查单金额、收款方或订单不匹配', -1);
++        }
++        return DataReturn('查单成功', 0, $data);
++    }
++
++    public function RefundQuery($params = [])
++    {
++        try { $request_id = \mono\PaymentGuard::refundRequestId($params); }
++        catch(\InvalidArgumentException $error) { return DataReturn($error->getMessage(), -1); }
++        $params['refund_request_no'] = $request_id;
++        return $this->RefundReceiptQuery($params);
++    }
++
++    /** Read-only receipt lookup, including a historical request ID supplied by an operator. */
++    public function RefundReceiptQuery($params = [])
++    {
++        $request_id = $params['refund_request_no'] ?? '';
++        if(!is_string($request_id) || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $request_id)) return DataReturn('原退款请求号无效', -1);
++        $ret = $this->VerifiedApiRequest('alipay.trade.fastpay.refund.query', [
++            'out_trade_no'=>$params['order_no'], 'trade_no'=>$params['trade_no'], 'out_request_no'=>$request_id,
++        ]);
++        if($ret['code'] != 0) return $ret;
++        $result = $ret['data'];
++        $result['refund_fee'] = $result['refund_amount'] ?? null;
++        if(($result['out_request_no'] ?? '') !== $request_id ||
++            ($result['refund_status'] ?? '') !== 'REFUND_SUCCESS' ||
++            !\mono\PaymentGuard::refundMatches($result, $params))
++        {
++            return DataReturn('原退款尚未确认成功或与售后不匹配，请勿换号重退', -1000);
++        }
++        return DataReturn('退款已核实', 0, [
++            'out_trade_no'=>$result['out_trade_no'], 'trade_no'=>$result['trade_no'],
++            'buyer_user'=>$result['buyer_user_id'] ?? '', 'refund_price'=>$result['refund_fee'],
++            'return_params'=>$result, 'request_params'=>['out_request_no'=>$request_id],
++        ]);
++    }
++
++    private function VerifiedApiRequest($method, $business)
++    {
++        $error = $this->ConfigurationError();
++        if($error !== null) return DataReturn($error, -1);
++        $parameter = [
++            'app_id'=>$this->config['appid'], 'method'=>$method, 'format'=>'JSON', 'charset'=>'utf-8',
++            'sign_type'=>'RSA2', 'timestamp'=>date('Y-m-d H:i:s'), 'version'=>'1.0',
++            'biz_content'=>json_encode($business, JSON_UNESCAPED_UNICODE),
++        ];
++        $parameter['sign'] = $this->MyRsaSign($this->GetSignContent($parameter));
++        $result = $this->HttpRequest($this->Gateway(), $parameter);
++        $key = str_replace('.', '_', $method).'_response';
++        if(empty($result[$key]) || !$this->SyncRsaVerify($result, $key)) return DataReturn('网关响应未能通过验签', -1000);
++        if((string) ($result[$key]['code'] ?? '') !== '10000')
++        {
++            return DataReturn('网关尚未确认交易结果', -1000);
++        }
++        return DataReturn('网关结果已核实', 0, $result[$key]);
+     }
+ 
+     /**
+@@ -614,7 +696,13 @@
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_URL, $url);
+         curl_setopt($ch, CURLOPT_FAILONERROR, false);
+-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
++        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
++        $reponse = '';
++        curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($handle, $chunk) use (&$reponse) {
++            if(strlen($reponse) + strlen($chunk) > 262144) return 0;
++            $reponse .= $chunk;
++            return strlen($chunk);
++        });
+         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+@@ -632,7 +720,7 @@
+         }
+         $headers = array('content-type: application/x-www-form-urlencoded;charset=UTF-8');
+         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+-        $reponse = curl_exec($ch);
++        $completed = curl_exec($ch);
+         if(curl_errno($ch))
+         {
+             curl_close($ch);
+@@ -646,7 +734,11 @@
+             }
+         }
+         curl_close($ch);
+-        return json_decode($reponse, true);
++        if($completed === false || strlen($reponse) > 262144) return false;
++        $decoded = json_decode($reponse, true);
++        if(!is_array($decoded)) return false;
++        $decoded['_mono_raw_response'] = $reponse;
++        return $decoded;
+     }
+ 
+     /**
+@@ -774,8 +866,11 @@
+      */
+     private function SyncRsaVerify($data, $key)
+     {
+-        $string = json_encode($data[$key], JSON_UNESCAPED_UNICODE);
+-        return $this->OutRsaVerify($string, $data['sign']);
++        try {
++            $string = \mono\PaymentGuard::signedObject($data['_mono_raw_response'] ?? '', $key);
++            if(!is_string($data['sign'] ?? null) || !$this->OutRsaVerify($string, $data['sign'])) return false;
++            return json_decode($string, true, 512, JSON_THROW_ON_ERROR) === $data[$key];
++        } catch(\Throwable $error) { return false; }
+     }
+ }
+ ?>
+--- a/app/service/OrderService.php
++++ b/app/service/OrderService.php
+@@ -134,103 +134,6 @@
+             }
+         }
+ 
+-        // 订单支付前校验订单商品
+-        $ret = BuyService::MoreOrderPayBeginCheck(array_merge($params, ['order_data'=>$order_data]));
+-        if($ret['code'] != 0)
+-        {
+-            return $ret;
+-        }
+-
+-        // 金额为0、走直接支付成功
+-        $total_price = 0;
+-        $success_count = 0;
+-        foreach($order_data as $order)
+-        {
+-            if($order['total_price'] <= 0.00)
+-            {
+-                $pay_result = self::OrderDirectSuccess([
+-                    'order'     => $order,
+-                    'user'      => $order['user'],
+-                    'params'    => $params,
+-                ]);
+-                if($pay_result['code'] == 0)
+-                {
+-                    // 已支付成功订单结束当前循环
+-                    $success_count++;
+-                    continue;
+-                }
+-                return $pay_result;
+-            }
+-
+-            // 数据集合
+-            $total_price += $order['total_price'];
+-        }
+-
+-        // 是否直接跳转
+-        if($success_count > 0 && $success_count == count($order_data))
+-        {
+-            return DataReturn(MyLang('operate_success'), 0, ['is_success'=>1]);
+-        }
+-
+-        // 订单金额大于0则必须存在支付方式
+-        // 支付方式、未指定支付方式则获取第一个订单的支付方式
+-        $payment = [];
+-        $payment_id = empty($params['payment_id']) ? Db::name('Order')->where(['id'=>$ids[0]])->value('payment_id') : intval($params['payment_id']);
+-        if(!empty($payment_id))
+-        {
+-            $payment = PaymentService::PaymentData(['where'=>['id'=>$payment_id]]);
+-        }
+-        if(empty($payment))
+-        {
+-            return DataReturn(MyLang('payment_method_error_tips'), -1);
+-        }
+-
+-        // 更新订单支付方式信息
+-        if($payment['id'] != $order_payment_id)
+-        {
+-            Db::name('Order')->where(['id'=>$ids])->update([
+-                'payment_id'    => $payment['id'],
+-                'is_under_line' => in_array($payment['payment'], MyConfig('shopxo.under_line_list')) ? 1 : 0,
+-                'upd_time'      => time(),
+-            ]);
+-        }
+-
+-        // 支付入口文件检查
+-        $pay_checked = PaymentService::EntranceFileChecked($payment['payment'], 'order');
+-        if($pay_checked['code'] != 0)
+-        {
+-            // 入口文件不存在则创建
+-            $payment_params = [
+-                'payment'       => $payment['payment'],
+-                'respond'       => '/index/order/respond',
+-                'notify'        => '/api/ordernotify/notify',
+-            ];
+-            $ret = PaymentService::PaymentEntranceCreated($payment_params);
+-            if($ret['code'] != 0)
+-            {
+-                return $ret;
+-            }
+-        }
+-
+-        // 回调地址
+-        $respond_url = $pay_checked['data']['respond'];
+-        $notify_url = $pay_checked['data']['notify'];
+-
+-        // 是否指定同步回调地址
+-        if(!empty($params['redirect_url']))
+-        {
+-            $redirect_url = base64_decode(urldecode($params['redirect_url']));
+-            if(!empty($redirect_url))
+-            {
+-                // 赋值同步返回地址
+-                $respond_url = $redirect_url;
+-            }
+-        }
+-        if(empty($redirect_url))
+-        {
+-            $redirect_url = MyUrl('index/order/index');
+-        }
+-
+         // 当前用户
+         $current_user = empty($params['user']) ? UserService::LoginUserInfo() : $params['user'];
+         if(!empty($current_user))
+@@ -261,15 +164,119 @@
+         {
+             return $ret;
+         }
+-        if(!empty($pay_power['is_check_owner']) && !empty($current_user))
++        if(!empty($pay_power['is_check_owner']))
+         {
+             foreach($order_data as $order)
+             {
+-                if($order['user_id'] != $current_user['id'])
++                if(empty($current_user['id']) || $order['user_id'] != $current_user['id'])
+                 {
+                     return DataReturn(empty($pay_power['error_msg']) ? MyLang('illegal_access_tips') : $pay_power['error_msg'], -1);
+                 }
+             }
++        }
++
++        $review = Db::name('PayLog')->alias('pl')->join('pay_log_value plv', 'pl.id=plv.pay_log_id')
++            ->where(['plv.business_id'=>$ids, 'pl.business_type'=>self::BusinessTypeName(), 'pl.status'=>1])
++            ->where('pl.subject', 'like', 'MONO_REVIEW:%')->count();
++        if($review > 0) return DataReturn('订单存在已收款待核对记录，请联系工作室，勿重复付款', -1);
++
++        // 订单支付前校验订单商品
++        $ret = BuyService::MoreOrderPayBeginCheck(array_merge($params, ['order_data'=>$order_data]));
++        if($ret['code'] != 0)
++        {
++            return $ret;
++        }
++
++        // 金额为0、走直接支付成功
++        $total_price = 0;
++        $success_count = 0;
++        foreach($order_data as $order)
++        {
++            if($order['total_price'] <= 0.00)
++            {
++                $pay_result = self::OrderDirectSuccess([
++                    'order'     => $order,
++                    'user'      => $order['user'],
++                    'params'    => $params,
++                ]);
++                if($pay_result['code'] == 0)
++                {
++                    // 已支付成功订单结束当前循环
++                    $success_count++;
++                    continue;
++                }
++                return $pay_result;
++            }
++
++            // 数据集合
++            $total_price += $order['total_price'];
++        }
++
++        // 是否直接跳转
++        if($success_count > 0 && $success_count == count($order_data))
++        {
++            return DataReturn(MyLang('operate_success'), 0, ['is_success'=>1]);
++        }
++
++        // 订单金额大于0则必须存在支付方式
++        // 支付方式、未指定支付方式则获取第一个订单的支付方式
++        $payment = [];
++        $payment_id = empty($params['payment_id']) ? Db::name('Order')->where(['id'=>$ids[0]])->value('payment_id') : intval($params['payment_id']);
++        if(!empty($payment_id))
++        {
++            $payment = PaymentService::PaymentData(['where'=>['id'=>$payment_id, 'is_enable'=>1, 'is_open_user'=>1]]);
++        }
++        if(empty($payment) || empty($payment['apply_terminal']) || !in_array(APPLICATION_CLIENT_TYPE, $payment['apply_terminal'], true))
++        {
++            return DataReturn(MyLang('payment_method_error_tips'), -1);
++        }
++
++        // 更新订单支付方式信息
++        if($payment['id'] != $order_payment_id)
++        {
++            $payment_where = ['id'=>$ids, 'pay_status'=>0, 'status'=>1];
++            if(!empty($pay_power['is_check_owner'])) $payment_where['user_id'] = $current_user['id'];
++            Db::name('Order')->where($payment_where)->update([
++                'payment_id'    => $payment['id'],
++                'is_under_line' => in_array($payment['payment'], MyConfig('shopxo.under_line_list')) ? 1 : 0,
++                'upd_time'      => time(),
++            ]);
++        }
++
++        // 支付入口文件检查
++        $pay_checked = PaymentService::EntranceFileChecked($payment['payment'], 'order');
++        if($pay_checked['code'] != 0)
++        {
++            // 入口文件不存在则创建
++            $payment_params = [
++                'payment'       => $payment['payment'],
++                'respond'       => '/index/order/respond',
++                'notify'        => '/api/ordernotify/notify',
++            ];
++            $ret = PaymentService::PaymentEntranceCreated($payment_params);
++            if($ret['code'] != 0)
++            {
++                return $ret;
++            }
++        }
++
++        // 回调地址
++        $respond_url = $pay_checked['data']['respond'];
++        $notify_url = $pay_checked['data']['notify'];
++
++        // 是否指定同步回调地址
++        if(!empty($params['redirect_url']))
++        {
++            $redirect_url = base64_decode(urldecode($params['redirect_url']));
++            if(!empty($redirect_url))
++            {
++                // 赋值同步返回地址
++                $respond_url = $redirect_url;
++            }
++        }
++        if(empty($redirect_url))
++        {
++            $redirect_url = MyUrl('index/order/index');
+         }
+ 
+         // 发起支付前处理钩子
+@@ -789,22 +796,25 @@
+         $pay_data = self::OrderPayLogValueList($data['out_trade_no']);
+         if($pay_data['code'] == 0)
+         {
+-            // 订单支付日志已支付则直接返回
+-            if($pay_data['data']['pay_log_data']['status'] == 1)
+-            {
+-                return DataReturn(MyLang('common_service.order.pay_log_already_pay_tips'), 0);
+-            }
+         } else {
+             return $pay_data;
+         }
+ 
+-        // 支付金额是否小于订单金额
+-        if(MyC('common_is_pay_price_must_max_equal', 0) == 1)
+-        {
+-            if($data['pay_price'] < $pay_data['data']['pay_log_data']['total_price'])
+-            {
+-                return DataReturn(MyLang('common_service.order.pay_price_less_than_order_price_tips').'['.$data['pay_price'].'<'.$pay_data['data']['pay_log_data']['total_price'].']', -1);
+-            }
++        // Every paid callback/query must match its immutable payment log, regardless of admin switches.
++        if(($pay_data['data']['pay_log_data']['payment'] ?? '') !== $payment['payment'] ||
++            ($pay_data['data']['pay_log_data']['business_type'] ?? '') !== self::BusinessTypeName() ||
++            !\mono\PaymentGuard::sameAmount($pay_data['data']['pay_log_data']['total_price'], $data['pay_price'] ?? null) ||
++            !is_string($data['trade_no'] ?? null) || !preg_match('/^[a-zA-Z0-9_-]{1,64}$/D', $data['trade_no']))
++        {
++            return DataReturn('支付单、通道或金额不匹配', -1);
++        }
++        if(!empty($pay_data['data']['pay_log_data']['trade_no']) && $pay_data['data']['pay_log_data']['trade_no'] !== $data['trade_no'])
++        {
++            return DataReturn('支付交易号与已记录收款不匹配', -1);
++        }
++        if($pay_data['data']['pay_log_data']['status'] == 1)
++        {
++            return DataReturn(MyLang('pay_success'), 0);
+         }
+ 
+         // 支付处理
+@@ -820,20 +830,6 @@
+             ],
+         ];
+ 
+-        // 支付成功异步通知处理钩子
+-        $hook_name = 'plugins_service_order_pay_notify_handle';
+-        $ret = EventReturnHandle(MyEventTrigger($hook_name, [
+-            'hook_name'     => $hook_name,
+-            'is_backend'    => true,
+-            'payment'       => $payment,
+-            'order'         => $pay_data['data']['order_list'],
+-            'pay_params'    => &$pay_params,
+-        ]));
+-        if(isset($ret['code']) && $ret['code'] != 0)
+-        {
+-            return $ret;
+-        }
+-
+         // 支付结果处理
+         return self::OrderPayHandle($pay_params);
+     }
+@@ -864,7 +860,7 @@
+         }
+ 
+         // 获取订单
+-        $order_list = Db::name('Order')->where(['id'=>$pay_log_value, 'status'=>1])->select()->toArray();
++        $order_list = Db::name('Order')->where(['id'=>$pay_log_value])->order('id asc')->select()->toArray();
+         // 订单数据不存在、并且日志订单非支付状态则报错
+         if(empty($order_list) && $pay_log_data['status'] != 1)
+         {
+@@ -896,7 +892,7 @@
+ 
+         // 订单金额大于0必须存在支付方式和订单支付日志
+         $order_total_price = array_sum(array_column($params['order'], 'total_price'));
+-        if($order_total_price > 0)
++        if($order_total_price > 0 || !empty($params['pay_log_data']))
+         {
+             // 支付方式
+             if(empty($params['payment']))
+@@ -911,23 +907,60 @@
+             }
+         }
+ 
+-        // 查看支付日志是否已支付处理成功、避免异步通知太快导致重叠处理
+-        if($order_total_price > 0 && !empty($params['pay_log_data']) && !empty($params['payment']))
+-        {
+-            $pay_log_status = Db::name('PayLog')->where(['id'=>$params['pay_log_data']['id']])->field('id,status')->value('status');
+-            if($pay_log_status == 1)
+-            {
+-                return DataReturn(MyLang('pay_success'), 0);
+-            }
+-        }
+-
+         // 启动事务
+         Db::startTrans();
+ 
+         // 捕获异常
+         try {
++            // Claim one payment log under a row lock. The second worker observes committed status.
++            $payment_issues = [];
++            $receipt_only = false;
++            if(!empty($params['pay_log_data']) && !empty($params['payment']))
++            {
++                $locked_log = Db::name('PayLog')->where(['id'=>$params['pay_log_data']['id']])->lock(true)->find();
++                if(empty($locked_log)) throw new \Exception('支付日志不存在');
++                if(!\mono\PaymentGuard::sameAmount($locked_log['total_price'], $params['pay']['pay_price'] ?? null) ||
++                    $locked_log['payment'] !== $params['payment']['payment'] ||
++                    $locked_log['business_type'] !== self::BusinessTypeName() ||
++                    (!in_array($params['payment']['payment'], MyConfig('shopxo.under_line_list')) &&
++                    (!is_string($params['pay']['trade_no'] ?? null) ||
++                    !preg_match('/^[a-zA-Z0-9_-]{1,64}$/D', $params['pay']['trade_no'])))) throw new \Exception('支付日志金额或通道不匹配');
++                if($locked_log['status'] == 1)
++                {
++                    if($locked_log['trade_no'] !== ($params['pay']['trade_no'] ?? '')) throw new \Exception('支付交易号不匹配');
++                    Db::commit();
++                    return DataReturn(MyLang('pay_success'), 0);
++                }
++                $params['pay_log_data'] = $locked_log;
++                // Another payment log can cover the same orders: always use fresh, locked state.
++                $params['order'] = Db::name('Order')->where(['id'=>array_column($params['order'], 'id')])->order('id asc')->lock(true)->select()->toArray();
++                if(empty($params['order'])) throw new \Exception('支付关联订单不存在');
++                $receipt_only = !\mono\PaymentGuard::sameAmount($locked_log['total_price'], array_sum(array_column($params['order'], 'total_price')));
++                foreach($params['order'] as $locked_order)
++                {
++                    if($receipt_only || $locked_order['pay_status'] != 0 || (int) $locked_order['status'] !== 1)
++                    {
++                        $payment_issues[] = $locked_order['id'];
++                    }
++                }
++                // Only the winning worker runs the notify hook. External integrations must also
++                // deduplicate by pay_log_data.id because a later database rollback is possible.
++                if(empty($payment_issues))
++                {
++                    $hook_name = 'plugins_service_order_pay_notify_handle';
++                    $hook_params = $params;
++                    $ret = EventReturnHandle(MyEventTrigger($hook_name, [
++                        'hook_name'=>$hook_name, 'is_backend'=>true,
++                        'payment'=>$params['payment'], 'order'=>$params['order'], 'pay_params'=>&$hook_params,
++                    ]));
++                    if(isset($ret['code']) && $ret['code'] != 0) throw new \Exception($ret['msg']);
++                }
++            } else {
++                $params['order'] = Db::name('Order')->where(['id'=>array_column($params['order'], 'id')])->order('id asc')->lock(true)->select()->toArray();
++                if(empty($params['order'])) throw new \Exception('支付关联订单不存在');
++            }
+             // 先更新支付日志
+-            if($order_total_price > 0 && !empty($params['pay_log_data']) && !empty($params['payment']))
++            if(!empty($params['pay_log_data']) && !empty($params['payment']))
+             {
+                 $pay_log_data = [
+                     'log_id'        => $params['pay_log_data']['id'],
+@@ -938,6 +971,11 @@
+                     'payment'       => $params['payment']['payment'],
+                     'payment_name'  => $params['payment']['name'],
+                 ];
++                if(!empty($payment_issues))
++                {
++                    // Native admin payment log exposes this durable reconciliation queue.
++                    $pay_log_data['subject'] = 'MONO_REVIEW:'.implode(',', array_slice($payment_issues, 0, 12));
++                }
+                 $ret = PayLogService::PayLogSuccess($pay_log_data);
+                 if($ret['code'] != 0)
+                 {
+@@ -948,9 +986,24 @@
+             // 循环处理
+             foreach($params['order'] as $order)
+             {
++                if($receipt_only)
++                {
++                    MessageService::MessageAdd($order['user_id'], '收款待核对', '支付后订单金额发生变化，请联系工作室核对，勿重复付款。', self::BusinessTypeName(), $order['id']);
++                    continue;
++                }
+                 // 订单非待支付则不处理
+                 if($order['pay_status'] != 0)
+                 {
++                    continue;
++                }
++                if(!empty($params['pay_log_data']) && (int) $order['status'] !== 1)
++                {
++                    // Record receipt without reopening a canceled/closed order or deducting stock.
++                    if(Db::name('Order')->where(['id'=>$order['id'], 'pay_status'=>0])->update([
++                        'pay_status'=>1, 'pay_price'=>$order['total_price'], 'pay_time'=>time(), 'upd_time'=>time(),
++                        'payment_id'=>$params['payment']['id'], 'is_under_line'=>0,
++                    ]) !== 1) throw new \Exception('异常收款登记失败');
++                    MessageService::MessageAdd($order['user_id'], '收款待核对', '已收到付款，订单状态未恢复，请联系工作室核对原路退款，勿重复付款。', self::BusinessTypeName(), $order['id']);
+                     continue;
+                 }
+ 
+@@ -1039,7 +1092,7 @@
+                 }
+ 
+                 // 虚拟商品自动触发发货操作
+-                if($order['order_model'] == 3)
++                if($order['order_model'] == 3 && !config('mono_payment.manual_service_delivery', true))
+                 {
+                     self::OrderDeliveryHandle([
+                         'id'                => $order['id'],
+--- a/app/service/PayLogService.php
++++ b/app/service/PayLogService.php
+@@ -241,7 +241,7 @@
+             'status'            => 1,
+             'pay_time'          => time(),
+         ];
+-        if(Db::name('PayLog')->where(['id'=>intval($params['log_id']), 'status'=>0])->update($data) !== false)
++        if(Db::name('PayLog')->where(['id'=>intval($params['log_id']), 'status'=>0])->update($data) === 1)
+         {
+             return DataReturn(MyLang('update_success'), 0);
+         }
+--- a/app/service/OrderAftersaleService.php
++++ b/app/service/OrderAftersaleService.php
+@@ -1027,6 +1027,20 @@
+      */
+     public static function AftersaleAudit($params = [])
+     {
++        Db::startTrans();
++        try {
++            $result = self::AftersaleAuditLocked($params);
++            if($result['code'] == 0) Db::commit();
++            else Db::rollback();
++            return $result;
++        } catch(\Throwable $error) {
++            Db::rollback();
++            return DataReturn('退款未完成确认，请查询原售后结果后重试', -1);
++        }
++    }
++
++    private static function AftersaleAuditLocked($params = [])
++    {
+         // 请求参数
+         $p = [
+             [
+@@ -1048,11 +1062,15 @@
+         }
+ 
+         // 售后订单
+-        $aftersale = Db::name('OrderAftersale')->where(['id' => intval($params['id'])])->find();
++        $aftersale = Db::name('OrderAftersale')->where(['id' => intval($params['id'])])->lock(true)->find();
+         if(empty($aftersale))
+         {
+             return DataReturn(MyLang('data_no_exist_or_delete_error_tips'), -1);
+         }
++
++        if((int) $aftersale['status'] === 3) return DataReturn(MyLang('refund_success'), 0);
++        // Serialize refunds of different aftersales against the same order before totals are read.
++        Db::name('Order')->where(['id'=>$aftersale['order_id']])->lock(true)->find();
+ 
+         // 状态校验
+         if($aftersale['status'] != 2)
+@@ -1094,7 +1112,14 @@
+         }
+ 
+         // 订单支付方式校验
+-        $pay_log = Db::name('PayLog')->alias('pl')->join('pay_log_value plv', 'pl.id=plv.pay_log_id')->where(['plv.business_id'=>$order['data']['id'], 'pl.business_type'=>OrderService::BusinessTypeName(), 'pl.status'=>1])->field('pl.*')->find();
++        $pay_logs = Db::name('PayLog')->alias('pl')->join('pay_log_value plv', 'pl.id=plv.pay_log_id')->where(['plv.business_id'=>$order['data']['id'], 'pl.business_type'=>OrderService::BusinessTypeName(), 'pl.status'=>1])->where('pl.subject', 'not like', 'MONO_REVIEW:%')->where('pl.subject', 'not like', 'MONO_RESOLVED:%')->field('pl.*')->select()->toArray();
++        if(count($pay_logs) > 1) return DataReturn('收款记录不唯一，请先核对原交易再退款', -1);
++        $pay_log = empty($pay_logs) ? [] : $pay_logs[0];
++
++        if(!empty($pay_log) && $pay_log['payment'] === 'Alipay' && (int) $params['refundment'] !== 0)
++        {
++            return DataReturn('支付宝订单请使用原路退款；异常收款请先核对支付宝原交易，勿切换退款渠道', -1);
++        }
+ 
+         // 线下支付方式强制使用手动方式退款
+         if(isset($params['is_under_line_use_manual']) && $params['is_under_line_use_manual'] == 1 && !empty($pay_log) && in_array($pay_log['payment'], MyConfig('shopxo.under_line_list')))
+@@ -1185,7 +1210,7 @@
+         }
+ 
+         // 启动事务
+-        Db::startTrans();
++        // Transaction is owned by AftersaleAudit().
+         // 捕获异常
+         try {
+             // 钱包退款
+@@ -1338,10 +1363,10 @@
+             }
+ 
+             // 提交事务
+-            Db::commit();
++            // Commit only after the complete audit succeeds.
+             return DataReturn(MyLang('refund_success'), 0);
+         } catch(\Exception $e) {
+-            Db::rollback();
++            // The outer wrapper rolls back every failure.
+             return DataReturn($e->getMessage(), -1);
+         }
+     }

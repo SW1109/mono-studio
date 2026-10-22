@@ -1,8 +1,8 @@
 import { createServer } from "node:http";
 import { createHash, randomBytes } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
-import { resolve, sep, extname } from "node:path";
-import { isIP } from "node:net";
+import { resolve } from "node:path";
+import { serveStatic } from "./static-files.mjs";
+import { clientAddress, notificationGuard } from "./rate-limit.mjs";
 import { createOrderAdmin } from "./order-admin.mjs";
 import { serviceOffers, validatePurchase } from "../shared/commerce.js";
 import { OrderStore, CommerceError, hashOwner, publicOrder } from "./order-store.mjs";
@@ -27,7 +27,6 @@ function uniqueForm(body) {
   return fields;
 }
 const orderIdPattern = /^GN[A-Z0-9]{20,45}$/;
-const contentTypes = { ".mp4": "video/mp4", ".xml": "application/xml;charset=utf-8", ".txt": "text/plain;charset=utf-8", ".wasm": "application/wasm", ".html": "text/html;charset=utf-8", ".js": "text/javascript;charset=utf-8", ".css": "text/css;charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2", ".ico": "image/x-icon" };
 
 export function createCommerceServer(config, { store = new OrderStore(config.database), provider = config.enabled || config.providerReady ? new AlipayProvider(config) : null, dist = resolve("dist") } = {}) {
   const rates = new Map();
@@ -35,6 +34,7 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
   const lastRefresh = new Map();
   const apiPrefix = `${config.base}api/commerce`;
   const admin = createOrderAdmin(store, config.adminToken);
+  const admitNotification = notificationGuard();
   const send = (response, status, payload, text = false) => {
     response.writeHead(status, { "Content-Type": text ? "text/plain;charset=utf-8" : "application/json;charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" });
     response.end(text ? payload : JSON.stringify(payload));
@@ -42,17 +42,15 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
   function owner(request, response, create = false) {
     const token = /(?:^|;\s*)gn_commerce=([a-f0-9]{64})(?:;|$)/.exec(request.headers.cookie || "")?.[1];
     if (token) return hashOwner(token);
-    if (!create) throw new CommerceError("请使用下单时的浏览器查询订单。", 401);
+    if (!create) throw new CommerceError("请使用下单时的浏览器，并允许本站 Cookie；刷新页面后重试。", 401);
     const fresh = randomBytes(32).toString("hex");
     response.setHeader("Set-Cookie", `gn_commerce=${fresh}; HttpOnly; SameSite=Lax; Path=${config.base}; Max-Age=2592000${config.secureCookie ? "; Secure" : ""}`);
     return hashOwner(fresh);
   }
   function rateLimit(request) {
     const now = Date.now();
-    const peer = request.socket.remoteAddress;
-    const realIp = request.headers["x-real-ip"];
     // 只信任回环代理覆盖后的单一 IP；公网直连不能借伪造头绕过限流。
-    const address = config.trustProxy && ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(peer) && typeof realIp === "string" && isIP(realIp) ? realIp : peer;
+    const address = clientAddress(request, config.trustProxy);
     if (rates.size >= 5000) for (const [key, value] of rates) if (value.until <= now) rates.delete(key);
     if (rates.size >= 5000 && !rates.has(address)) throw new CommerceError("请求较多，请稍后重试。", 429);
     let rate = rates.get(address);
@@ -93,7 +91,9 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
       }
       if (url.pathname === `${apiPrefix}/alipay/notify` && request.method === "POST") {
         // 不依赖浏览器回跳判断付款。只有验签、商户和金额均匹配的通知才能改变订单。
+        let release;
         try {
+          release = admitNotification(clientAddress(request, config.trustProxy));
           if (!provider) throw new CommerceError("支付通道尚未配置。", 503);
           if (!/^application\/x-www-form-urlencoded(?:;|$)/i.test(request.headers["content-type"] || "")) throw new CommerceError("通知格式无效。");
           const fields = uniqueForm(await readBody(request));
@@ -101,7 +101,10 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
           const eventId = `notify:${createHash("sha256").update(fields.sign).digest("hex")}`;
           store.applyPayment(provider.toPaymentEvent(fields, { source: "notify" }), { source: "notify", eventId });
           return send(response, 200, "success", true);
-        } catch { return send(response, 200, "failure", true); }
+        } catch (error) {
+          if (error.status === 429) { response.setHeader("Retry-After", "60"); return send(response, 429, "failure", true); }
+          return send(response, 200, "failure", true);
+        } finally { release?.(); }
       }
       if (url.pathname === `${apiPrefix}/alipay/return` && request.method === "GET") {
         const id = url.searchParams.get("order_id") || url.searchParams.get("out_trade_no") || "";
@@ -115,6 +118,8 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
           return send(response, 200, admin(request, url, `${apiPrefix}/admin`));
         }
         if (url.pathname === `${apiPrefix}/catalog` && request.method === "GET") {
+          // Confirm the browser can retain its owner cookie before creating any order.
+          if (config.enabled) owner(request, response, true);
           return send(response, 200, { offers: serviceOffers, paymentsEnabled: config.enabled, environment: config.enabled ? config.environment : null, merchantName: config.merchantName, channels: config.enabled ? ["alipay"] : [] });
         }
         if (url.pathname === `${apiPrefix}/orders` && request.method === "GET") {
@@ -128,7 +133,7 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
           if (Object.keys(errors).length) throw new CommerceError("请检查订单信息。", 422, errors);
           const key = request.headers["idempotency-key"];
           if (typeof key !== "string" || !/^[a-zA-Z0-9_-]{16,80}$/.test(key)) throw new CommerceError("订单请求标识无效。");
-          const order = store.create(data, owner(request, response, true), key, provider.id);
+          const order = store.create(data, owner(request, response), key, provider.id);
           return send(response, 201, { order: publicOrder(order) });
         }
         const match = new RegExp(`^${apiPrefix}/orders/(GN[A-Z0-9]{20,45})(?:/(payment|refresh))?$`).exec(url.pathname);
@@ -151,43 +156,7 @@ export function createCommerceServer(config, { store = new OrderStore(config.dat
         throw new CommerceError("接口不存在。", 404);
       }
       if (!["GET", "HEAD"].includes(request.method) || !url.pathname.startsWith(config.base)) throw new CommerceError("页面不存在。", 404);
-      const relative = decodeURIComponent(url.pathname.slice(config.base.length));
-      const filename = resolve(dist, relative.endsWith("/") || !extname(relative) ? `${relative.replace(/\/$/, "")}/index.html`.replace(/^\//, "") : relative);
-      if (!filename.startsWith(`${dist}${sep}`)) throw new CommerceError("页面不存在。", 404);
-      let data, status = 200, actual = filename;
-      try { if (!(await stat(filename)).isFile()) throw new Error(); data = await readFile(filename); }
-      catch { status = 404; actual = resolve(dist, "404/index.html"); try { data = await readFile(actual); } catch { return send(response, 404, "请先运行 npm run build 生成官网。", true); } }
-      const headers = { "Content-Type": contentTypes[extname(actual)] || "application/octet-stream", "Content-Length": data.length, "Cache-Control": status === 200 && relative.startsWith("assets/") ? "public,max-age=31536000,immutable" : "no-cache", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" };
-      if (status === 200 && extname(actual) === ".mp4") {
-        // 视频拖动与部分移动浏览器依赖字节范围请求；仅处理单段媒体请求。
-        headers["Accept-Ranges"] = "bytes";
-        if (request.method === "GET" && request.headers.range?.startsWith("bytes=")) {
-          const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.range);
-          const size = data.length;
-          let start = 0, end = size - 1;
-          if (!range || (!range[1] && !range[2])) start = NaN;
-          else if (!range[1]) {
-            const suffix = Number(range[2]);
-            start = Number.isSafeInteger(suffix) && suffix > 0 ? Math.max(0, size - suffix) : NaN;
-          } else {
-            start = Number(range[1]);
-            if (range[2]) {
-              const requestedEnd = Number(range[2]);
-              end = Number.isSafeInteger(requestedEnd) ? Math.min(requestedEnd, size - 1) : NaN;
-            }
-          }
-          if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || start >= size || end < start) {
-            response.writeHead(416, { ...headers, "Content-Range": `bytes */${size}`, "Content-Length": 0 });
-            return response.end();
-          }
-          data = data.subarray(start, end + 1);
-          status = 206;
-          headers["Content-Range"] = `bytes ${start}-${end}/${size}`;
-          headers["Content-Length"] = data.length;
-        }
-      }
-      response.writeHead(status, headers);
-      response.end(request.method === "HEAD" ? undefined : data);
+      await serveStatic(request, response, url.pathname, { dist, base: config.base });
     } catch (error) {
       if (response.headersSent) return response.end();
       if (!(error instanceof CommerceError)) console.error("[commerce]", error.name, "请求处理失败（未记录订单联系信息与密钥）。");

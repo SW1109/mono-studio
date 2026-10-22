@@ -3,12 +3,14 @@ import { createPrivateKey, createPublicKey } from "node:crypto";
 import { resolve } from "node:path";
 
 export function paymentConfig(env = process.env) {
-  const enabled = env.PAYMENTS_ENABLED === "true";
+  const orderCenter = env.PAYMENT_ORDER_CENTER || "node";
+  if (!["node", "shopxo"].includes(orderCenter)) throw new Error("PAYMENT_ORDER_CENTER 只能为 node 或 shopxo。");
+  const enabled = orderCenter === "node" && env.PAYMENTS_ENABLED === "true";
   const adminToken = env.PAYMENT_ADMIN_TOKEN || "";
   if (adminToken && !/^[a-f0-9]{64}$/.test(adminToken)) throw new Error("PAYMENT_ADMIN_TOKEN 必须为 32 字节随机值的小写十六进制字符串；不可使用支付私钥。");
   const environment = env.ALIPAY_ENV || "sandbox";
   if (!["sandbox", "production"].includes(environment)) throw new Error("ALIPAY_ENV 只能为 sandbox 或 production。");
-  const origin = env.PAYMENT_PUBLIC_ORIGIN || "http://127.0.0.1:4176";
+  const origin = env.PAYMENT_PUBLIC_ORIGIN || "http://localhost:5173";
   const parsed = new URL(origin);
   if (!["http:", "https:"].includes(parsed.protocol) || parsed.origin !== origin || parsed.username || parsed.password) throw new Error("PAYMENT_PUBLIC_ORIGIN 必须是仅含协议和域名的站点地址。");
   const base = env.PAYMENT_BASE_PATH || "/";
@@ -16,7 +18,7 @@ export function paymentConfig(env = process.env) {
   const port = Number(env.PAYMENT_PORT || 8787);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("PAYMENT_PORT 无效。");
   const config = {
-    enabled, environment, origin, base, port, host: env.PAYMENT_HOST || "127.0.0.1",
+    enabled, orderCenter, environment, origin, base, port, host: env.PAYMENT_HOST || "127.0.0.1",
     adminToken, trustProxy: env.PAYMENT_TRUST_PROXY === "true",
     merchantName: (env.PAYMENT_MERCHANT_NAME || "").trim(),
     database: resolve(env.PAYMENT_DATABASE_PATH || "data/commerce.sqlite"),

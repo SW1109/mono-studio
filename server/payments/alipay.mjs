@@ -1,5 +1,6 @@
 import { sign, verify } from "node:crypto";
 import { centsToAmount, amountToCents } from "../../shared/commerce.js";
+import { boundedResponseText, signedResponsePart } from "./signed-response.mjs";
 
 export function signatureText(fields, notification = false) {
   return Object.keys(fields).filter(key => key !== "sign" && (!notification || key !== "sign_type") && fields[key] !== "" && fields[key] !== undefined && fields[key] !== null)
@@ -18,23 +19,7 @@ function timestamp(date = new Date()) {
 }
 
 // 查询响应签的是原始 JSON 片段，不可 parse 后重新 stringify；空格、转义会影响验签。
-export function extractResponse(text, name) {
-  const match = new RegExp(`"${name}"\\s*:\\s*`).exec(text);
-  if (!match || text[match.index + match[0].length] !== "{") throw new Error("支付宝响应格式无效。");
-  const start = match.index + match[0].length;
-  let depth = 0, quoted = false, escaped = false;
-  for (let i = start; i < text.length; i++) {
-    const ch = text[i];
-    if (quoted) {
-      if (escaped) escaped = false;
-      else if (ch === "\\") escaped = true;
-      else if (ch === '"') quoted = false;
-    } else if (ch === '"') quoted = true;
-    else if (ch === "{") depth++;
-    else if (ch === "}" && --depth === 0) return text.slice(start, i + 1);
-  }
-  throw new Error("支付宝响应不完整。");
-}
+export const extractResponse = signedResponsePart;
 export class AlipayProvider {
   constructor(config, request = fetch) { this.config = config; this.request = request; this.id = "alipay"; }
   parameters(method, business, extra = {}) {
@@ -68,15 +53,14 @@ export class AlipayProvider {
   async query(order) {
     const response = await this.request(this.config.gateway, {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded;charset=utf-8" },
-      body: new URLSearchParams(this.parameters("alipay.trade.query", { out_trade_no: order.id })), signal: AbortSignal.timeout(12000),
+      body: new URLSearchParams(this.parameters("alipay.trade.query", { out_trade_no: order.id })), signal: AbortSignal.timeout(12000), redirect: "error",
     });
     if (!response.ok) throw new Error("支付宝查询暂时不可用，请稍后重试。");
-    const text = await response.text();
-    if (text.length > 256000) throw new Error("支付宝响应过大。");
+    const text = await boundedResponseText(response);
     const envelope = JSON.parse(text);
     const responseName = envelope.alipay_trade_query_response ? "alipay_trade_query_response" : "error_response";
     const raw = extractResponse(text, responseName);
-    if (!envelope.sign || !verify("RSA-SHA256", Buffer.from(raw, "utf8"), this.config.publicKey, Buffer.from(envelope.sign, "base64"))) throw new Error("支付宝查询响应验签失败。");
+    if (typeof envelope.sign !== "string" || envelope.sign.length > 1024 || !/^[A-Za-z0-9+/]+={0,2}$/.test(envelope.sign) || !verify("RSA-SHA256", Buffer.from(raw, "utf8"), this.config.publicKey, Buffer.from(envelope.sign, "base64"))) throw new Error("支付宝查询响应验签失败。");
     const result = JSON.parse(raw);
     if (result.code === "40004" && result.sub_code === "ACQ.TRADE_NOT_EXIST") return null;
     if (result.code !== "10000") throw new Error("支付宝未能确认交易，请稍后重试或联系工作室。");

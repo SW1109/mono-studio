@@ -1,5 +1,5 @@
 <script setup>
-import { computed, shallowRef, onScopeDispose } from "vue";
+import { computed, shallowRef, onScopeDispose, watch } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import PageHeading from "../components/site/PageHeading.vue";
 import PurchaseForm from "../components/commerce/PurchaseForm.vue";
@@ -11,7 +11,7 @@ import { orderCenter } from "../config/orderCenter.js";
 import "../styles/commerce.css";
 const route = useRoute();
 const router = useRouter();
-const { catalog, loading, error: catalogError } = useCommerceCatalog();
+const { catalog, loading, error: catalogError, reload } = useCommerceCatalog();
 const offer = computed(() => catalog.value.offers.find(item => item.id === route.query.service) || (!route.query.service ? catalog.value.offers[0] : null));
 const busy = shallowRef(false), error = shallowRef(""), serverErrors = shallowRef({}), savedOrder = shallowRef(null);
 let key, fingerprint, controller;
@@ -30,6 +30,7 @@ async function purchase(payload) {
     }
     if (!savedOrder.value) {
       const result = await commerceRequest("/orders", { method: "POST", body: payload, idempotencyKey: key, signal: current.signal });
+      if (current.signal.aborted) return;
       savedOrder.value = result.order;
     }
     const { checkout } = await commerceRequest(`/orders/${savedOrder.value.id}/payment`, { method: "POST", body: { provider: "alipay" }, signal: current.signal });
@@ -38,6 +39,10 @@ async function purchase(payload) {
   finally { if (!current.signal.aborted) busy.value = false; }
 }
 onScopeDispose(() => controller?.abort());
+watch(() => route.query.service, () => {
+  controller?.abort(); busy.value = false; error.value = ""; serverErrors.value = {};
+  savedOrder.value = null; key = undefined; fingerprint = undefined;
+});
 </script>
 <template>
   <PageHeading eyebrow="CHECKOUT" title="确认服务订单" current="确认订单" :description="orderCenter ? '请进入订单中心核对价格、服务范围与条款，登录账号后确认购买。' : '请核对套餐范围与价格，并填写可联系的邮箱。你将在支付宝自己的收银台完成支付。'" />
@@ -51,12 +56,13 @@ onScopeDispose(() => controller?.abort());
   </section>
   <section v-else class="container commerce-checkout">
     <p v-if="loading" class="commerce-notice" role="status">正在确认服务与支付状态…</p>
-    <p v-else-if="catalogError" class="commerce-notice" role="alert">{{ catalogError }}</p>
+    <p v-else-if="catalogError" class="commerce-notice" role="alert">{{ catalogError }} <button class="text-link" type="button" @click="reload">重新检查</button></p>
     <p v-else-if="!catalog.paymentsEnabled" class="commerce-notice">在线收款尚未开放，以下套餐与价格待经营者确认。请先<RouterLink to="/contact/">联系工作室</RouterLink>。</p>
     <p v-else-if="catalog.environment === 'sandbox'" class="commerce-notice">沙箱测试：请使用支付宝沙箱账号，不能用于真实交易。</p>
     <template v-if="offer">
       <fieldset class="commerce-selector" :disabled="busy"><legend>选择服务</legend><label v-for="item in catalog.offers" :key="item.id" :class="{ selected: item.id === offer.id }"><input type="radio" name="service" :checked="item.id === offer.id" :value="item.id" @change="selectService(item.id)" /><span>{{ item.name }}</span><strong>¥{{ centsToAmount(item.priceCents) }}</strong></label></fieldset>
       <p v-if="error" class="commerce-error" role="alert">{{ error }}</p>
+      <button v-if="serverErrors.serviceId" class="text-link" type="button" :disabled="busy || loading" @click="reload">刷新服务与价格</button>
       <p v-if="savedOrder && error" class="commerce-help">订单已创建，不必重复下单。<RouterLink :to="{ path: '/orders/', query: { order: savedOrder.id } }">查看订单 {{ savedOrder.id }}</RouterLink></p>
       <div class="commerce-checkout-grid"><div class="commerce-panel"><PurchaseForm :offer="offer" :busy="busy" :enabled="!loading && !catalogError && catalog.paymentsEnabled" :server-errors="serverErrors" @submit="purchase" /></div><OrderSummary :offer="offer" /></div>
       <p v-if="catalog.merchantName" class="commerce-help">经营主体：{{ catalog.merchantName }}。支付渠道：支付宝{{ catalog.environment === 'sandbox' ? '（沙箱）' : '' }}。</p>

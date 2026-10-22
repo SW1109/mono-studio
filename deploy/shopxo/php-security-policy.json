@@ -1,0 +1,15 @@
+{
+  "reviewedAt": "2026-10-22",
+  "advisories": ["CVE-2026-109618", "CVE-2026-109619"],
+  "sources": [
+    "https://www.php.net/archive/2026.php",
+    "https://docs.bt.cn/notices/php-nodejs-security-update-2026-10-21/"
+  ],
+  "minimumVersions": {
+    "8.3": "8.3.36",
+    "8.4": "8.4.27",
+    "8.5": "8.5.12"
+  },
+  "composerConstraint": ">=8.3.36 <8.4 || >=8.4.27 <8.5 || >=8.5.12 <8.6",
+  "note": "Version baseline for these advisories, not a complete security audit. PHP 8.2 is outside this application's requirements; vendor backports and new branches need separate review."
+}

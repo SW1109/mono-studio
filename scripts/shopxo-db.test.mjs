@@ -1,0 +1,95 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { spawn } from "node:child_process";
+import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve, join } from "node:path";
+import { randomBytes } from "node:crypto";
+import { phpBinary } from "./lib/php-runtime.mjs";
+
+test("真实 MySQL：并发通知、重放、越权、停用渠道、异常收款与回滚重试", async t => {
+  if (!process.env.SHOPXO_TEST_CONFIG) { t.skip("需要隔离 MySQL 测试连接 SHOPXO_TEST_CONFIG；不会自动连接业务库。"); return; }
+  const temp = await mkdtemp(join(tmpdir(), "mono-db-regression-"));
+  const connection = JSON.parse(await readFile(process.env.SHOPXO_TEST_CONFIG, "utf8"));
+  connection.database = `mono_test_${randomBytes(8).toString("hex")}`;
+  const path = join(temp, "connection.json");
+  await writeFile(path, JSON.stringify(connection), { mode: 0o600 });
+  const env = { ...process.env, SHOPXO_SOURCE: resolve(process.env.SHOPXO_SOURCE || "artifacts/order-center/shopxo"), SHOPXO_TEST_CONFIG: path };
+  const run = (file, args, extra = {}) => new Promise((done, reject) => {
+    const child = spawn(phpBinary(), [file, ...args.map(String)], { env: { ...env, ...extra }, windowsHide: true });
+    let stdout = "", stderr = "";
+    child.stdout.on("data", bytes => stdout += bytes); child.stderr.on("data", bytes => stderr += bytes);
+    child.on("error", reject);
+    child.on("exit", code => done({ code, stdout, stderr }));
+  });
+  const worker = (action, id, amount, extra) => run("scripts/shopxo-db-worker.php", [action, id, ...(amount ? [amount] : [])], extra);
+  const inspect = async () => {
+    const result = await run("scripts/shopxo-db-fixture.php", ["inspect"]);
+    assert.equal(result.code, 0, result.stderr + result.stdout);
+    return JSON.parse(result.stdout);
+  };
+  try {
+    const setup = await run("scripts/shopxo-db-fixture.php", ["setup"]);
+    assert.equal(setup.code, 0, setup.stderr + setup.stdout);
+    const initial = await inspect();
+    for (const id of [6, 7]) assert.equal((await worker("pay", id)).code, 1);
+    assert.deepEqual((await inspect()).order, initial.order, "普通和零元订单均应先检查归属");
+    const disabled = await worker("pay", 8);
+    assert.equal(disabled.code, 1);
+    assert.deepEqual((await inspect()).order, initial.order, "禁用渠道不能更改订单");
+    const results = await Promise.all(Array.from({ length: 16 }, () => worker("notify", 1)));
+    for (const result of results) assert.equal(result.code, 0, result.stdout + result.stderr);
+    let state = await inspect();
+    assert.equal(Number(state.goods[0].inventory), 99);
+    assert.equal(Number(state.goods[0].sales_count), 1);
+    assert.equal(state.mono_effects.filter(item => item.kind === "plugins_service_order_pay_notify_handle").length, 1);
+    assert.equal(Number(state.order[0].status), 2, "虚拟服务付款不能自动交付");
+    assert.equal((await worker("notify", 1)).code, 0, "顺序重放成功");
+    assert.equal((await worker("notify", 1, "0.01")).code, 1, "已付重放仍核对金额");
+    assert.equal((await worker("notify", 2)).code, 0);
+    state = await inspect();
+    assert.equal(Number(state.order[1].status), 5, "关闭订单不恢复交付");
+    assert.equal(Number(state.order[1].pay_status), 1);
+    assert.match(state.pay_log[1].subject, /^MONO_REVIEW:/);
+    for (const result of await Promise.all([worker("notify", 3), worker("notify", 4)])) assert.equal(result.code, 0, result.stdout + result.stderr);
+    state = await inspect();
+    assert.equal(Number(state.goods[0].inventory), 98);
+    assert.equal(state.pay_log.slice(2, 4).filter(item => item.subject.startsWith("MONO_REVIEW:")).length, 1);
+    assert.equal((await worker("notify", 5)).code, 0);
+    state = await inspect();
+    assert.equal(Number(state.order[3].pay_status), 0, "改价后不把旧款当作足额付款");
+    assert.match(state.pay_log[4].subject, /^MONO_REVIEW:/);
+    const failed = await worker("notify", 6, undefined, { MONO_TEST_FAIL: "1" });
+    assert.equal(failed.code, 1);
+    state = await inspect();
+    assert.equal(Number(state.pay_log[5].status), 0);
+    assert.equal(Number(state.order[4].pay_status), 0);
+    assert.equal(Number(state.goods[0].inventory), 98);
+    assert.equal((await worker("notify", 6)).code, 0);
+    state = await inspect();
+    assert.equal(Number(state.goods[0].inventory), 97);
+    assert.equal(Number(state.goods[0].sales_count), 3);
+    const refundSetup = await run("scripts/shopxo-db-fixture.php", ["refund-setup"]);
+    assert.equal(refundSetup.code, 0, refundSetup.stdout + refundSetup.stderr);
+    const refund = (id, mode = 0, extra = {}) => run("scripts/shopxo-refund-worker.php", [id, mode], extra);
+    for (const result of await Promise.all(Array.from({ length: 12 }, () => refund(1)))) assert.equal(result.code, 0, result.stdout + result.stderr);
+    assert.equal((await refund(2)).code, 0);
+    assert.equal((await refund(3)).code, 1, "累计退款不得超出实付");
+    assert.equal((await refund(4, 1)).code, 1, "不允许不确定退款改走钱包");
+    assert.equal((await refund(4, 0, { MONO_TEST_FAIL: "1" })).code, 1);
+    let refunds = JSON.parse((await run("scripts/shopxo-db-fixture.php", ["refund-inspect"])).stdout);
+    assert.equal(Number(refunds.order.refund_price), 200);
+    assert.equal(refunds.gateway.length, 3, "远端成功但本地失败仍保留退款事实");
+    assert.equal(refunds.logs.length, 2, "失败操作的本地业务记录回滚");
+    assert.equal((await refund(4)).code, 0);
+    refunds = JSON.parse((await run("scripts/shopxo-db-fixture.php", ["refund-inspect"])).stdout);
+    assert.equal(Number(refunds.order.refund_price), 250);
+    assert.equal(refunds.gateway.length, 3, "同售后重试不得再次退款");
+    assert.equal(refunds.logs.length, 3);
+    t.diagnostic("16 个 PHP worker 使用 InnoDB；库存/消息为可计数测试适配器，不代表插件外部服务验收。");
+  } finally {
+    const cleaned = await run("scripts/shopxo-db-fixture.php", ["cleanup"]);
+    if (cleaned.code !== 0) t.diagnostic("临时测试数据库清理失败，请检查隔离数据库。");
+    await rm(temp, { recursive: true, force: true });
+  }
+});

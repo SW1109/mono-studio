@@ -16,7 +16,10 @@ export function useCommerceCatalog() {
     const current = controller;
     loading.value = true;
     error.value = "";
-    try { catalog.value = await commerceRequest("/catalog", { signal: current.signal }); }
+    try {
+      const result = await commerceRequest("/catalog", { signal: current.signal });
+      if (!current.signal.aborted) catalog.value = result;
+    }
     catch (failure) { if (!current.signal.aborted) error.value = failure.message; }
     finally { if (!current.signal.aborted) loading.value = false; }
   }

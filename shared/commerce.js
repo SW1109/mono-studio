@@ -43,7 +43,7 @@ export function amountToCents(amount) {
   const [whole, decimal = ""] = amount.split(".");
   return Number(BigInt(whole) * 100n + BigInt(decimal.padEnd(2, "0")));
 }
-export function validatePurchase(input) {
+export function validatePurchase(input, offers = serviceOffers) {
   const data = {
     serviceId: typeof input?.serviceId === "string" ? input.serviceId : "",
     contactName: typeof input?.contactName === "string" ? input.contactName.trim() : "",
@@ -52,7 +52,7 @@ export function validatePurchase(input) {
     requirements: typeof input?.requirements === "string" ? input.requirements.trim() : "",
   };
   const errors = {};
-  const offer = findServiceOffer(data.serviceId);
+  const offer = offers.find(item => item.id === data.serviceId);
   if (!offer) errors.serviceId = "请选择有效的服务商品。";
   else if (data.expectedAmountCents !== offer.priceCents) errors.serviceId = "服务价格已调整，请刷新页面并重新确认。";
   if (!data.contactName) errors.contactName = "联系人不能为空。";

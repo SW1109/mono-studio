@@ -9,16 +9,42 @@
   "reviewedAt": "2026-10-22",
   "versionCaveat": "官方站列出 v6.9.2，但本次 GitHub 远端未找到该标签；v6.9.1 仅为可复现的二开基线，不代表最新版或安全审计通过。",
   "patches": [
-    "patches/0001-alipay-backoffice-environment.patch"
+    "patches/0001-alipay-backoffice-environment.patch",
+    "patches/0002-payment-invariants.patch"
   ],
   "sourceFiles": {
     "extend/payment/Alipay.php": "e12421083ef774e54ca6149f2bf3b7dfc5ae5f646ac50a245a41b9d97cb75dcf",
     "app/admin/controller/Payment.php": "c583bfd2494ea1800fa9c6793617b79406f28a68d749f365dcab2fcc82df8837",
     "app/service/PaymentService.php": "e67f884abcdbb1ddaf29bba3e654e9493d01ffa352535b7e42eef34655c2e9c3",
     "app/service/UserService.php": "f38be5ce89ad9bd5f4e232649d046fa1d930b8508a3725b8e64eabc192d3c084",
-    "app/service/OrderService.php": "0ae725e366dc27a598b3a35be099c62abaee2c1c35ca40ffda070cdc6ef44c46"
+    "app/service/OrderService.php": "0ae725e366dc27a598b3a35be099c62abaee2c1c35ca40ffda070cdc6ef44c46",
+    "app/service/PayLogService.php": "f20884eaa30ddfdaf2155484b2dbfff391bbf5984d33d63a919942d3e656644e",
+    "app/service/OrderAftersaleService.php": "f87a8208aeadfa712764f02e2b316e1bd4412d1fd7796bb31821af72b867d1ec",
+    "composer.json": "0929a32c96e6fa1a08c8b8e061c8678b24d9f6ebf04646c76504651e3a544f6b",
+    "composer.lock": "ac5a2bb0da4b89bfb8b9b4d5f9c8932c816a59a2097972fa574e18e9b79d5fdb"
   },
   "patchedFiles": {
-    "extend/payment/Alipay.php": "902d9776b75a0a4785d708a8dbcdff824bfc663ed491d9205968913c7ff5a3cd"
+    "extend/payment/Alipay.php": "77b8d0e58dd6c8457fd4359f296a365cb483a8ab94c50326352bb200c40e22fb",
+    "app/service/OrderService.php": "bc50a5eaf02dc37c76f8b31d6634f63a0cfc23fa327921d91a353cc7b2327f25",
+    "app/service/PayLogService.php": "36424722879b16a06b60ecb84e5b0c29c99500cc629ea5e5733466b19717745b",
+    "app/service/OrderAftersaleService.php": "6a4281e7db954a2f5da04d847a997d93f16d62f8af45e3dc1700def665a66708"
+  },
+  "overlays": {
+    "config/mono_payment.php": "83e458ed8fcee0a96e596b0cb6e9ff027e7ece463007c5c5a496a7da2a92c7e1",
+    "extend/mono/PaymentGuard.php": "3c00ede31120af56c6381daa8a51808f42014712aac7e52e0f76c6dec250d8c0",
+    "mono-payments.php": "ec588919553d18d71df993f59aac3a4f16a41adcdb4ceda5753060000f7d84c1"
+  },
+  "dependencies": {
+    "files": {
+      "composer.json": "55f04257699df1b8168d67099f5b13675458dbbad646aa84ed57dfdd72a4bca7",
+      "composer.lock": "73ac398371e6b92b679a7d4191edc93ba1d3e73ad1f6b5365252381976d56d5f"
+    },
+    "note": "Pinned security updates. Bundled upstream vendor is removed; install this lock with Composer, no development packages or scripts, before running the order center."
+  },
+  "runtimeFiles": {
+    "php-security-policy.json": "9ae3b123549fd110bee0254fe985c36e553e001a7edafc4035cbe31ec91ac3b7",
+    "php-runtime-check.php": "983f99c772223dd21ead7d9483ffe25189ed2a81912b31e68d078199864ed443",
+    "php-production.ini": "1731864766eab523144f672e3981598a42d9b34dc44b2116db40cfab77da230a",
+    "nginx-hardening.conf": "297d5abefda024451048d17b1a5b93092e0875f45f0f327ef44008b2385fcf4e"
   }
 }

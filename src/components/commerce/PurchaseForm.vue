@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, shallowRef, computed, useTemplateRef, nextTick } from "vue";
+import { reactive, shallowRef, computed, useTemplateRef, nextTick, watch } from "vue";
 import { RouterLink } from "vue-router";
 import { purchaseRules, validatePurchase } from "../../../shared/commerce.js";
 const props = defineProps({ offer: { type: Object, required: true }, busy: Boolean, enabled: Boolean, serverErrors: { type: Object, default: () => ({}) } });
@@ -9,19 +9,24 @@ const fields = reactive({ contactName: "", email: "", requirements: "", accepted
 const localErrors = shallowRef({});
 const edited = reactive({});
 const errors = computed(() => ({ ...Object.fromEntries(Object.entries(props.serverErrors).filter(([key]) => !edited[key])), ...localErrors.value }));
+watch(() => props.serverErrors, async value => {
+  if (!Object.keys(value).length) return;
+  await nextTick();
+  form.value?.querySelector('[aria-invalid="true"]')?.focus();
+});
 function payload() { return { ...fields, serviceId: props.offer.id, expectedAmountCents: props.offer.priceCents, termsVersion: purchaseRules.termsVersion }; }
 function validateField(field) {
   edited[field] = true;
   const next = { ...localErrors.value };
   delete next[field];
-  const error = validatePurchase(payload()).errors[field];
+  const error = validatePurchase(payload(), [props.offer]).errors[field];
   if (error) next[field] = error;
   localErrors.value = next;
 }
 function handleInput(field) { edited[field] = true; if (errors.value[field]) validateField(field); }
 function submit() {
   if (props.busy || !props.enabled) return;
-  const result = validatePurchase(payload());
+  const result = validatePurchase(payload(), [props.offer]);
   localErrors.value = result.errors;
   if (Object.keys(result.errors).length) {
     // 校验反馈渲染后定位第一个错误，避免只显示页面顶部提示。

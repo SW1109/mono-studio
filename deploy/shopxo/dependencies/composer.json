@@ -1,0 +1,60 @@
+{
+    "name": "shopxo/shopxo",
+    "description": "ShopXO domestic leading enterprise-class B2C free open source e-commerce system!",
+    "type": "project",
+    "keywords": [
+        "shop",
+        "shopxo",
+        "b2c",
+        "mall",
+        "商城",
+        "开源商城",
+        "小程序",
+        "thinkphp",
+        "ORM"
+    ],
+    "homepage": "http://shopxo.net/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Devil",
+            "email": "fuxiang.gong@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.3.36 <8.4 || >=8.4.27 <8.5 || >=8.5.12 <8.6",
+        "topthink/framework": "^8.1",
+        "topthink/think-orm": "^3.0",
+        "topthink/think-multi-app": "*",
+        "topthink/think-view": "*",
+        "phpoffice/phpspreadsheet": "^1.30.6",
+        "overtrue/pinyin": "^5.3",
+        "picqer/php-barcode-generator": "^2.4",
+        "phpmailer/phpmailer": "^6.12"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "*",
+        "topthink/think-trace": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        },
+        "psr-0": {
+            "": "extend/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "platform": {
+            "php": "8.3.36"
+        },
+        "allow-plugins": {}
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php think service:discover",
+            "@php think vendor:publish"
+        ]
+    }
+}

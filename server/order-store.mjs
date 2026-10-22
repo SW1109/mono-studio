@@ -1,8 +1,9 @@
 import { DatabaseSync } from "node:sqlite";
-import { mkdirSync, chmodSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { createHash, randomBytes } from "node:crypto";
 import { findServiceOffer, purchaseRules } from "../shared/commerce.js";
+import { restrictPrivatePath } from "./file-permissions.mjs";
 
 export const hashOwner = token => createHash("sha256").update(token).digest("hex");
 export class CommerceError extends Error {
@@ -10,9 +11,12 @@ export class CommerceError extends Error {
 }
 export class OrderStore {
   constructor(filename) {
-    if (filename !== ":memory:") mkdirSync(dirname(filename), { recursive: true, mode: 0o700 });
+    if (filename !== ":memory:") {
+      mkdirSync(dirname(filename), { recursive: true, mode: 0o700 });
+      restrictPrivatePath(dirname(filename), true);
+    }
     this.db = new DatabaseSync(filename);
-    if (filename !== ":memory:") chmodSync(filename, 0o600);
+    if (filename !== ":memory:") restrictPrivatePath(filename);
     this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS orders (
         id TEXT PRIMARY KEY, owner_hash TEXT NOT NULL, idempotency_key TEXT NOT NULL, fingerprint TEXT NOT NULL,

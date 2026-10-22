@@ -103,7 +103,7 @@ test("查询响应验签拒绝篡改，不从重复 JSON 键取未验签业务�
     assert.equal((await provider.query(order)).total_amount, "299.00");
     text = text.replace("299.00", "0.01"); await assert.rejects(provider.query(order), /验签/);
     text = `{"alipay_trade_query_response":${raw},"alipay_trade_query_response":{"code":"10000","total_amount":"0.01"},"sign":"${signature}"}`;
-    assert.equal((await provider.query(order)).total_amount, "299.00");
+    await assert.rejects(provider.query(order), /重复/);
     const foreign = JSON.stringify({ code: "10000", out_trade_no: "another-order", total_amount: "299.00" });
     const foreignSign = sign("RSA-SHA256", Buffer.from(foreign), platform.privateKey).toString("base64");
     text = `{"alipay_trade_query_response":${foreign},"sign":"${foreignSign}"}`;
@@ -157,6 +157,8 @@ test("HTTP 全链路：下单、收银台、通知、查询与异常边界（无
   try {
     await t.test("目录不会暴露应用私钥、支付宝公钥或联系人", async () => {
       const response = await api("/catalog"), text = await response.text(); assert.equal(response.status, 200); assert.doesNotMatch(text, /PRIVATE KEY|PUBLIC KEY|privateKey|contactName/);
+      assert.match(response.headers.get("set-cookie"), /HttpOnly; SameSite=Lax/);
+      cookie = response.headers.get("set-cookie").split(";")[0];
     });
     await t.test("跨站请求、无效 JSON 与字段超限被拒绝", async () => {
       assert.equal((await api("/orders", { method: "POST", body: purchase, headers: { Origin: "https://attacker.invalid" } })).status, 403);
@@ -175,8 +177,7 @@ test("HTTP 全链路：下单、收银台、通知、查询与异常边界（无
     });
     await t.test("下单时客户端篡改金额无效，会话 Cookie 为 HttpOnly", async () => {
       const response = await api("/orders", { method: "POST", body: { ...purchase, amountCents: 1, status: "PAID" }, headers: { "Idempotency-Key": randomUUID() } });
-      assert.equal(response.status, 201); assert.match(response.headers.get("set-cookie"), /HttpOnly; SameSite=Lax/);
-      cookie = response.headers.get("set-cookie").split(";")[0]; order = (await response.json()).order;
+      assert.equal(response.status, 201); order = (await response.json()).order;
       assert.equal(order.amountCents, 29900); assert.equal(order.status, "PENDING");
     });
     await t.test("本人查询与未实现的微信渠道边界", async () => {
@@ -346,7 +347,14 @@ test("在线 SQLite 备份包含 WAL 交易、验证完整性且不泄露文件�
     const order = makeOrder(store);
     store.applyPayment(paymentEvent(notification(order)), { source: "notify", eventId: "backup-payment" });
     const target = backupOrders(join(directory, "source.sqlite"), join(directory, "backups"));
-    assert.equal((await stat(target)).mode & 0o777, 0o600);
+    if (process.platform === "win32") {
+      const { execFileSync } = await import("node:child_process");
+      const permissions = JSON.parse(execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", "$acl = [System.IO.File]::GetAccessControl($env:MONO_BACKUP_TEST); @{ protected = $acl.AreAccessRulesProtected; inherited = @($acl.Access | Where-Object IsInherited).Count; count = @($acl.Access).Count; sids = @($acl.Access | ForEach-Object { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value }) } | ConvertTo-Json -Compress"], { encoding: "utf8", env: { ...process.env, MONO_BACKUP_TEST: target }, windowsHide: true }));
+      assert.equal(permissions.protected, true);
+      assert.equal(permissions.inherited, 0);
+      assert.ok(permissions.count >= 1 && permissions.count <= 2);
+      assert.ok(permissions.sids.includes("S-1-5-18"));
+    } else assert.equal((await stat(target)).mode & 0o777, 0o600);
     const backup = new DatabaseSync(target, { readOnly: true });
     try {
       assert.equal(backup.prepare("SELECT status FROM orders WHERE id=?").get(order.id).status, "PAID");
@@ -354,6 +362,18 @@ test("在线 SQLite 备份包含 WAL 交易、验证完整性且不泄露文件�
     } finally { backup.close(); }
     assert.throws(() => backupOrders(join(directory, "missing.sqlite"), join(directory, "backups")), /不存在/);
     assert.equal((await readdir(join(directory, "backups"))).length, 1);
+    const { copyFile } = await import("node:fs/promises");
+    const restoredDirectory = join(directory, "restored");
+    await mkdir(restoredDirectory);
+    const restoredPath = join(restoredDirectory, "commerce.sqlite");
+    await copyFile(target, restoredPath);
+    const restored = new OrderStore(restoredPath);
+    try {
+      assert.equal(restored.owned(order.id, hashOwner("a".repeat(64))).status, "PAID");
+      restored.applyPayment(paymentEvent(notification(order)), { source: "notify", eventId: "backup-payment" });
+      assert.equal(restored.paymentHistory(order.id).length, 1);
+      assert.equal(makeOrder(restored).status, "PENDING");
+    } finally { restored.close(); }
   } finally { store.close(); await rm(directory, { recursive: true, force: true }); }
 });
 
