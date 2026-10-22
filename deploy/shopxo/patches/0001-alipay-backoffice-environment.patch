@@ -1,0 +1,226 @@
+--- a/extend/payment/Alipay.php
++++ b/extend/payment/Alipay.php
+@@ -62,6 +62,28 @@
+ 
+         // 配置信息
+         $element = [
++            // 光年二开：在原生支付后台配置环境和收款方，不使用官网 VITE_* 保存凭据。
++            [
++                'element' => 'select', 'name' => 'environment', 'title' => '支付环境',
++                'default' => 'sandbox', 'is_required' => 1, 'message' => '请选择支付环境',
++                'element_data' => [
++                    ['value' => 'sandbox', 'name' => '沙箱联调（不真实收款）'],
++                    ['value' => 'production', 'name' => '正式收款（需完成商户开通）'],
++                ],
++            ],
++            [
++                'element' => 'input', 'type' => 'text', 'name' => 'seller_id',
++                'title' => '收款方 PID', 'placeholder' => '请输入 2088 开头的 16 位收款方 PID',
++                'default' => '', 'is_required' => 1, 'message' => '请输入收款方 PID',
++            ],
++            [
++                'element' => 'select', 'name' => 'wap_enabled', 'title' => '手机网站支付产品',
++                'default' => '0', 'is_required' => 1, 'message' => '请选择已开通的支付产品',
++                'element_data' => [
++                    ['value' => '0', 'name' => '仅电脑网站支付（手机访问仍使用电脑收银台）'],
++                    ['value' => '1', 'name' => '同时已开通手机网站支付'],
++                ],
++            ],
+             [
+                 'element'       => 'input',
+                 'type'          => 'text',
+@@ -130,13 +152,19 @@
+             return DataReturn('支付缺少配置', -1);
+         }
+ 
++        $error = $this->ConfigurationError();
++        if($error !== null)
++        {
++            return DataReturn($error, -1);
++        }
++
+         // 支付方式
+         switch(APPLICATION_CLIENT_TYPE)
+         {
+             // web
+             case 'pc' :
+             case 'h5' :
+-                if(IsMobile())
++                if(IsMobile() && ($this->config['wap_enabled'] ?? '0') === '1')
+                 {
+                     $ret = $this->PayMobile($params);
+                 } else {
+@@ -259,7 +287,7 @@
+             $result = [
+                 'data'  => $parameter,
+                 'html'  => $html,
+-                'url'   => 'https://openapi.alipay.com/gateway.do?charset=utf-8',
++                'url'   => $this->Gateway().'?charset=utf-8',
+             ];
+             return DataReturn('success', 0, $result);
+         }
+@@ -313,7 +341,7 @@
+             $result = [
+                 'data'  => $parameter,
+                 'html'  => $html,
+-                'url'   => 'https://openapi.alipay.com/gateway.do?charset=utf-8',
++                'url'   => $this->Gateway().'?charset=utf-8',
+             ];
+             return DataReturn('success', 0, $result);
+         }
+@@ -330,6 +358,32 @@
+      * @date    2021-03-24
+      * @desc    description
+      */
++    // 网关只从固定白名单选择；未选择环境时默认沙箱，绝不隐式转为正式收费。
++    private function Gateway()
++    {
++        return ($this->config['environment'] ?? 'sandbox') === 'production'
++            ? 'https://openapi.alipay.com/gateway.do'
++            : 'https://openapi-sandbox.dl.alipaydev.com/gateway.do';
++    }
++
++    private function ConfigurationError()
++    {
++        if(!in_array($this->config['environment'] ?? 'sandbox', ['sandbox', 'production'], true))
++        {
++            return '支付环境只能为 sandbox 或 production';
++        }
++        if(!preg_match('/^\d{16}$/D', $this->config['appid'] ?? '') ||
++            !preg_match('/^2088\d{12}$/D', $this->config['seller_id'] ?? ''))
++        {
++            return '请在订单后台填写有效的应用 ID 和收款方 PID';
++        }
++        if(!in_array($this->config['wap_enabled'] ?? '0', ['0', '1'], true))
++        {
++            return '请选择已开通的手机网站支付产品状态';
++        }
++        return null;
++    }
++
+     public function OrderAutoCloseTime()
+     {
+         return intval(MyC('common_order_close_limit_time', 30, true)).'m';
+@@ -346,7 +400,22 @@
+      */
+     public function Respond($params = [])
+     {
+-        $data = empty($_POST) ? $_GET :  array_merge($_GET, $_POST);
++        $data = $params;
++        // 同一公钥可能对应多个业务；验签之外仍须核对具体应用、收款方和通知类型。
++        if(empty($this->config['appid']) || empty($this->config['seller_id']) ||
++            ($data['app_id'] ?? '') !== $this->config['appid'] ||
++            ($data['seller_id'] ?? '') !== $this->config['seller_id'] ||
++            ($data['sign_type'] ?? '') !== 'RSA2' || !is_string($data['sign'] ?? null))
++        {
++            return DataReturn('支付应用、收款方或签名类型不匹配', -1);
++        }
++        foreach($data as $value)
++        {
++            if(!is_scalar($value))
++            {
++                return DataReturn('支付通知字段格式无效', -1);
++            }
++        }
+         ksort($data);
+ 
+         // 参数字符串
+@@ -376,19 +445,8 @@
+                 {
+                     $status = true;
+                 }
+-            } else {
+-                switch($data['method'])
+-                {
+-                    // pc、h5
+-                    case 'alipay.trade.wap.pay.return' :
+-                    case 'alipay.trade.page.pay.return' :
+-                        if(isset($data['seller_id']))
+-                        {
+-                            $status = true;
+-                        }
+-                        break;
+-                }
+-            }
++            }
++            // 回跳没有 trade_status 时只展示待核实，不将跳回官网当作付款凭据。
+             if($status)
+             {
+                 return DataReturn('支付成功', 0, $this->ReturnData($data));
+@@ -409,7 +467,7 @@
+     {
+         // 返回数据固定基础参数
+         $data['trade_no']       = $data['trade_no'];        // 支付平台 - 订单号
+-        $data['buyer_user']     = $data['seller_id'];       // 支付平台 - 用户
++        $data['buyer_user']     = isset($data['buyer_id']) ? $data['buyer_id'] : '';       // 支付平台 - 用户
+         $data['out_trade_no']   = $data['out_trade_no'];    // 本系统发起支付的 - 订单号
+         $data['subject']        = isset($data['subject']) ? $data['subject'] : ''; // 本系统发起支付的 - 商品名称
+         $data['pay_price']      = $data['total_amount'];    // 本系统发起支付的 - 总价
+@@ -450,6 +508,12 @@
+         if($ret !== true)
+         {
+             return DataReturn($ret, -1);
++        }
++
++        $error = $this->ConfigurationError();
++        if($error !== null)
++        {
++            return DataReturn($error, -1);
+         }
+ 
+         // 退款原因
+@@ -478,7 +542,7 @@
+         $parameter['sign'] = $this->MyRsaSign($this->GetSignContent($parameter));
+ 
+         // 执行请求
+-        $result = $this->HttpRequest('https://openapi.alipay.com/gateway.do', $parameter);
++        $result = $this->HttpRequest($this->Gateway(), $parameter);
+         $key = str_replace('.', '_', $parameter['method']).'_response';
+ 
+ 
+@@ -503,8 +567,8 @@
+             return DataReturn('退款成功', 0, $data);
+         }
+ 
+-        // 直接返回支付信息
+-        return DataReturn($result[$key]['sub_msg'].'['.$result[$key]['sub_code'].']', -1000);
++        // 网络或网关异常不能被当作已退款，也不把内部响应完整暴露给客户。
++        return DataReturn('支付宝未能确认退款，请在商户后台核对后重试，避免重复退款', -1000);
+     }
+ 
+     /**
+@@ -519,7 +583,7 @@
+      */
+     private function BuildRequestForm($params)
+     {
+-        $html = "<form id='alipaysubmit' name='alipaysubmit' action='https://openapi.alipay.com/gateway.do?charset=utf-8' method='POST'>";
++        $html = "<form id='alipaysubmit' name='alipaysubmit' action='".$this->Gateway()."?charset=utf-8' method='POST'>";
+         foreach($params as $key=>$val)
+         {
+             if(!empty($val))
+@@ -551,7 +615,10 @@
+         curl_setopt($ch, CURLOPT_URL, $url);
+         curl_setopt($ch, CURLOPT_FAILONERROR, false);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
++        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
++        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
++        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
++        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+ 
+         $body_string = '';
+         if(is_array($data) && 0 < count($data))
+@@ -568,11 +635,13 @@
+         $reponse = curl_exec($ch);
+         if(curl_errno($ch))
+         {
++            curl_close($ch);
+             return false;
+         } else {
+             $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+             if(200 !== $httpStatusCode)
+             {
++                curl_close($ch);
+                 return false;
+             }
+         }

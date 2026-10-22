@@ -185,16 +185,17 @@ npm run orders:list -- --status PAID --limit 20
 
 ## 开源订单中心与宝塔部署
 
-推荐保持官网展示与交易系统分离。已添加 **ShopXO 原生页面入口集成**，不导入整套商城代码、不伪造登录或付款成功：
+推荐保持官网展示与交易系统分离。已添加 **ShopXO 原生页面入口集成**，官网不打包整套商城代码，不伪造登录或付款成功；独立订单中心通过锁定上游源码和补丁准备：
 
 - 配置 `VITE_SHOPXO_ORIGIN` 与 `VITE_SHOPXO_PRODUCTS` 后，服务卡片进入真实 ShopXO 商品页；订单查询进入其账户订单中心。电脑/手机必须登录同一账号，交易只由订单中心持久化。
 - 未配置仍沿用现有 Node 链路，不会因为新增入口代码就获得跨设备查询能力。旧 Node 订单不会自动归入 ShopXO 账户；不提供未鉴权的同邮箱查单。
 - 官网隐藏 ShopXO 模式下的静态报价，最终价格、主体、交付与条款以订单中心下单确认为准。
-- 目前只做网页入口，不含原生 App、小程序、SSO、Vue 内嵌 ShopXO API 或旧库迁移。ShopXO 是否已安装、商品是否上架、手机网站支付是否开通，仍须真实环境验证。
+- 官网侧仍是网页入口，另提供 `npm run orders:prepare` 准备 ShopXO 二开源码：账户订单归上游统一管理，支付宝应用、密钥、沙箱/正式环境在订单后台配置。不含原生 App、小程序、SSO、Vue 内嵌 ShopXO API 或旧库迁移。ShopXO 是否已安装、商品是否上架、手机网站支付是否开通，仍须真实环境验证。
 
 宝塔部署、版本与许可、商品映射和多端验收见 `deploy/shopxo/README.md`。原 Node 链路的经营者 Bearer 鉴权只读接口、systemd/HTTPS 代理、持久数据库与每日备份见 `deploy/linux/README.md`。管理 API 未设置令牌时关闭，示例 Nginx 禁止公网管理访问。
 
 ```bash
+npm run orders:prepare  # 获取锁定的 ShopXO 源码并应用后台支付宝配置补丁；不安装数据库、不启用收款
 npm run release:package # 构建官网并生成明确允许清单内的发布包，不包含商户秘密或订单库
 npm run orders:backup   # 配置 PAYMENT_BACKUP_DIR 后生成一致性 SQLite 备份
 ```

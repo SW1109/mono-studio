@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/gongfuxiang/shopxo",
+  "ref": "v6.9.1",
+  "commit": "e55db292b07b3406049b41dad216da6fa568ac57",
+  "archiveUrl": "https://codeload.github.com/gongfuxiang/shopxo/tar.gz/e55db292b07b3406049b41dad216da6fa568ac57",
+  "archiveSha256": "897bcaf932ba892c6b36b18718bebdfbd465fad164c8cba716bab9a2d1df1b14",
+  "license": "MIT",
+  "purpose": "development-baseline-not-production-approval",
+  "reviewedAt": "2026-10-22",
+  "versionCaveat": "官方站列出 v6.9.2，但本次 GitHub 远端未找到该标签；v6.9.1 仅为可复现的二开基线，不代表最新版或安全审计通过。",
+  "patches": [
+    "patches/0001-alipay-backoffice-environment.patch"
+  ],
+  "sourceFiles": {
+    "extend/payment/Alipay.php": "e12421083ef774e54ca6149f2bf3b7dfc5ae5f646ac50a245a41b9d97cb75dcf",
+    "app/admin/controller/Payment.php": "c583bfd2494ea1800fa9c6793617b79406f28a68d749f365dcab2fcc82df8837",
+    "app/service/PaymentService.php": "e67f884abcdbb1ddaf29bba3e654e9493d01ffa352535b7e42eef34655c2e9c3",
+    "app/service/UserService.php": "f38be5ce89ad9bd5f4e232649d046fa1d930b8508a3725b8e64eabc192d3c084",
+    "app/service/OrderService.php": "0ae725e366dc27a598b3a35be099c62abaee2c1c35ca40ffda070cdc6ef44c46"
+  },
+  "patchedFiles": {
+    "extend/payment/Alipay.php": "902d9776b75a0a4785d708a8dbcdff824bfc663ed491d9205968913c7ff5a3cd"
+  }
+}

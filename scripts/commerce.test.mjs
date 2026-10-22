@@ -411,3 +411,60 @@ test("静态 MP4 提供正确类型和字节分段，支持播放、拖动及范
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("订单中心源码归档拒绝目录穿越、链接与非预期顶层目录", async () => {
+  const { validateArchiveEntries } = await import("./prepare-order-center.mjs");
+  assert.doesNotThrow(() => validateArchiveEntries(["shopxo-fixed/", "shopxo-fixed/public/index.php"], ["d", "-"], "shopxo-fixed"));
+  for (const [names, types] of [
+    [["shopxo-fixed/../../outside"], ["-"]],
+    [["/shopxo-fixed/index.php"], ["-"]],
+    [["another-source/index.php"], ["-"]],
+    [["shopxo-fixed/linked"], ["l"]],
+    [["shopxo-fixed/hardlink"], ["h"]],
+    [["shopxo-fixed/device"], ["c"]],
+    [["shopxo-fixed/public\\outside"], ["-"]],
+    [[], []],
+    [["shopxo-fixed/index.php"], []],
+  ]) assert.throws(() => validateArchiveEntries(names, types, "shopxo-fixed"));
+});
+
+test("订单中心准备不覆盖已有目录，拒绝未知归档摘要", async () => {
+  const { prepareOrderCenter } = await import("./prepare-order-center.mjs");
+  const { readFile, access } = await import("node:fs/promises");
+  const directory = await mkdtemp(join(tmpdir(), "mono-shopxo-guard-"));
+  try {
+    const old = join(directory, "existing");
+    await mkdir(old);
+    await writeFile(join(old, "site.env"), "keep-existing-site");
+    const fake = join(directory, "untrusted.tar.gz");
+    await writeFile(fake, "not-the-pinned-source");
+    await assert.rejects(prepareOrderCenter({ archive: fake, output: old }), /输出目录已经存在/);
+    assert.equal(await readFile(join(old, "site.env"), "utf8"), "keep-existing-site");
+    const fresh = join(directory, "new");
+    await assert.rejects(prepareOrderCenter({ archive: fake, output: fresh }), /SHA-256 不匹配/);
+    await assert.rejects(access(fresh), { code: "ENOENT" });
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test("订单中心来源锁定与支付补丁约束检查（不代表 PHP 运行或实付验收）", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const lock = JSON.parse(await readFile(new URL("../deploy/shopxo/upstream.lock.json", import.meta.url), "utf8"));
+  assert.equal(lock.repository, "https://github.com/gongfuxiang/shopxo");
+  assert.match(lock.commit, /^[a-f0-9]{40}$/);
+  assert.match(lock.archiveSha256, /^[a-f0-9]{64}$/);
+  assert.equal(new URL(lock.archiveUrl).hostname, "codeload.github.com");
+  assert.ok(lock.archiveUrl.endsWith(lock.commit));
+  assert.equal(lock.purpose, "development-baseline-not-production-approval");
+  const patch = await readFile(new URL("../deploy/shopxo/patches/0001-alipay-backoffice-environment.patch", import.meta.url), "utf8");
+  const added = patch.split("\n").filter(line => line.startsWith("+") && !line.startsWith("+++")).join("\n");
+  assert.match(added, /'name' => 'environment'/);
+  assert.match(added, /'default' => 'sandbox'/);
+  assert.match(added, /'name' => 'seller_id'/);
+  assert.match(added, /'name' => 'wap_enabled'/);
+  assert.match(added, /CURLOPT_SSL_VERIFYPEER, true/);
+  assert.match(added, /CURLOPT_SSL_VERIFYHOST, 2/);
+  assert.match(added, /\$data\['app_id'\]/);
+  assert.match(added, /\$data\['seller_id'\]/);
+  assert.match(added, /openapi-sandbox\.dl\.alipaydev\.com/);
+  assert.doesNotMatch(added, /CURLOPT_SSL_VERIFYPEER, false|VITE_ALIPAY_PRIVATE/);
+});

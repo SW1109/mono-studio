@@ -12,3 +12,6 @@ secrets/
 
 # 发布包仅包含明确允许的运行文件，不提交生成产物
 artifacts/releases/
+
+# 可复现下载的第三方订单中心源码，禁止夹带实际站点数据或凭据
+artifacts/order-center/
