@@ -1,0 +1,12 @@
+{{:ModuleInclude('public/header')}}
+
+<div class="am-container am-text-center am-padding-vertical-xl" role="status">
+    <p class="am-margin-bottom-lg"><i class="am-icon-clock-o am-icon-lg am-text-warning" aria-hidden="true"></i></p>
+    <p class="am-text-lg am-margin-bottom-lg">{{$msg}}</p>
+    <div class="am-margin-bottom-xl">
+        <a href="{{$to_url}}" class="am-btn am-btn-primary am-radius">{{$to_title}}</a>
+        <a href="{{$home_url}}" class="am-btn am-btn-default am-radius am-margin-left-sm">{{:MyLang('common.back_to_the_home_title')}}</a>
+    </div>
+</div>
+
+{{:ModuleInclude('public/footer')}}

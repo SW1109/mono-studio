@@ -3,7 +3,6 @@ import { readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { prerenderPaths, publicPaths, noindexPaths } from "../src/content/paths.js";
-import { serviceOffers, centsToAmount } from "../shared/commerce.js";
 import { products } from "../src/content/products.js";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
@@ -11,6 +10,11 @@ const load = filename => readFile(path.join(dist, filename), "utf8");
 const manifest = JSON.parse(await load(".vite/manifest.json"));
 const metadata = JSON.parse(await load("site-build.json"));
 assert.deepEqual(metadata.paths, prerenderPaths, "产物路径与当前内容配置不一致，可能是旧构建。");
+// 缺配置的构建会静默降级：商城入口退回站内占位页、canonical 与 sitemap 不再输出，因此这里直接失败。
+if (!process.env.VITE_ALLOW_UNCONFIGURED_BUILD) {
+  assert.equal(metadata.commerce?.configured, true, "构建缺少 VITE_SHOPXO_ORIGIN / VITE_SHOPXO_BASE_PATH：商品购买会退回「商城暂未开放」占位页。请使用仓库内的 .env.production 构建。");
+  assert.ok(metadata.origin, "构建缺少 VITE_SITE_URL：页面不会输出 canonical，sitemap 也会缺少绝对地址。");
+}
 const main = manifest["index.html"] || Object.values(manifest).find(item => item.isEntry);
 assert.ok(main, "缺少主入口构建记录。");
 
@@ -61,26 +65,55 @@ for (const route of prerenderPaths) {
       for (const text of content) assert.ok(html.includes(text), `${route} 未预渲染详情内容：${text}`);
     }
   }
-  if (route === "/shop/") for (const offer of serviceOffers) {
-    assert.ok(html.includes(offer.name) && html.includes(offer.scope), `商城未预渲染 ${offer.name} 的名称或范围。`);
-    if (metadata.commerce?.provider === "shopxo") {
-      const href = metadata.commerce.products[offer.id].replaceAll("&", "&amp;");
-      assert.ok(html.includes(`href="${href}"`), `商城缺少 ${offer.name} 的订单中心入口。`);
-      assert.ok(!html.includes(centsToAmount(offer.priceCents)), "订单中心模式不应展示旧静态报价。");
-    } else assert.ok(html.includes(centsToAmount(offer.priceCents)), `商城缺少 ${offer.name} 的价格。`);
+  if (["/shop/", "/checkout/", "/orders/"].includes(route)) {
+    assert.equal(metadata.commerce?.provider, "shopxo", "只保留 ShopXO 一套交易系统。");
+    assert.doesNotMatch(html, /api\/commerce|当前浏览器还没有订单|确认订单并前往支付宝|￥?(?:299|699|999)\.00/, "官网不应保留本地订单表单或静态报价。");
+    if (!metadata.commerce.configured) assert.ok(html.includes("商城暂未开放"), "未配置时应提示商城未开放。");
   }
-  if (metadata.commerce?.provider === "shopxo" && route === "/orders/") {
+  if (metadata.commerce.configured && route === "/shop/") {
+    assert.ok(html.includes(`href="${metadata.commerce.shopUrl.replaceAll("&", "&amp;")}"`), "商品购买应直接进入原生商城。");
+  }
+  if (metadata.commerce.configured && route === "/orders/") {
     assert.ok(html.includes(`href="${metadata.commerce.ordersUrl.replaceAll("&", "&amp;")}"`) && html.includes("同一账号"), "缺少跨设备账户订单入口。");
-    assert.ok(!html.includes("当前浏览器还没有订单"), "订单中心模式不应继续展示旧浏览器查询流程。");
   }
-  if (metadata.commerce?.provider === "shopxo" && route === "/checkout/") assert.ok(html.includes("本页面不创建另一笔订单"), "订单中心模式缺少唯一交易系统说明。");
-  if (noindexPaths.includes(route)) assert.match(html, /noindex/);
+  if (metadata.commerce.configured && route === "/checkout/") {
+    assert.ok(html.includes(`href="${metadata.commerce.shopUrl.replaceAll("&", "&amp;")}"`) && html.includes("本页面不创建另一笔订单"), "旧确认页应进入商城，不再本地下单。");
+  }
+  const descriptions = [...html.matchAll(/<meta\b[^>]*name="description"[^>]*>/g)];
+  assert.equal(descriptions.length, 1, `${route} 页面描述应只有一份。`);
+  const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(match => JSON.parse(match[1]));
+  if (metadata.origin && publicPaths.includes(route)) {
+    assert.equal([...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*>/g)].length, 1, `${route} 规范链接应只有一份。`);
+    assert.equal(structured.length, 1, `${route} 缺少结构化数据。`);
+    assert.ok(structured[0]["@graph"].some(item => item["@type"] === "Organization"));
+    assert.match(html, /social-card\.png/, `${route} 缺少分享图。`);
+  }
+  if (route === "/guides/") {
+    assert.match(html, /<table[\s>]/, "选购对照应在无 JavaScript 的 HTML 中可读。");
+    assert.match(html, /id="selection"/);
+    assert.match(html, /Excel 数据整理自动化/);
+  }
+  // JSON-LD 不能比正文多描述问答，避免只给爬虫展示额外营销内容。
+  for (const graph of structured) for (const entry of graph["@graph"] || []) {
+    if (entry["@type"] !== "FAQPage") continue;
+    for (const question of entry.mainEntity) {
+      const outsideSchema = html.replace(/<script\b[^>]*type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/g, "");
+      assert.ok(outsideSchema.includes(question.name) && outsideSchema.includes(question.acceptedAnswer.text), `${route} 结构化问答与正文不一致。`);
+    }
+  }
+  if (noindexPaths.includes(route)) { assert.match(html, /noindex/); assert.equal(structured.length, 0); }
   if (metadata.origin && publicPaths.includes(route)) assert.ok(html.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`), `${route} 缺少正式 canonical。`);
 }
 await stat(path.join(dist, "favicon.png"));
 await stat(path.join(dist, "cesium/Workers"));
 await stat(path.join(dist, "cesium/Assets/Textures/NaturalEarthII"));
 if (metadata.origin) {
+  await stat(path.join(dist, "social-card.png"));
+  const robots = await load("robots.txt");
+  for (const route of noindexPaths) assert.ok(!robots.includes(`Disallow: ${metadata.base}${route.slice(1)}`), "爬虫必须能读取页面上的 noindex。");
+  const directory = await load("llms.txt");
+  assert.ok(directory.includes(`${metadata.origin}${metadata.base}guides/`));
+  if (metadata.commerce.configured) assert.ok(robots.includes(`${metadata.commerce.origin}${metadata.commerce.basePath}?s=sitemap/index`));
   const sitemap = await load("sitemap.xml");
   assert.ok(!sitemap.includes("/404/"));
   for (const route of publicPaths) assert.ok(sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`));

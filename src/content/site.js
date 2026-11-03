@@ -1,14 +1,14 @@
 export const site = Object.freeze({
   name: "光年数智网络科技工作室",
   shortName: "光年数智",
-  email: "heerjohn379@gmail.com",
+  email: "nexlyaihub@gmail.com",
   wechat: "feg1735",
   description: "光年数智网络科技工作室，提供产品设计、软件研发与系统集成服务，涵盖企业网站、业务管理系统、小程序、桌面软件与自动化工具。",
   navigation: [
     { label: "首页", to: "/" },
     { label: "开发服务", to: "/services/" },
     { label: "软件产品", to: "/products/" },
-    { label: "服务商城", to: "/shop/" },
+    { label: "商品购买", to: "/shop/" },
     { label: "关于光年", to: "/about/" },
     { label: "技术演示", to: "/lab/" },
   ],

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
+import SiteNavLink from "../components/site/SiteNavLink.vue";
 import { solutions, existingProducts } from "../content/products.js";
 import PageHeading from "../components/site/PageHeading.vue";
 import ProductCard from "../components/site/ProductCard.vue";
@@ -16,7 +17,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
   <section class="container catalog-intro glass-panel" aria-label="软件展示说明" data-reveal>
     <div class="catalog-intro-copy">
       <span class="icon-tile"><SiteIcon name="layers" /></span>
-      <div><h2>定制方案与适用范围</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。</p></div>
+      <div><h2>定制方案与适用范围</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。可直接选购的技术服务请前往 <SiteNavLink to="/shop/">服务商城 ↗</SiteNavLink>。</p></div>
     </div>
     <dl class="catalog-counts">
       <div><dt>开发方向</dt><dd>{{ solutions.length }}<small>个方案</small></dd></div>

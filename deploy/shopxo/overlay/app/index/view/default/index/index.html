@@ -1,0 +1,38 @@
+{{:ModuleInclude('public/header')}}
+{{php}}
+$mono_catalogue = json_decode(file_get_contents(ROOT.'mono-service-catalog.json'), true);
+$mono_website = rtrim(MyC('mono_website_origin', 'https://guangnian.xin'), '/');
+$mono_contract = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
+$mono_contract_goods_id = is_array($mono_contract) && !empty($mono_contract['goodsId']) ? intval($mono_contract['goodsId']) : 0;
+{{/php}}
+<div class="gn-store">
+    <a class="gn-skip" href="#services">跳转到服务商品</a>
+    <main>
+        <section class="gn-shop-intro gn-container"><p class="gn-eyebrow">PRODUCTS & SERVICES</p><h1>商品购买</h1><p>把需要解决的问题，交给明确的服务。这里提供网站开发、接口集成、页面优化与数据自动化服务，每一项都写清范围、交付物与验收方式。</p><div class="gn-intro-meta"><span>远程人工服务</span><span>源码与交付记录</span><span>同一账号跨设备查看订单</span></div></section>
+        {{if !empty(MyC('common_shop_notice'))}}<div class="gn-container"><div class="gn-notice" role="note"><span class="gn-notice-label">商城公告</span><p>{{:MyC('common_shop_notice')}}</p></div></div>{{/if}}
+        <section class="gn-catalog gn-container" id="services" aria-labelledby="gn-catalog-title">
+            <div class="gn-section-heading"><div><p class="gn-eyebrow">SELECT A SERVICE</p><h2 id="gn-catalog-title">可选服务</h2></div><a class="gn-text-link" href="{{:MyUrl('index/search/index')}}">全部商品 <span aria-hidden="true">↗</span></a></div>
+            <div class="gn-grid">
+                {{if !empty($goods_floor_list)}}
+                    {{foreach $goods_floor_list as $floor}}
+                        {{if !empty($floor['goods'])}}
+                            {{foreach $floor.goods as $goods}}
+                                <article class="gn-product">
+                                    <a class="gn-product-image" href="{{$goods.goods_url}}" tabindex="-1" aria-hidden="true"><img src="{{$goods.images}}" alt="" loading="lazy" width="1200" height="800" decoding="async"></a>
+                                    <div class="gn-product-content"><p class="gn-product-category">{{$floor.name}}</p><h3><a href="{{$goods.goods_url}}">{{$goods.title}}</a>{{if $mono_contract_goods_id > 0 && intval($goods.id) == $mono_contract_goods_id}}<span class="gn-contract-badge">合同付款</span>{{/if}}</h3><p class="gn-product-description">{{$goods.simple_desc}}</p><div class="gn-product-footer"><span class="gn-price">{{if $mono_contract_goods_id > 0 && intval($goods.id) == $mono_contract_goods_id}}按合同金额{{else /}}<span>¥</span>{{$goods.price}}{{/if}}</span><a class="gn-product-link" href="{{$goods.goods_url}}">查看详情 <span aria-hidden="true">↗</span></a></div></div>
+                                </article>
+                            {{/foreach}}
+                        {{/if}}
+                    {{/foreach}}
+                {{/if}}
+            </div>
+            {{if empty($goods_floor_list)}}<p class="gn-empty">服务商品正在准备中，请通过光年官网联系我们。</p>{{/if}}
+        </section>
+        <section class="gn-service-flow gn-container" aria-labelledby="gn-flow-title">
+            <div class="gn-section-heading"><div><p class="gn-eyebrow">HOW WE WORK</p><h2 id="gn-flow-title">从需求确认，到交付验收。</h2></div><a class="gn-text-link" href="{{$mono_website}}/guides/">服务选购指南 ↗</a></div>
+            <ol><li><span>01</span><h3>先确认，后下单</h3><p>提供项目情况与目标，确认套餐范围、必要资料和可安排的时间。</p></li><li><span>02</span><h3>按范围实施</h3><p>在约定环境中完成工作，保留修改内容、验证记录及必要的使用说明。</p></li><li><span>03</span><h3>逐项验收与交付</h3><p>依据商品约定核对交付物。范围内的问题优先修正，额外需求提前沟通。</p></li></ol>
+        </section>
+        <section class="gn-shop-faq gn-container" aria-labelledby="gn-faq-title"><div><p class="gn-eyebrow">BEFORE YOU ORDER</p><h2 id="gn-faq-title">购买前，先了解这些。</h2><p>不确定哪个套餐适合你的项目？<br>先交流需求，再决定。</p><a class="gn-text-link" href="{{$mono_website}}/contact/">联系工作室 ↗</a></div><div class="gn-faq-list">{{foreach $mono_catalogue.purchaseFaqs as $faq}}<details><summary>{{$faq.question}}</summary><p>{{$faq.answer}}</p></details>{{/foreach}}<a class="gn-text-link" href="{{$mono_website}}/service-terms/">阅读服务条款与隐私说明 ↗</a></div></section>
+    </main>
+</div>
+{{:ModuleInclude('public/footer')}}

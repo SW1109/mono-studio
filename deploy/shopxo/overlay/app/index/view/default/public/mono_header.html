@@ -1,0 +1,24 @@
+{{php}}
+$mono_site = json_decode(file_get_contents(ROOT.'mono-site-navigation.json'), true);
+$mono_website = rtrim(MyC('mono_website_origin', 'https://guangnian.xin'), '/');
+// 售后控制器实际名为 orderaftersale；只按明确的页面归属选中，避免账号页面误亮购买入口。
+$mono_order_active = in_array($controller_name, ['order', 'orderaftersale'], true);
+$mono_shop_active = in_array($controller_name, ['index', 'goods', 'search', 'category', 'cart', 'buy'], true);
+{{/php}}
+<a class="gn-site-skip" href="#gn-commerce-content">跳转到主要内容</a>
+<header class="gn-site-header">
+    <div class="gn-site-header-inner">
+        <a class="gn-site-brand" href="{{$mono_website}}/" aria-label="光年数智首页"><img src="{{$public_host}}static/mono/brand-mark.png" width="35" height="30" alt=""><span><strong>光年数智</strong><small>GUANGNIAN · DIGITAL</small></span></a>
+        <nav class="gn-site-nav" aria-label="主导航">
+            {{foreach $mono_site.navigation as $item}}
+                <a href="{{if $item['to'] eq '/shop/'}}{{:MyUrl('index/index/index')}}{{else /}}{{$mono_website}}{{$item.to}}{{/if}}" {{if $item['to'] eq '/shop/'}}aria-current="page"{{/if}}>{{$item.label}}</a>
+            {{/foreach}}
+        </nav>
+        <a class="gn-site-contact" href="{{$mono_website}}/contact/">项目咨询 <span aria-hidden="true">↗</span></a>
+        <details class="gn-site-menu"><summary aria-label="打开导航菜单">菜单 <span aria-hidden="true">☰</span></summary><nav aria-label="移动端主导航">{{foreach $mono_site.navigation as $item}}<a href="{{if $item['to'] eq '/shop/'}}{{:MyUrl('index/index/index')}}{{else /}}{{$mono_website}}{{$item.to}}{{/if}}">{{$item.label}} <span aria-hidden="true">↗</span></a>{{/foreach}}<a href="{{$mono_website}}/contact/">联系合作</a></nav></details>
+    </div>
+</header>
+<div class="gn-commerce-bar gn-container" id="gn-commerce-content" tabindex="-1">
+    <nav aria-label="商品与订单"><a href="{{:MyUrl('index/index/index')}}" {{if $mono_shop_active}}aria-current="page"{{/if}}>商品购买</a><a href="{{:MyUrl('index/order/index')}}" {{if $mono_order_active}}aria-current="page"{{/if}}>我的订单</a></nav>
+    <div class="gn-account-links">{{if empty($user)}}<a href="{{:MyUrl('index/user/logininfo')}}">登录</a><span aria-hidden="true">/</span><a href="{{:MyUrl('index/user/reginfo')}}">注册</a>{{else /}}<a href="{{:MyUrl('index/user/index')}}">{{$user.user_name_view}}</a><a href="{{:MyUrl('index/user/logout')}}">退出</a>{{/if}}</div>
+</div>

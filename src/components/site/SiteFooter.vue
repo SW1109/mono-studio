@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink } from "vue-router";
+import SiteNavLink from "./SiteNavLink.vue";
 import { site } from "../../content/site.js";
 import mark from "../../assets/brand-mark.png";
 import recordIcon from "../../assets/gongan-beian.png";
@@ -13,14 +14,15 @@ import recordIcon from "../../assets/gongan-beian.png";
         <p>软件设计与研发<br />网站 · 业务系统 · 自动化</p>
         <p class="footer-wordmark">SOFTWARE DESIGN &amp; ENGINEERING.</p>
       </div>
-      <div><h2>网站导航</h2><nav aria-label="页脚导航"><RouterLink v-for="item in site.navigation.slice(1)" :key="item.to" :to="item.to">{{ item.label }}</RouterLink></nav></div>
+      <div><h2>网站导航</h2><nav aria-label="页脚导航"><SiteNavLink v-for="item in site.navigation.slice(1)" :key="item.to" :to="item.to">{{ item.label }}</SiteNavLink></nav></div>
       <div class="footer-contact">
         <h2>联系合作</h2>
         <a :href="`mailto:${site.email}`">{{ site.email }}</a>
         <p>微信 · {{ site.wechat }}</p>
         <nav aria-label="服务与订单">
+          <RouterLink to="/guides/">服务选购指南</RouterLink>
           <RouterLink to="/service-terms/">服务条款与隐私说明</RouterLink>
-          <RouterLink to="/orders/">订单查询</RouterLink>
+          <SiteNavLink to="/orders/">我的订单</SiteNavLink>
         </nav>
         <RouterLink class="text-link" to="/contact/">项目咨询 <span aria-hidden="true">↗</span></RouterLink>
       </div>

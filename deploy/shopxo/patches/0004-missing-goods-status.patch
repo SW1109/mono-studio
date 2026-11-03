@@ -1,0 +1,22 @@
+--- a/app/index/controller/Goods.php
++++ b/app/index/controller/Goods.php
+@@ -56,7 +56,8 @@
+         if($goods_id <= 0)
+         {
+             MyViewAssign('msg', MyLang('goods.goods_no_data_tips'));
+-            return MyView('/public/tips_error');
++            // 缺失商品返回真实 404，避免搜索引擎把错误提示识别为有效商品页。
++            return response(MyView('/public/tips_error'), 404);
+         }
+ 
+         $user_id = !empty($this->user) && !empty($this->user['id']) ? intval($this->user['id']) : 0;
+@@ -79,7 +80,8 @@
+         if(empty($goods))
+         {
+             MyViewAssign('msg', MyLang('goods.goods_no_data_tips'));
+-            return MyView('/public/tips_error');
++            // 缺失商品返回真实 404，避免搜索引擎把错误提示识别为有效商品页。
++            return response(MyView('/public/tips_error'), 404);
+         }
+ 
+         // 用户收藏状态（实时）

@@ -1,6 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
+import SiteNavLink from "./SiteNavLink.vue";
 import { site } from "../../content/site.js";
 import mark from "../../assets/brand-mark.png";
 
@@ -47,14 +48,14 @@ onBeforeUnmount(() => {
         <span><strong>光年数智</strong><small>GUANGNIAN · DIGITAL</small></span>
       </RouterLink>
       <nav class="desktop-nav" aria-label="主导航">
-        <RouterLink v-for="item in site.navigation" :key="item.to" :to="item.to" :class="{ 'is-active': item.to === '/' ? route.path === '/' : route.path.startsWith(item.to) }">{{ item.label }}</RouterLink>
+        <SiteNavLink v-for="item in site.navigation" :key="item.to" :to="item.to" :class="{ 'is-active': item.to === '/' ? route.path === '/' : route.path.startsWith(item.to) }">{{ item.label }}</SiteNavLink>
       </nav>
       <RouterLink class="button button-primary header-contact" to="/contact/">项目咨询 <span aria-hidden="true">↗</span></RouterLink>
       <button class="menu-toggle" type="button" aria-label="打开导航菜单" aria-controls="mobile-menu" :aria-expanded="menuOpen" @click="openMenu"><span></span><span></span></button>
     </div>
     <dialog id="mobile-menu" ref="menu" class="mobile-menu" aria-label="导航菜单" @close="restoreScroll" @click="(event) => { if (event.target === menu) closeMenu(); }">
       <div class="mobile-menu-top"><strong>光年数智</strong><button class="icon-button" type="button" aria-label="关闭导航菜单" @click="closeMenu">×</button></div>
-      <nav aria-label="移动端主导航"><RouterLink v-for="item in site.navigation" :key="item.to" :to="item.to" @click="closeMenu">{{ item.label }} <span aria-hidden="true">↗</span></RouterLink><RouterLink to="/contact/" @click="closeMenu">联系合作 <span aria-hidden="true">↗</span></RouterLink></nav>
+      <nav aria-label="移动端主导航"><SiteNavLink v-for="item in site.navigation" :key="item.to" :to="item.to" @click="closeMenu">{{ item.label }} <span aria-hidden="true">↗</span></SiteNavLink><RouterLink to="/contact/" @click="closeMenu">联系合作 <span aria-hidden="true">↗</span></RouterLink></nav>
       <p>专注软件研发，设计与工程并重。</p>
     </dialog>
   </header>

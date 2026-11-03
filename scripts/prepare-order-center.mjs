@@ -4,7 +4,8 @@ import { readFile, writeFile, mkdir, mkdtemp, rm, stat, copyFile } from "node:fs
 import { tmpdir } from "node:os";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { serviceOffers, centsToAmount } from "../shared/commerce.js";
+import { site } from "../src/content/site.js";
+import { serviceOffers, servicePurchaseFaqs } from "../src/content/serviceOffers.js";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const deploymentRoot = join(projectRoot, "deploy/shopxo");
@@ -57,21 +58,42 @@ export async function prepareOrderCenter({ archive, output = join(projectRoot, "
       execFileSync("patch", ["--batch", "--forward", "--fuzz=0", "-p1", "-i", join(deploymentRoot, patch)], { cwd: destination, stdio: "inherit" });
     }
     await verifyFiles(destination, lock.patchedFiles);
-    const php = spawnSync("php", ["-l", join(destination, "extend/payment/Alipay.php")], { encoding: "utf8" });
-    if (php.error && php.error.code !== "ENOENT") throw php.error;
-    if (!php.error && php.status !== 0) throw new Error("支付宝二开文件 PHP 语法检查失败，已停止准备。");
-    const syntaxCheck = php.error ? "not-run-php-unavailable" : "passed";
+    for (const [path, digest] of Object.entries(lock.overlayFiles || {})) {
+      const source = join(deploymentRoot, "overlay", path);
+      if (sha256(await readFile(source)) !== digest) throw new Error(`商城主题覆盖文件摘要不匹配：${path}`);
+      await mkdir(dirname(join(destination, path)), { recursive: true });
+      await copyFile(source, join(destination, path));
+    }
+    await verifyFiles(destination, lock.overlayFiles || {});
+    if (lock.upgrade) {
+      const source = join(deploymentRoot, lock.upgrade.path);
+      if (sha256(await readFile(source)) !== lock.upgrade.sha256) throw new Error("数据库增量迁移脚本摘要不匹配。");
+      await copyFile(source, join(destination, lock.upgrade.output));
+    }
+    let syntaxCheck = "passed";
+    const phpFiles = [...Object.keys(lock.patchedFiles), ...Object.keys(lock.overlayFiles || {}), ...(lock.upgrade ? [lock.upgrade.output] : [])].filter(path => path.endsWith(".php"));
+    for (const path of phpFiles) {
+      const php = spawnSync("php", ["-l", join(destination, path)], { encoding: "utf8" });
+      if (php.error && php.error.code !== "ENOENT") throw php.error;
+      if (php.error) { syntaxCheck = "not-run-php-unavailable"; break; }
+      if (php.status !== 0) throw new Error(`二开文件 PHP 语法检查失败：${path}`);
+    }
     const catalogue = {
-      requiresOwnerConfirmation: true,
-      note: "这是待经营者确认的服务资料，不是已入库商品。请在后台创建服务商品并回填真实 ID；不自动上架、不启用支付。",
-      services: serviceOffers.map(offer => ({ ...offer, price: centsToAmount(offer.priceCents) })),
+      catalogVersion: "2026-10-28",
+      note: "有明确范围与交付清单的软件技术服务套餐；维护脚本须先检查并在备份后显式执行。定价和履约由经营者负责，准备源码不自动上架或启用支付。",
+      purchaseFaqs: servicePurchaseFaqs,
+      services: serviceOffers,
     };
     await writeFile(join(destination, "mono-service-catalog.json"), JSON.stringify(catalogue, null, 2) + "\n");
+    await writeFile(join(destination, "mono-site-navigation.json"), JSON.stringify({ name: site.name, navigation: site.navigation, email: site.email, wechat: site.wechat, records: site.records }, null, 2) + "\n");
     await copyFile(join(deploymentRoot, "README.md"), join(destination, "MONO-STUDIO-SETUP.md"));
+    await copyFile(join(deploymentRoot, "nginx-security.conf"), join(destination, "MONO-NGINX-SECURITY.conf"));
+    await copyFile(join(deploymentRoot, "nginx-storefront.conf"), join(destination, "MONO-NGINX-STOREFRONT.conf"));
+    await copyFile(join(deploymentRoot, "nginx-seo.conf"), join(destination, "MONO-NGINX-SEO.conf"));
     const manifest = {
       preparedAt: new Date().toISOString(), repository: lock.repository, commit: lock.commit,
-      ref: lock.ref, archiveSha256: lock.archiveSha256, patches: lock.patches,
-      files: lock.patchedFiles, phpSyntaxCheck: syntaxCheck, runtimeVerified: false,
+      ref: lock.ref, archiveSha256: lock.archiveSha256, patches: lock.patches, upgrade: lock.upgrade,
+      files: lock.patchedFiles, overlayFiles: lock.overlayFiles, upstreamFiles: lock.sourceFiles, phpSyntaxCheck: syntaxCheck, runtimeVerified: false,
       merchantConfigured: false, productionApproved: false, containsMerchantSecrets: false,
     };
     await writeFile(join(destination, "mono-source-manifest.json"), JSON.stringify(manifest, null, 2) + "\n");

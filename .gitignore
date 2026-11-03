@@ -3,15 +3,30 @@ dist/
 .vite/
 *.log
 .env
-.env.*.local
+.env.*
 !.env.example
+!.env.production
+# .env.production 只含公开域名与商品 ID，需要进入仓库以保证构建可复现
+
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
 
 # 服务端订单库与支付密钥不得进入仓库或前端产物
 data/
 secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.bak
 
-# 发布包仅包含明确允许的运行文件，不提交生成产物
-artifacts/releases/
-
-# 可复现下载的第三方订单中心源码，禁止夹带实际站点数据或凭据
-artifacts/order-center/
+# 源码副本、预览数据库、截图、备份和发布包都只保留在本机。
+artifacts/
+playwright-report/
+test-results/
+coverage/

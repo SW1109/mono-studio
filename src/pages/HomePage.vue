@@ -36,7 +36,7 @@ import filmPoster from "../assets/media/studio-film-v5-poster.webp";
     </div>
   </section>
 
-  <section class="section section-soft">
+  <section id="solutions" class="section section-soft">
     <div class="container">
       <div class="section-heading" data-reveal>
         <div><p class="eyebrow">02 / SOFTWARE SOLUTIONS</p><h2>企业应用<br />与定制方案</h2><p class="section-description">提供官网、业务管理与移动服务等方案参考。以下内容为定制开发方向，非已上线客户案例。</p></div>
@@ -46,7 +46,7 @@ import filmPoster from "../assets/media/studio-film-v5-poster.webp";
     </div>
   </section>
 
-  <section class="section container process-section">
+  <section id="process" class="section container process-section">
     <div data-reveal><p class="eyebrow">03 / HOW WE WORK</p><h2>需求、研发<br />与项目交付</h2><p class="section-description">确认功能范围、技术方案与验收要求，按阶段评审开发成果；部署、源码交接与维护安排以项目约定为准。</p><RouterLink class="text-link" to="/services/#process">了解合作方式 <span aria-hidden="true">↗</span></RouterLink></div>
     <ol class="process-list">
       <li v-for="(step, index) in process" :key="step.title" data-reveal :data-reveal-delay="index * 60"><span class="step-number">0{{ index + 1 }}</span><div><h3>{{ step.title }}</h3><p>{{ step.description }}</p></div><SiteIcon name="arrow" /></li>
@@ -66,6 +66,13 @@ import filmPoster from "../assets/media/studio-film-v5-poster.webp";
 </template>
 
 <style scoped>
+/* 服务卡片：顶部渐变细线与图标着色只在悬停/聚焦时出现，保持静态排版不变 */
+.service-card { position: relative; overflow: hidden; }
+.service-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, rgba(150, 96, 205, .55), transparent); opacity: 0; transition: opacity .24s; }
+.service-card:hover::before, .service-card:focus-within::before { opacity: 1; }
+.service-card:hover .icon-tile, .service-card:focus-within .icon-tile { background: var(--accent-soft); border-color: rgba(150, 96, 205, .38); }
+.service-card:hover .card-number, .service-card:focus-within .card-number { color: var(--accent); }
+.icon-tile, .card-number { transition: background-color .24s, border-color .24s, color .24s; }
 .home-showcase { padding-top: 96px; }
 .showcase-heading { text-align: center; margin-bottom: 40px; }
 .showcase-heading .eyebrow { justify-content: center; }

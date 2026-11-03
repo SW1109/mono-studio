@@ -1,0 +1,190 @@
+{
+  "version": "20261102-shop-config-1",
+  "notes": "商城站点配置与内容清单。由 MONO-STUDIO-SITE-CONFIG.php 幂等应用；只写配置、分类、商品参数与文章，不改账号、订单与支付参数。",
+  "configs": {
+    "common_shop_notice": "支付宝在线支付已开通，下单后可在收银台直接完成付款。服务由工作室人工实施，付款前请核对服务范围与排期；实际金额以商品说明或双方合同为准。",
+    "common_customer_store_chat_email": "nexlyaihub@gmail.com",
+    "common_app_customer_service_tel": "",
+    "common_customer_store_chat_tel": "",
+    "common_customer_store_chat_weixin": "",
+    "common_app_is_online_service": "0",
+    "common_default_payment": "{\"pc\":\"Alipay\",\"h5\":\"Alipay\",\"ios\":\"Alipay\",\"android\":\"Alipay\",\"weixin\":\"Alipay\",\"alipay\":\"Alipay\",\"baidu\":\"Alipay\",\"toutiao\":\"Alipay\",\"qq\":\"Alipay\",\"kuaishou\":\"Alipay\"}",
+    "home_search_keywords": "故障诊断,页面优化,接口对接,企业官网,Excel自动化,SEO优化,合同付款",
+    "home_index_floor_top_right_keywords": "{\"1\":\"企业官网,网站搭建\",\"2\":\"故障诊断,SEO优化\",\"3\":\"接口对接,自动化\"}",
+    "home_index_floor_manual_mode_goods": "{\"1\":[\"114\",\"112\"],\"2\":[\"111\",\"116\"],\"3\":[\"113\",\"115\"]}",
+    "home_index_floor_left_top_category": "{\"1\":\"914\",\"2\":\"912\",\"3\":\"913,915\"}",
+    "home_site_name": "光年数智 · 软件技术服务商城",
+    "home_site_filing": "鲁ICP备2026028241号-1",
+    "home_theme_footer_bottom_powered": "光年数智网络科技工作室",
+    "home_order_aftersale_return_goods_address": "本商城为远程线上交付，无需寄回实物。请在订单详情页提交售后申请并说明问题与订单号。",
+    "home_order_aftersale_return_goods_contacts_name": "光年数智",
+    "home_order_aftersale_return_goods_contacts_tel": "",
+    "common_self_extraction_address": "[]",
+    "common_buy_extraction_contact_info": "",
+    "common_order_detail_goods_use_guide_title": "服务使用说明",
+    "common_order_detail_goods_use_guide_describe": "付款后 1 个工作日内联系确认需求与排期；请在订单页保留沟通记录，勿提交口令、密钥或敏感业务数据。",
+    "common_goods_category_is_show_cart_nav": "0",
+    "common_cookie_httponly": "1",
+    "common_cookie_secure": "1",
+    "common_cookie_samesite": "Lax",
+    "admin_notice": "生产环境：修改商品、配置或支付参数前先备份数据库。支付宝为正式商户参数（production），到账以异步通知或交易查询为准；退款由经营者人工审核原路办理。",
+    "common_agreement_userregister": "<p>注册并使用本商城，表示你同意以下约定：</p><p>1. 本商城提供远程软件技术服务的在线下单与付款，服务范围、交付物、排期条件与排除项以商品页面及双方确认的订单为准。</p><p>2. 请提供真实有效的联系方式；订单沟通、交付与售后均以订单号为准。请勿在需求说明中提交口令、密钥、完整身份信息或敏感业务数据。</p><p>3. 付款前请核对所选服务、价格与联系方式。付款状态由服务端核实，不以浏览器回跳页面作为付款凭证。</p><p>4. 尚未开始服务时可申请取消并全额退款；服务已开始的，结合实际完成情况与双方约定协商处理。退款由经营者人工审核并通过原支付渠道办理。</p><p>5. 账号注销后，依法需要保留的交易记录按实际义务处理。</p><p>完整条款见：<a href=\"https://guangnian.xin/service-terms/\" target=\"_blank\" rel=\"noopener noreferrer\">服务条款与隐私说明</a>。</p>",
+    "common_agreement_userprivacy": "<p>为完成服务沟通与交付，订单信息包含联系人、邮箱、需求说明、所选服务、金额与付款状态及必要交易信息，仅用于服务履约、售后与必要的交易记录，由经营者管理。</p><p>支付信息由实际选用的支付服务商依据其规则处理，本站不收集支付宝账号密码，也不收取页面之外未确认的额外费用。</p><p>合同类商品上传的合同文件仅用于本次交易核验，保存在非公开目录，不通过网页目录直接访问。</p><p>你可通过邮箱申请查询、更正或在适用范围内删除个人信息；依法需要保留的交易记录按实际义务处理。联系方式见商城页脚与服务条款。</p>",
+    "common_agreement_userlogout": "<p>账号注销后，将无法再使用该账号登录商城、查看历史订单或在线提交售后申请，进行中的服务订单请先与工作室确认状态再申请注销。</p><p>注销会停止对个人信息的常规展示与使用；为履行交易与售后义务，订单、付款、合同核验等必要记录将按法律规定的期限保留，仅用于争议处理与合规要求。</p><p>如需在注销后查询或处理历史订单，可凭注册邮箱与订单号联系工作室。完整说明见：<a href=\"https://guangnian.xin/service-terms/\" target=\"_blank\" rel=\"noopener noreferrer\">服务条款与隐私说明</a>。</p>",
+    "common_app_mini_alipay_title": "光年数智",
+    "common_app_mini_alipay_describe": "软件技术服务与在线下单",
+    "common_app_mini_weixin_title": "光年数智",
+    "common_app_mini_weixin_describe": "软件技术服务与在线下单",
+    "common_app_mini_baidu_title": "光年数智",
+    "common_app_mini_baidu_describe": "软件技术服务与在线下单",
+    "common_app_mini_toutiao_title": "光年数智",
+    "common_app_mini_toutiao_describe": "软件技术服务与在线下单",
+    "common_app_mini_qq_title": "光年数智",
+    "common_app_mini_qq_describe": "软件技术服务与在线下单",
+    "common_app_mini_kuaishou_title": "光年数智",
+    "common_app_mini_kuaishou_describe": "软件技术服务与在线下单",
+    "home_site_user_login_ad1_images": "",
+    "home_site_user_login_ad1_url": "",
+    "home_site_user_login_ad2_images": "",
+    "home_site_user_login_ad2_url": "",
+    "home_site_user_login_ad3_images": "",
+    "home_site_user_login_ad3_url": ""
+  },
+  "categories": [
+    {
+      "name": "技术支持与优化",
+      "disable": false,
+      "vice_name": "先定位，再动手",
+      "describe": "网站上线后的故障诊断、页面适配与 SEO 基础优化，按项交付并给出可复测的结论。",
+      "seo_title": "技术支持与优化 | 光年数智商城",
+      "seo_keywords": "故障诊断,页面优化,SEO优化,网站维护",
+      "seo_desc": "Web 项目故障诊断、前端页面适配与网站 SEO 基础优化，明确范围、按约交付。"
+    },
+    {
+      "name": "系统集成与自动化",
+      "disable": false,
+      "vice_name": "把重复劳动变成脚本",
+      "describe": "业务接口对接与数据整理自动化，交付可运行的代码、脚本或模板与使用说明。",
+      "seo_title": "系统集成与自动化 | 光年数智商城",
+      "seo_keywords": "接口对接,系统集成,Excel自动化,数据整理",
+      "seo_desc": "业务单接口对接与 Excel 数据整理自动化，含联调记录、脚本模板与使用说明。"
+    },
+    {
+      "name": "网站设计与建设",
+      "disable": false,
+      "vice_name": "从页面到上线",
+      "describe": "企业官网与业务页面的设计、搭建与上线配合，含响应式适配与基础 SEO 设置。",
+      "seo_title": "网站设计与建设 | 光年数智商城",
+      "seo_keywords": "企业官网,网站搭建,响应式,网站设计",
+      "seo_desc": "企业官网标准版搭建与前端页面适配，交付上线站点与后台操作说明。"
+    },
+    {
+      "name": "合同与定制",
+      "disable": false,
+      "vice_name": "按合同约定金额付款",
+      "describe": "已确认合作内容与金额的项目：上传双方确认的合同，按约定金额付款并进入支付宝收银台。",
+      "seo_title": "合同与定制项目付款 | 光年数智商城",
+      "seo_keywords": "合同付款,定制开发,项目付款,支付宝网页支付",
+      "seo_desc": "上传合同、填写约定金额并完成支付宝付款，合同与到账核验后按约定安排履约。"
+    },
+    {
+      "name": "专业技术服务",
+      "disable": true,
+      "vice_name": "",
+      "describe": "",
+      "seo_title": "",
+      "seo_keywords": "",
+      "seo_desc": ""
+    }
+  ],
+  "goods": [
+    {
+      "coding": "GN-SERVICE-technical-review",
+      "inventory": 9999,
+      "params": {
+        "交付物": "问题定位说明 + 修复改动记录 + 复测结论",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "GN-SERVICE-page-improvement",
+      "inventory": 9999,
+      "params": {
+        "交付物": "改造后的页面文件 + 多尺寸自检清单",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "GN-SERVICE-api-integration",
+      "inventory": 9999,
+      "params": {
+        "交付物": "可运行的接口代码 + 联调记录与说明",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "GN-SERVICE-website-starter",
+      "inventory": 9999,
+      "params": {
+        "交付物": "上线站点 + 后台操作说明 + 备案与解析配合",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "GN-SERVICE-data-automation",
+      "inventory": 9999,
+      "params": {
+        "交付物": "可复用的脚本或模板文件 + 使用说明",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "GN-SERVICE-seo-foundation",
+      "inventory": 9999,
+      "params": {
+        "交付物": "优化实施清单 + 提交与验证记录",
+        "售后与退款": "未开始服务可申请全额退款；已开始按实际完成情况协商，原支付渠道人工办理",
+        "合同与发票": "需要合同或发票请在下单前联系确认，并提供订单号"
+      }
+    },
+    {
+      "coding": "CONTRACT_PAY",
+      "params": {
+        "交付安排": "按合同约定的范围与里程碑执行",
+        "售后与退款": "合同未进入执行阶段可申请退款；已发生的工作按合同约定结算，原支付渠道人工办理"
+      }
+    }
+  ],
+  "articleCategory": "帮助中心",
+  "articles": [
+    {
+      "title": "服务流程与交付说明",
+      "describe": "从下单到交付的五个步骤，以及每个环节需要你准备的材料。",
+      "seo_title": "服务流程与交付说明 | 光年数智商城",
+      "seo_keywords": "服务流程,交付说明,排期,验收",
+      "seo_desc": "远程软件技术服务的下单、核对资料、排期、交付与验收流程说明。",
+      "content": "<p>维护日期：2026-11-02。</p><h3>一、下单前</h3><p>请在商品页核对服务范围、参考周期与排除项。范围不在套餐内或需要多人协作时，先通过页脚联系方式沟通确认，再选择对应商品或「合同项目付款」下单。</p><h3>二、付款与确认</h3><p>支持支付宝电脑网站支付。付款成功后工作室会在 1 个工作日内联系确认需求与排期；付款状态以服务端核实结果为准，不以浏览器回跳页面作为凭证。</p><h3>三、资料准备</h3><p>请提供必要的访问方式与素材（如站点地址、页面截图、数据结构示例、接口文档）。涉及源码、接口或数据时，请确保具有合法使用权限并自行脱敏；请勿提交口令、密钥、完整身份信息或敏感业务数据，必要凭据请通过单独的安全方式提供。</p><h3>四、交付周期</h3><p>交付周期从「资料齐备且双方确认排期」后开始计算。超出套餐范围的需求先另行协商，未经确认不自动追加费用。</p><h3>五、交付与验收</h3><p>按商品说明交付相应产物（代码、脚本、模板、说明文档或上线站点）。请在收到交付后按约定方式验收并反馈；未开始服务时可申请取消并全额退款，服务已开始的按实际完成情况协商处理。</p>"
+    },
+    {
+      "title": "支付、合同与发票",
+      "describe": "支付宝付款、合同项目付款入口、订单有效期与开票说明。",
+      "seo_title": "支付、合同与发票 | 光年数智商城",
+      "seo_keywords": "支付宝支付,合同付款,订单有效期,发票",
+      "seo_desc": "说明支付宝在线支付、合同项目付款的上传与核验流程，以及订单有效期与开票联系方式。",
+      "content": "<p>维护日期：2026-11-02。</p><h3>在线支付</h3><p>商城已接入支付宝电脑网站支付，付款在支付宝收银台完成。支付结果以支付宝异步通知或交易查询为准；如已付款但订单状态未更新，请先联系工作室核对，不要重复付款。</p><h3>订单有效期</h3><p>未支付订单会在规定时限后自动关闭（以商城配置为准），关闭后可重新下单。已支付订单不会因超时被取消。</p><h3>合同项目付款</h3><p>已确认合作内容与金额的项目，请在「合同与定制」分类下选择「合同项目付款」：上传双方确认的合同文件（PDF / JPG / PNG，单个不超过 10MB），填写与合同一致的付款金额，核对后进入收银台。支付宝费率为 0.6%，手续费按输入的合同金额计算并四舍五入到分，实付金额为合同金额加手续费。例如合同金额 100.00 元，手续费 0.60 元，实付 100.60 元。合同文件仅用于本次交易核验，保存在非公开目录，订单详情页提供带签名的下载入口。</p><h3>金额核验</h3><p>合同商品的页面标价仅为系统占位，实际订单金额为你填写的合同金额加支付宝手续费，提交前可查看完整明细。金额填写错误或与合同不一致时，工作室可以暂停履约、联系更正或按原路退款。</p><h3>合同与发票</h3><p>需要正式合同文本或开票，请在下单前联系工作室确认，并提供订单号；不要通过公开渠道发送支付凭据中的敏感信息。</p>"
+    },
+    {
+      "title": "售后与退款政策",
+      "describe": "什么情况下可以取消、如何申请售后、退款如何办理。",
+      "seo_title": "售后与退款政策 | 光年数智商城",
+      "seo_keywords": "售后,退款,取消订单,问题反馈",
+      "seo_desc": "远程软件技术服务的取消、退款与售后申请方式，退款由经营者人工审核原路办理。",
+      "content": "<p>维护日期：2026-11-02。</p><h3>取消与全额退款</h3><p>尚未开始服务时，可在订单页申请售后或通过邮箱申请取消，确认后全额退款。</p><h3>已开始服务</h3><p>服务已经开始的，结合实际完成情况与双方约定协商处理，可能按已完成部分结算后退还剩余金额。</p><h3>无法承接</h3><p>若工作室评估后无法承接，或无法满足双方确认的服务范围，会先与你沟通调整；调整后仍无法进行的，按未开始服务处理并退款。</p><h3>退款方式</h3><p>当前退款由经营者人工审核并通过原支付渠道办理，不宣称已提供自动退款功能；到账时间以支付渠道为准。请在申请时提供订单号与问题说明。</p><h3>问题反馈</h3><p>交付后如出现与约定范围相关的问题，请提供订单号、现象描述与复现方式。页面说明不排除适用法律赋予消费者的权利。联系方式见商城页脚与<a href=\"https://guangnian.xin/service-terms/\" target=\"_blank\" rel=\"noopener noreferrer\">服务条款与隐私说明</a>。</p>"
+    }
+  ]
+}

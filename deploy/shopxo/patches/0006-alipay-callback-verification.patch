@@ -1,0 +1,93 @@
+--- a/extend/payment/Alipay.php
++++ b/extend/payment/Alipay.php
+@@ -436,7 +436,7 @@
+         }
+ 
+         // 支付状态
+-        if(!empty($data['trade_no']) && isset($data['total_amount']) && $data['total_amount'] > 0)
++        if(!empty($data['out_trade_no']) && !empty($data['trade_no']) && isset($data['total_amount']) && $data['total_amount'] > 0)
+         {
+             $status = false;
+             if(isset($data['trade_status']))
+@@ -446,13 +446,27 @@
+                     $status = true;
+                 }
+             }
+-            // 回跳没有 trade_status 时只展示待核实，不将跳回官网当作付款凭据。
+             if($status)
+             {
+                 return DataReturn('支付成功', 0, $this->ReturnData($data));
+             }
++            // 网页回跳不带交易状态；先交给订单服务核对已入账记录，不能据此把订单改为已付。
++            if(!isset($data['trade_status']) && in_array($data['method'] ?? '', ['alipay.trade.page.pay.return', 'alipay.trade.wap.pay.return'], true))
++            {
++                return DataReturn('支付结果确认中；如已扣款，请勿重复支付，可前往我的订单查看', -8000, $this->ReturnData($data));
++            }
+         }
+         return DataReturn('处理异常错误', -100);
++    }
++
++    public function Notify($params = [])
++    {
++        // 异步通知必须有实际交易状态，不能把浏览器回跳的待确认结果当作通知成功。
++        if(!isset($params['trade_status']))
++        {
++            return DataReturn('支付通知缺少交易状态', -1);
++        }
++        return $this->Respond($params);
+     }
+ 
+     /**
+--- a/app/service/OrderService.php
++++ b/app/service/OrderService.php
+@@ -641,7 +641,23 @@
+ 
+         // 支付数据校验
+         $pay_name = 'payment\\'.$payment_name;
+-        $pay_ret = (new $pay_name($payment['config']))->Respond(array_merge(input('get.'), input('post.')));
++        // 支付宝签名覆盖原始字段，默认 HTML 转义会改写 fund_bill_list 等 JSON 字段。
++        $pay_params = $payment_name === 'Alipay'
++            ? array_merge(input('get.', [], null), input('post.', [], null))
++            : array_merge(input('get.'), input('post.'));
++        $pay_ret = (new $pay_name($payment['config']))->Respond($pay_params);
++        if($payment_name === 'Alipay' && isset($pay_ret['code']) && $pay_ret['code'] == -8000)
++        {
++            // 只读取异步通知已确认的记录；回跳验签通过也不能单独确认到账。
++            $pay_log = PayLogService::PayLogData($pay_ret['data']['out_trade_no']);
++            if(!empty($pay_log) && $pay_log['payment'] === $payment_name &&
++                $pay_log['business_type'] === self::BusinessTypeName() && intval($pay_log['status']) === 1 &&
++                $pay_log['trade_no'] === $pay_ret['data']['trade_no'] &&
++                PriceNumberFormat($pay_log['pay_price']) === PriceNumberFormat($pay_ret['data']['pay_price']))
++            {
++                $pay_ret = DataReturn(MyLang('pay_success'), 0, $pay_ret['data']);
++            }
++        }
+         if(isset($pay_ret['code']) && $pay_ret['code'] == 0)
+         {
+             // 线下支付方式
+@@ -802,7 +818,11 @@
+ 
+         // 是否存在处理方法
+         $method = method_exists($payment_obj, 'Notify') ? 'Notify' : 'Respond';
+-        $pay_ret = $payment_obj->$method(array_merge(input('get.'), input('post.')));
++        // 仅支付宝验签跳过 HTML 转义，其余渠道保持既有输入规则。
++        $pay_params = PAYMENT_TYPE === 'Alipay'
++            ? array_merge(input('get.', [], null), input('post.', [], null))
++            : array_merge(input('get.'), input('post.'));
++        $pay_ret = $payment_obj->$method($pay_params);
+         if(!isset($pay_ret['code']) || $pay_ret['code'] != 0)
+         {
+             return $pay_ret;
+--- a/app/index/controller/Order.php
++++ b/app/index/controller/Order.php
+@@ -286,6 +286,10 @@
+         if($ret['code'] == 0)
+         {
+             return MyView('public/tips_success');
++        }
++        if($ret['code'] == -8000)
++        {
++            return MyView('public/tips_payment_pending');
+         }
+         return MyView('public/tips_error');
+     }

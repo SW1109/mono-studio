@@ -1,0 +1,24 @@
+--- a/app/index/view/default/public/header.html
++++ b/app/index/view/default/public/header.html
+@@ -1,17 +1,19 @@
+ <!DOCTYPE html>
+-<html>
++<html lang="zh-CN">
+ <head>
+     <meta charset="{{:MyConfig('shopxo.default_charset', 'utf-8')}}" />
+     <title>{{$home_seo_site_title}}</title>
+     <meta name="keywords" content="{{$home_seo_site_keywords}}" />
+     <meta name="description" content="{{$home_seo_site_description}}" />
++    {{:ModuleInclude('public/mono_seo')}}
+     <meta name="generator" content="{{$my_url}}" />
+     <meta name="application-name" content="{{$home_seo_site_title}}" />
+     <meta name="msapplication-tooltip" content="{{$home_seo_site_title}}" />
+     <meta name="msapplication-starturl" content="{{$my_url}}" />
+     <link rel="shortcut icon" type="image/x-icon" href="{{$public_host}}favicon.ico" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1">
++    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="apple-mobile-web-app-capable" content="yes">
++    <meta name="mobile-web-app-capable" content="yes">
+     <meta name="apple-mobile-web-app-title" content="{{$home_site_name}}">
+     <link rel="apple-touch-icon" href="{{$home_site_logo_square}}">
+     <link rel="apple-touch-icon-precomposed" href="{{$home_site_logo_square}}">

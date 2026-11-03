@@ -1,4 +1,5 @@
 <script setup>
+import SiteNavLink from "../components/site/SiteNavLink.vue";
 import { RouterLink } from "vue-router";
 import { services } from "../content/services.js";
 import { process, faqs } from "../content/site.js";
@@ -20,7 +21,7 @@ import ContactBanner from "../components/site/ContactBanner.vue";
   </div>
   <section id="process" class="section section-soft"><div class="container"><div class="section-heading" data-reveal><div><p class="eyebrow">HOW WE WORK</p><h2>项目协作与交付流程</h2></div></div><ol class="process-grid"><li v-for="(step, index) in process" :key="step.title" data-reveal :data-reveal-delay="index * 60"><span class="step-number">0{{ index + 1 }}</span><h3>{{ step.title }}</h3><p>{{ step.description }}</p></li></ol><p class="small-note">具体交付范围、源码归属、费用、时间与维护安排，在项目方案中共同确认。</p></div></section>
   <section class="section container faq-section"><div><p class="eyebrow">BEFORE WE START</p><h2>项目合作<br />常见问题</h2></div><div class="faq-list" data-reveal><details v-for="faq in faqs" :key="faq.question"><summary>{{ faq.question }}<span aria-hidden="true">+</span></summary><p>{{ faq.answer }}</p></details></div></section>
-  <section class="section section-soft"><div class="container fixed-service-section"><div><p class="eyebrow">FIXED-SCOPE SERVICES</p><h2>专项技术服务</h2><p class="section-description">提供软件诊断、单页面优化与单接口对接服务。购买前请核对服务范围、价格与交付约定。</p></div><RouterLink class="button button-primary" to="/shop/">查看服务商品 <span aria-hidden="true">↗</span></RouterLink></div></section>
+  <section class="section section-soft"><div class="container fixed-service-section"><div><p class="eyebrow">FIXED-SCOPE SERVICES</p><h2>专项技术服务</h2><p class="section-description">提供软件诊断、单页面优化与单接口对接服务。购买前请核对服务范围、价格与交付约定。</p></div><div class="button-row"><SiteNavLink class="button button-primary" to="/shop/">商品购买 <span aria-hidden="true">↗</span></SiteNavLink><RouterLink class="text-link" to="/guides/#selection">服务选购对照 <span aria-hidden="true">↗</span></RouterLink></div></div></section>
   <ContactBanner />
 </template>
 
@@ -41,7 +42,7 @@ import ContactBanner from "../components/site/ContactBanner.vue";
 .faq-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 88px; }
 .fixed-service-section { display: flex; align-items: center; justify-content: space-between; gap: 56px; }
 .fixed-service-section .section-description { max-width: 600px; }
-.fixed-service-section > .button { flex-shrink: 0; }
+.fixed-service-section > .button-row { flex-shrink: 0; }
 @media (max-width: 1040px) { .service-detail { padding: 32px; }.service-detail h2 { font-size: 28px; }.faq-section { gap: 48px; } }
 @media (max-width: 760px) {
   .service-nav { gap: 10px; padding-bottom: 32px; }

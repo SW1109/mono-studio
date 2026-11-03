@@ -1,0 +1,19 @@
+{{php}}
+$mono_seo = \app\service\MonoSeoService::HeadData($controller_name, $action_name, isset($goods) && is_array($goods) ? $goods : [], isset($goods_floor_list) && is_array($goods_floor_list) ? $goods_floor_list : []);
+{{/php}}
+<meta name="robots" content="{{if $mono_seo.indexable}}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{{else /}}noindex, follow{{/if}}">
+{{if $mono_seo.indexable}}
+<link rel="canonical" href="{{$mono_seo.canonical}}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="光年数智">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="{{$mono_seo.title}}">
+<meta property="og:description" content="{{$mono_seo.description}}">
+<meta property="og:url" content="{{$mono_seo.canonical}}">
+<meta property="og:image" content="{{$mono_seo.image}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{$mono_seo.title}}">
+<meta name="twitter:description" content="{{$mono_seo.description}}">
+<meta name="twitter:image" content="{{$mono_seo.image}}">
+<script type="application/ld+json">{{$mono_seo.json|raw}}</script>
+{{/if}}

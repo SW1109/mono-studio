@@ -1,0 +1,100 @@
+--- a/app/service/BuyService.php
++++ b/app/service/BuyService.php
+@@ -186,6 +186,17 @@
+                 // 数量/小计
+                 $goods['stock'] = $v['stock'];
+                 $goods['total_price'] = $v['stock']* ((float) $goods['price']);
++
++                // 光年合同付款：合同商品只能使用合同付款表单中的服务端签名金额。
++                $mono_contract = MonoContractService::BuyOverride($goods, $params);
++                if($mono_contract['code'] != 0)
++                {
++                    return $mono_contract;
++                }
++                if(!empty($mono_contract['data']))
++                {
++                    $goods = $mono_contract['data'];
++                }
+                 $data[] = $goods;
+             }
+         }
+--- a/app/index/view/default/goods/module/middle_base/right.html
++++ b/app/index/view/default/goods/module/middle_base/right.html
+@@ -1,4 +1,8 @@
+ <!-- 中间模块基础右侧 -->
++{{php}}
++$mono_contract_config = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
++$mono_contract_goods_id = is_array($mono_contract_config) && !empty($mono_contract_config['goodsId']) ? intval($mono_contract_config['goodsId']) : 0;
++{{/php}}
+ {{if !empty($module_data['goods'])}}
+     <div class="clearfix-right">
+         <!-- 商品页右侧内容顶部钩子 开始 -->
+@@ -118,8 +122,12 @@
+                 {{/foreach}}
+             {{/if}}
+ 
+-            <!-- 右侧基础购买导航模块 -->
+-            {{:ModuleInclude('goods/module/middle_base/right/buy_nav', ['goods'=>$module_data['goods']])}}
++            <!-- 右侧基础购买导航模块 / 合同付款表单 -->
++            {{if $mono_contract_goods_id > 0 && intval($module_data.goods.id) == $mono_contract_goods_id}}
++                {{:ModuleInclude('goods/module/middle_base/right/contract_form', ['goods'=>$module_data['goods']])}}
++            {{else /}}
++                {{:ModuleInclude('goods/module/middle_base/right/buy_nav', ['goods'=>$module_data['goods']])}}
++            {{/if}}
+ 
+             <!-- 商品页右侧内容内部顶部钩子 开始 -->
+             {{if isset($shopxo_is_develop) and $shopxo_is_develop eq true}}
+--- a/app/index/view/default/goods/module/middle_base/right/panel_base.html
++++ b/app/index/view/default/goods/module/middle_base/right/panel_base.html
+@@ -1,4 +1,8 @@
+ <!-- 右侧基础面板模块 -->
++{{php}}
++$mono_contract_config = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
++$mono_contract_goods_id = is_array($mono_contract_config) && !empty($mono_contract_config['goodsId']) ? intval($mono_contract_config['goodsId']) : 0;
++{{/php}}
+ {{if !empty($module_data['goods'])}}
+     <div class="tb-detail-panel-base">
+         <div class="tb-detail-panel-top-price-content {{if (isset($module_data['goods']['show_field_price_status']) and $module_data['goods']['show_field_price_status'] eq 1) or (isset($module_data['goods']['show_field_original_price_status']) and $module_data['goods']['show_field_original_price_status'] eq 1)}}show-price{{/if}}" style="--background-image: url({{:StaticAttachmentUrl('goods-meta-bg.png')}})">
+@@ -55,9 +59,13 @@
+                 <!-- 售价 -->
+                 {{if isset($module_data['goods']['show_field_price_status']) and $module_data['goods']['show_field_price_status'] eq 1}}
+                     <div class="items goods-price goods-sale-price{{if isset($module_data['goods']['is_exhibition_hide_price']) and $module_data['goods']['is_exhibition_hide_price'] eq 1}} exhibition-hide-price{{/if}}">
+-                        <dt>{{if empty($module_data['goods']['show_field_price_text'])}}销售价{{else /}}{{$module_data.goods.show_field_price_text|raw}}{{/if}}</dt>
++                        <dt>{{if $mono_contract_goods_id > 0 && intval($module_data.goods.id) == $mono_contract_goods_id}}合同金额{{else /}}{{if empty($module_data['goods']['show_field_price_text'])}}销售价{{else /}}{{$module_data.goods.show_field_price_text|raw}}{{/if}}{{/if}}</dt>
+                         <dd>
+-                            {{if !empty($module_data['goods']['show_price_symbol'])}}<em class="symbol">{{$module_data.goods.show_price_symbol}}</em>{{/if}}<b class="goods-sale-price-value" data-original-price="{{$module_data.goods.price}}">{{$module_data.goods.price}}</b>{{if !empty($module_data['goods']['show_price_unit'])}}<em class="goods-sale-price-unit am-text-grey" data-value="{{$module_data.goods.show_price_unit}}">{{$module_data.goods.show_price_unit}}</em>{{/if}}
++                            {{if $mono_contract_goods_id > 0 && intval($module_data.goods.id) == $mono_contract_goods_id}}
++                                <b class="goods-sale-price-value">按合同金额</b><em class="am-text-grey">（以合同约定为准）</em>
++                            {{else /}}
++                                {{if !empty($module_data['goods']['show_price_symbol'])}}<em class="symbol">{{$module_data.goods.show_price_symbol}}</em>{{/if}}<b class="goods-sale-price-value" data-original-price="{{$module_data.goods.price}}">{{$module_data.goods.price}}</b>{{if !empty($module_data['goods']['show_price_unit'])}}<em class="goods-sale-price-unit am-text-grey" data-value="{{$module_data.goods.show_price_unit}}">{{$module_data.goods.show_price_unit}}</em>{{/if}}
++                            {{/if}}
+                         </dd>                                 
+                     </div>
+                 {{/if}}
+--- a/app/index/view/default/goods/module/bottom_base/right.html
++++ b/app/index/view/default/goods/module/bottom_base/right.html
+@@ -1,4 +1,8 @@
+ <!-- 底部信息右侧模块 -->
++{{php}}
++$mono_contract_config = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
++$mono_contract_goods_id = is_array($mono_contract_config) && !empty($mono_contract_config['goodsId']) ? intval($mono_contract_config['goodsId']) : 0;
++{{/php}}
+ {{if !empty($module_data['goods'])}}
+     <div class="introduce-main {{if empty($module_data['left_goods'])}}no-left-goods{{/if}}">
+         <!-- 商品页面tabs顶部钩子 -->
+@@ -19,6 +23,7 @@
+             <div class="am-tabs" data-am-tabs="{noSwipe: 1}">
+                 <!-- tab导航 -->
+                 <ul class="am-avg-sm-{{:count($middle_tabs_nav['nav'])}} am-tabs-nav am-nav am-nav-tabs am-tabs-short-border" data-am-sticky="{animation: 'slide-top'}">
++                    {{if $mono_contract_goods_id <= 0 || intval($module_data.goods.id) != $mono_contract_goods_id}}
+                     {{if !empty($buy_button) and !empty($buy_button['data'])}}
+                         {{foreach $buy_button.data as $v}}
+                             {{if !empty($v['type']) and !empty($v['name']) and stripos($v['type'], 'cart') nheq false}}
+@@ -36,6 +41,7 @@
+                             {{/if}}
+                         {{/foreach}}
+                     {{/if}}
++                    {{/if}}
+                     {{foreach $middle_tabs_nav.nav as $k=>$v}}
+                         <li class="{{if isset($v['active']) and $v['active'] eq 1}}am-active{{/if}} goods-middle-nav-{{$v.type}}">
+                             <a href="#goods-middle-tabs-nav-{{$v.type}}" data-title="{{$v.name}}" data-type="{{$v.type}}" data-value="{{if isset($v['value'])}}{{$v.value}}{{/if}}">{{$v.name}}</a>

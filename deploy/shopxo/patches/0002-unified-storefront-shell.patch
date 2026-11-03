@@ -1,0 +1,65 @@
+--- a/app/index/view/default/public/header.html
++++ b/app/index/view/default/public/header.html
+@@ -208,9 +208,12 @@
+         {{/if}}
+     </script>
+ </head>
+-<body class="{{$page_unique_mark}} {{if in_array(MiniAppEnv(), MyConfig('shopxo.mini_app_type_list'))}} mini-app-env{{/if}}">
++<body class="{{if (!isset($page_pure) or $page_pure neq 1) and (!isset($is_header) or $is_header eq 1)}}gn-unified {{/if}}{{$page_unique_mark}} {{if in_array(MiniAppEnv(), MyConfig('shopxo.mini_app_type_list'))}} mini-app-env{{/if}}">
+ <div class="body-content-container">
+     <div class="body-content-formal-container">
++        {{if (!isset($page_pure) or $page_pure neq 1) and (!isset($is_header) or $is_header eq 1)}}
++            {{:ModuleInclude('public/mono_header')}}
++        {{/if}}
+         <!-- 页面加载层 -->
+         {{if isset($is_page_loading) and $is_page_loading eq 1}}
+             {{:ModuleInclude('public/page_loading')}}
+--- a/app/index/view/default/public/footer.html
++++ b/app/index/view/default/public/footer.html
+@@ -4,7 +4,7 @@
+             <!-- footer start, is footer nav -->
+             {{if empty($module_data) or !isset($module_data['is_footer_nav']) or $module_data['is_footer_nav'] eq 1}}
+                 {{if (!isset($page_pure) or $page_pure neq 1) and (!isset($is_footer) or $is_footer eq 1)}}
+-                	{{:ModuleInclude('public/footer_nav', isset($module_data) ? $module_data : [])}}
++                	{{:ModuleInclude('public/mono_footer')}}
+                 {{/if}}
+             {{/if}}
+             <!-- footer end -->
+--- a/app/index/view/default/user/logininfo.html
++++ b/app/index/view/default/user/logininfo.html
+@@ -11,7 +11,7 @@
+ ])}}
+ 
+ <!-- conntent start  -->
+-<div class="am-g user-login-container am-padding-top-0 am-padding-bottom-0 theme-data-edit-event" data-module="user_login" {{if !empty($user_login_left_data['bg_color'])}}style="background-color:{{$user_login_left_data.bg_color}};"{{/if}}>
++<div class="am-g user-login-container am-padding-top-0 am-padding-bottom-0 theme-data-edit-event" data-module="user_login">
+     <div class="user-login-background-img-container">
+         {{if !empty($user_login_left_data['images'])}}
+             <div class="user-login-background-img-content" style="background-image: url({{$user_login_left_data.images}});"></div>
+@@ -23,6 +23,7 @@
+                 {{/if}}
+             </div>
+             <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 user-right-container">
++                <div class="gn-account-intro"><h1>登录光年账号</h1><p>购买商品、查看订单与服务进度。</p></div>
+                 <div class="login-top">
+                     <!-- 用户登录页面顶部钩子 -->
+                     {{if isset($shopxo_is_develop) and $shopxo_is_develop eq true}}
+--- a/app/index/view/default/user/reginfo.html
++++ b/app/index/view/default/user/reginfo.html
+@@ -11,7 +11,7 @@
+ ])}}
+ 
+ <!-- conntent start  -->
+-<div class="am-g user-register-container theme-data-edit-event" data-module="user_register" {{if !empty($user_register_bg_images)}}style="background: {{if empty($user_register_bg_color)}}#f5f5f5{{else /}}{{$user_register_bg_color}}{{/if}} url({{:AttachmentPathViewHandle($user_register_bg_images)}});"{{/if}}>
++<div class="am-g user-register-container theme-data-edit-event" data-module="user_register">
+     <div class="am-container">
+         <!-- 用户注册页面顶部钩子 -->
+         {{if isset($shopxo_is_develop) and $shopxo_is_develop eq true}}
+@@ -28,6 +28,7 @@
+         {{/if}}
+ 
+         <div class="register-container am-margin-auto">
++            <div class="gn-account-intro"><h1>注册光年账号</h1><p>使用同一账号，在不同设备查看商品与订单。</p></div>
+             <div class="register-top">
+                 <!-- 用户注册页面钩子 -->
+                 {{if isset($shopxo_is_develop) and $shopxo_is_develop eq true}}

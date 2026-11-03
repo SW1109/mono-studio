@@ -1,0 +1,14 @@
+{
+  "name": "光年官网 · 商品与订单",
+  "ver": "6.9.2",
+  "author": "Devil",
+  "home": "https://shopxo.net/",
+  "is_theme_data_admin": 1,
+  "theme_style": {
+    "color_footer_masking": "#000"
+  },
+  "import_css": [
+    "mono/storefront.css",
+    "mono/shell.css"
+  ]
+}

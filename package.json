@@ -8,14 +8,9 @@
     "dev": "vite",
     "build": "vite-ssg build && node scripts/check-build.mjs",
     "preview": "vite preview",
-    "test": "node --test scripts/site.test.mjs scripts/commerce.test.mjs",
     "check:build": "node scripts/check-build.mjs",
-    "server": "node --env-file-if-exists=.env.payment.local server/index.mjs",
-    "start": "npm run server",
     "release:package": "npm run build && node scripts/package-release.mjs",
-    "orders:prepare": "node scripts/prepare-order-center.mjs",
-    "orders:backup": "node --env-file-if-exists=.env.payment.local server/backup.mjs",
-    "orders:list": "node --env-file-if-exists=.env.payment.local server/orders-cli.mjs"
+    "orders:prepare": "node scripts/prepare-order-center.mjs"
   },
   "dependencies": {
     "@unhead/vue": "^2.1.2",

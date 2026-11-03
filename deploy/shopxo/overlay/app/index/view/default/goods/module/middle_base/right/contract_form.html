@@ -1,0 +1,154 @@
+{{php}}
+$mono_contract_config = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
+$mono_contract_min = is_array($mono_contract_config) && isset($mono_contract_config['amountMin']) ? number_format((float) $mono_contract_config['amountMin'], 2, '.', '') : '1.00';
+$mono_contract_max = is_array($mono_contract_config) && isset($mono_contract_config['amountMax']) ? number_format((float) $mono_contract_config['amountMax'], 2, '.', '') : '200000.00';
+$mono_contract_max_mb = is_array($mono_contract_config) && isset($mono_contract_config['maxUploadBytes']) ? max(1, (int) round($mono_contract_config['maxUploadBytes'] / 1048576)) : 10;
+$mono_alipay_fee_basis_points = \app\service\MonoContractService::ALIPAY_FEE_BASIS_POINTS;
+$mono_alipay_fee_rate = number_format($mono_alipay_fee_basis_points / 100, 1, '.', '').'%';
+{{/php}}
+{{if !empty($module_data['goods'])}}
+<div class="gn-contract-pay" id="gn-contract-pay">
+    <div class="gn-contract-head">
+        <p class="gn-eyebrow"><span aria-hidden="true"></span> CONTRACT PAYMENT</p>
+        <h2>按合同金额付款</h2>
+        <p>适用于已确认合作内容与金额的项目。请上传双方确认的合同并填写合同金额。支付宝费率 {{$mono_alipay_fee_rate}}，实付金额为合同金额加手续费。</p>
+    </div>
+    {{if empty($user)}}
+        <div class="gn-contract-login">
+            <p>合同付款需要登录账号，以便合同文件与订单关联。</p>
+            <a class="gn-contract-button" href="{{:MyUrl('index/user/logininfo')}}">登录后继续</a>
+        </div>
+    {{else /}}
+        <form id="gn-contract-form" class="gn-contract-form" action="{{:MyUrl('index/contract/submit')}}" method="post" enctype="multipart/form-data" novalidate>
+            <label class="gn-contract-field gn-contract-file-field">
+                <span>合同文件 <em>必填</em></span>
+                <input type="file" name="contract_file" id="gn-contract-file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
+                <small>支持 PDF、JPG、PNG，单个文件不超过 {{$mono_contract_max_mb}}MB。</small>
+            </label>
+            <div class="gn-contract-row">
+                <label class="gn-contract-field">
+                    <span>合同编号 <i>可选</i></span>
+                    <input type="text" name="contract_no" maxlength="80" autocomplete="off" placeholder="例如：GN-2026-001">
+                </label>
+                <label class="gn-contract-field">
+                    <span>合同金额 <em>必填</em></span>
+                    <div class="gn-contract-amount"><b>¥</b><input type="text" name="contract_price" id="gn-contract-price" inputmode="decimal" autocomplete="off" placeholder="请输入合同金额" aria-describedby="gn-contract-price-hint" required><span class="gn-contract-unit">元</span></div>
+                    <small id="gn-contract-price-hint">范围 {{$mono_contract_min}} — {{$mono_contract_max}} 元，需与合同一致。</small>
+                </label>
+            </div>
+            <label class="gn-contract-field">
+                <span>备注</span>
+                <textarea name="user_note" maxlength="120" rows="2" placeholder="可选：项目名称、付款阶段等"></textarea>
+            </label>
+            <div class="gn-contract-payment" aria-live="polite" aria-atomic="true">
+                <p><span>合同金额</span><strong id="gn-contract-base-amount">-- 元</strong></p>
+                <p><span>支付宝手续费（{{$mono_alipay_fee_rate}}）</span><strong id="gn-contract-fee-amount">-- 元</strong></p>
+                <p class="gn-contract-payment-total"><span>实付金额</span><strong id="gn-contract-payment-amount">-- 元</strong></p>
+                <small>手续费按合同金额计算，四舍五入到分。</small>
+            </div>
+            <label class="gn-contract-check">
+                <input type="checkbox" name="agreement" value="1" required>
+                <span class="gn-contract-check-box" aria-hidden="true"></span>
+                <span class="gn-contract-check-text">我已核对合同与金额，并同意 <a href="https://guangnian.xin/service-terms/" target="_blank" rel="noopener noreferrer">服务条款与隐私说明</a>。</span>
+            </label>
+            <div class="gn-contract-actions">
+                <button type="submit" class="gn-contract-button" id="gn-contract-submit">确认金额并去支付</button>
+                <p class="gn-contract-status" id="gn-contract-status" role="status" aria-live="polite"></p>
+            </div>
+            <p class="gn-contract-note">支付结果以支付宝异步通知或交易查询为准。合同文件仅用于本次交易核验，保存在非公开目录，订单详情提供下载入口。</p>
+        </form>
+        <script>
+        (function () {
+            var form = document.getElementById('gn-contract-form');
+            if (!form) { return; }
+            var fileInput = document.getElementById('gn-contract-file');
+            var priceInput = document.getElementById('gn-contract-price');
+            var submit = document.getElementById('gn-contract-submit');
+            var status = document.getElementById('gn-contract-status');
+            var min = Number('{{$mono_contract_min}}');
+            var max = Number('{{$mono_contract_max}}');
+            var maxBytes = {{$mono_contract_max_mb}} * 1024 * 1024;
+            var allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+            var feeBasisPoints = {{$mono_alipay_fee_basis_points}};
+            var baseAmount = document.getElementById('gn-contract-base-amount');
+            var feeAmount = document.getElementById('gn-contract-fee-amount');
+            var paymentAmount = document.getElementById('gn-contract-payment-amount');
+            function message(text, error) {
+                if (!status) { return; }
+                status.textContent = text || '';
+                status.className = 'gn-contract-status' + (error ? ' is-error' : '');
+            }
+            function fileError() {
+                if (!fileInput || !fileInput.files || !fileInput.files[0]) { return '请选择合同文件'; }
+                var file = fileInput.files[0];
+                var ext = (file.name.split('.').pop() || '').toLowerCase();
+                if (allowed.indexOf(ext) === -1) { return '合同文件仅支持 PDF、JPG、PNG'; }
+                if (file.size <= 0 || file.size > maxBytes) { return '合同文件大小需在 1 字节至 {{$mono_contract_max_mb}}MB 之间'; }
+                return '';
+            }
+            function amountError() {
+                var value = (priceInput.value || '').trim();
+                if (!/^(?:0|[1-9][0-9]{0,8})(?:\.[0-9]{1,2})?$/.test(value)) { return '请输入正确的金额，最多两位小数'; }
+                var number = Number(value);
+                if (!isFinite(number) || number < min || number > max) { return '金额需在 ' + min.toFixed(2) + ' 至 ' + max.toFixed(2) + ' 元之间'; }
+                return '';
+            }
+            function updatePayment() {
+                if (amountError()) {
+                    baseAmount.textContent = feeAmount.textContent = paymentAmount.textContent = '-- 元';
+                    return;
+                }
+                var cents = Math.round(Number(priceInput.value.trim()) * 100);
+                var feeCents = Math.floor((cents * feeBasisPoints + 5000) / 10000);
+                baseAmount.textContent = (cents / 100).toFixed(2) + ' 元';
+                feeAmount.textContent = (feeCents / 100).toFixed(2) + ' 元';
+                paymentAmount.textContent = ((cents + feeCents) / 100).toFixed(2) + ' 元';
+            }
+            if (priceInput) {
+                priceInput.addEventListener('input', updatePayment);
+                priceInput.addEventListener('blur', function () {
+                    var value = (priceInput.value || '').trim();
+                    if (/^(?:0|[1-9][0-9]{0,8})(?:\.[0-9]{1,2})?$/.test(value)) { priceInput.value = Number(value).toFixed(2); }
+                    updatePayment();
+                });
+                updatePayment();
+            }
+            var termsLink = form.querySelector('.gn-contract-check a');
+            if (termsLink) {
+                termsLink.addEventListener('click', function (event) { event.stopPropagation(); });
+            }
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                message('');
+                var error = fileError() || amountError();
+                // 按字段顺序提示，避免后出现的条款提示覆盖更靠前的必填问题
+                if (!error && !form.querySelector('input[name="agreement"]').checked) { error = '请勾选同意服务条款'; }
+                if (error) { message(error, true); return; }
+                submit.disabled = true;
+                submit.textContent = '正在创建订单…';
+                message('正在校验合同并创建订单，请稍候…');
+                fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        if (Number(data.code) === 0 && data.data && data.data.jump_url) {
+                            message('订单已创建，正在前往支付…');
+                            window.location.href = data.data.jump_url;
+                            return;
+                        }
+                        if (Number(data.code) === -400 && typeof data.data === 'string') {
+                            window.location.href = data.data;
+                            return;
+                        }
+                        throw new Error(data.msg || '订单创建失败，请重试');
+                    })
+                    .catch(function (error) {
+                        submit.disabled = false;
+                        submit.textContent = '确认金额并去支付';
+                        message(error.message || '订单创建失败，请重试', true);
+                    });
+            });
+        })();
+        </script>
+    {{/if}}
+</div>
+{{/if}}
