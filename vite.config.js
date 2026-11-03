@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { viteStaticCopy } from "vite-plugin-static-copy";
+import { cesiumAssets } from "./scripts/lib/cesium-assets.mjs";
 import { createShopxoOrderCenter } from "./shared/order-center.js";
 import { prerenderPaths, publicPaths } from "./src/content/paths.js";
 import { site } from "./src/content/site.js";
@@ -31,10 +31,11 @@ export default defineConfig(({ mode, command }) => {
 
   return {
     base,
+    server: { host: "127.0.0.1", port: 5173, strictPort: true },
     define: { CESIUM_BASE_URL: JSON.stringify(`${base}cesium/`) },
     plugins: [
       vue(),
-      viteStaticCopy({ targets: ["Workers", "ThirdParty", "Assets", "Widgets"].map(name => ({ src: `node_modules/cesium/Build/Cesium/${name}`, dest: "cesium" })) }),
+      cesiumAssets(),
       publishMetadata(origin, base, orderCenter),
     ],
     build: {

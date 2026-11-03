@@ -4,7 +4,7 @@ Vue 3 + Vite + Vue Router + Vite SSG 官网，公开页面在构建时输出 HTM
 
 ## 开发与构建
 
-使用项目要求的 Node.js 版本，依赖通过 `package-lock.json` 锁定。
+使用 `.nvmrc` 指定的 Node.js 版本（`nvm use`），其他受支持版本见 `package.json` 的 `engines`；依赖通过 `package-lock.json` 锁定。
 
 ```bash
 npm ci
