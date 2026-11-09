@@ -1,4 +1,7 @@
 deploy/shopxo/** text eol=lf
+public/theme.js text eol=lf
+public/theme.css text eol=lf
+public/fonts/OFL.txt text eol=lf
 *.png -text
 *.jpg -text
 *.webp -text
