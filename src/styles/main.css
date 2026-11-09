@@ -1,4 +1,4 @@
-/* 语义色来自共用主题，官网与原生商城保持相同的明暗偏好。 */
+/* 语义色来自共用主题，官网与原生商城统一使用暗色。 */
 :root {
   --ink: var(--theme-ink);
   --muted: var(--theme-muted);
@@ -241,8 +241,7 @@ h3 { font-size: 21px; }
 }
 @media (max-width: 580px) {
   .product-grid, .service-grid { grid-template-columns: 1fr; }
-  .header-contact { display: none; }
-  .menu-toggle { margin-left: auto; }
+  .header-contact { flex-shrink: 0; padding-inline: 12px; }
   .button { padding-inline: 22px; }
 }
 @media (max-width: 380px) { .process-grid { grid-template-columns: 1fr; } .footer-display { font-size: 60px; } }

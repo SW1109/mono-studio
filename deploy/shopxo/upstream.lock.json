@@ -64,7 +64,7 @@
     "MONO-STUDIO-PAYMENTS.php": "94d8f4c3de3466106307bfc095c0d9aa15391bd2715b3bf5d41ca47b1c05d261",
     "public/static/mono/brand-mark.png": "2ae5e3d7fe77ebb8cb7fc0fa4f235b82157bce6ebac003fb85a75c38ce4927b6",
     "app/index/view/default/public/mono_footer.html": "f406a8ae5546f7274cd62f8fcbfb911ba3936e7823c3e1ed13abb40a15dea9c6",
-    "app/index/view/default/public/mono_header.html": "2d8a5f8011d8676976edadc4f553ffde7b47ff35e2c8004772fa92bf898611fb",
+    "app/index/view/default/public/mono_header.html": "df235394a0c17f60438995c40fae391675d6088db061cb107f38774c55293b49",
     "public/static/mono/shell.css": "065f577acc7e27d1c7d92e81f8131e288035622fa16ee7164f2423f00435af58",
     "app/index/view/default/public/nav_search.html": "4a44df3ad0214f025a3bd08f74735b55e54e4e832ba9741689df71ea213f53d3",
     "app/index/view/default/public/header_nav.html": "4a44df3ad0214f025a3bd08f74735b55e54e4e832ba9741689df71ea213f53d3",
@@ -95,8 +95,8 @@
     "public/static/mono/aurora.jpg": "24c6dd4e8d1d8672323e5d455614cb1e44697ed921bd45f9999b529c9664d53e",
     "public/static/mono/fonts/OFL.txt": "5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6",
     "public/static/mono/fonts/noto-serif-sc-subset.woff2": "0b3cdbba4e023d9b0a335f0502fc67db494924ef8b4e0aa9a5f3aa09e5f6a266",
-    "public/static/mono/theme.css": "0ca52ca1b8e8dfff535a83b226125cbfdd37c687ee160a88199c0c84b713a970",
-    "public/static/mono/theme.js": "472bf4a63d7065d3a972333c3a49945fcaa02c5a85e26332839431ef46ce59b6"
+    "public/static/mono/theme.css": "c754dcf94dfb54677dcae3b0eb5b754e648e88314925a78e09e488eb3132cfa2",
+    "public/static/mono/theme.js": "c438de95b0ea7b4634f92eb38f8a3de95998e56c687bd874272c42f6234beb83"
   },
   "upgrade": {
     "path": "upgrades/6.9.1-to-6.9.2.php",

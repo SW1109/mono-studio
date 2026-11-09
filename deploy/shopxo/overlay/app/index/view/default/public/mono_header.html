@@ -16,10 +16,12 @@ $mono_shop_active = in_array($controller_name, ['index', 'goods', 'search', 'cat
         </nav>
         <div class="gn-site-actions">
         <a class="gn-site-contact" href="{{$mono_website}}/contact/">项目咨询 <span aria-hidden="true">↗</span></a>
+        <!-- 亮色与跟随系统暂时停用，保留切换器以便后续恢复。
         <details class="theme-picker">
             <summary aria-label="切换外观主题" title="外观：跟随系统、亮色或暗色"><svg class="theme-system" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 21h8M12 16v5"/></svg><svg class="theme-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/></svg><svg class="theme-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13a9 9 0 0 1-9.9-9.9A9 9 0 1 0 20.9 13Z"/></svg></summary>
             <div class="theme-picker-options" role="group" aria-label="外观主题"><label>跟随系统<input type="radio" name="shop-theme" value="system" data-theme-choice checked></label><label>亮色<input type="radio" name="shop-theme" value="light" data-theme-choice></label><label>暗色<input type="radio" name="shop-theme" value="dark" data-theme-choice></label></div>
         </details>
+        -->
         <details class="gn-site-menu"><summary aria-label="打开导航菜单">菜单 <span aria-hidden="true">☰</span></summary><nav aria-label="移动端主导航">{{foreach $mono_site.navigation as $item}}<a href="{{if $item['to'] eq '/shop/'}}{{:MyUrl('index/index/index')}}{{else /}}{{$mono_website}}{{$item.to}}{{/if}}">{{$item.label}} <span aria-hidden="true">↗</span></a>{{/foreach}}<a href="{{$mono_website}}/contact/">联系合作</a></nav></details>
         </div>
     </div>

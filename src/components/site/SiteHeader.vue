@@ -2,7 +2,6 @@
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import SiteNavLink from "./SiteNavLink.vue";
-import ThemePicker from "./ThemePicker.vue";
 import { site } from "../../content/site.js";
 import mark from "../../assets/brand-mark.png";
 
@@ -51,8 +50,8 @@ onBeforeUnmount(() => {
       <nav class="desktop-nav" aria-label="主导航">
         <SiteNavLink v-for="item in site.navigation" :key="item.to" :to="item.to" :class="{ 'is-active': item.to === '/' ? route.path === '/' : route.path.startsWith(item.to) }">{{ item.label }}</SiteNavLink>
       </nav>
-      <RouterLink class="button button-secondary header-contact" to="/contact/">项目咨询 <span aria-hidden="true">↗</span></RouterLink>
-      <ThemePicker />
+      <SiteNavLink class="button button-secondary header-contact" to="/shop/">进入商城 <span aria-hidden="true">↗</span></SiteNavLink>
+      <!-- 暂停外观切换，默认暗色。<ThemePicker /> -->
       <button class="menu-toggle" type="button" aria-label="打开导航菜单" aria-controls="mobile-menu" :aria-expanded="menuOpen" @click="openMenu"><span></span><span></span></button>
     </div>
     <dialog id="mobile-menu" ref="menu" class="mobile-menu" aria-label="导航菜单" @close="restoreScroll" @click="(event) => { if (event.target === menu) closeMenu(); }">

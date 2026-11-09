@@ -1,6 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import SiteNavLink from "./SiteNavLink.vue";
 import poster from "../../assets/visuals/particle-poster.webp";
 import lightPoster from "../../assets/visuals/particle-poster-light.webp";
 
@@ -30,7 +30,7 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
         <h1 id="studio-hero-title" data-reveal data-reveal-delay="80">光年数智<br /><span>软件设计与研发</span></h1>
         <p class="hero-description" data-reveal data-reveal-delay="160">网站、业务系统、小程序与自动化。<br />从需求梳理，到上线交付。</p>
         <div class="button-row" data-reveal data-reveal-delay="240">
-          <RouterLink class="button button-primary" to="/contact/">聊聊你的项目 <span class="button-arrow" aria-hidden="true">↗</span></RouterLink>
+          <SiteNavLink class="button button-primary" to="/shop/">浏览商品 <span class="button-arrow" aria-hidden="true">↗</span></SiteNavLink>
           <a class="text-link hero-service-link" href="#capabilities">了解开发服务 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -88,5 +88,5 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
   .hero-specs dt { font-size: 9px; }
   .hero-specs dd { font-size: 11px; }
 }
-@media (max-width: 380px) { .hero-copy h1 { font-size: 40px; } .hero-copy .button-row { gap: 16px; } .hero-copy .button { gap: 12px; } }
+@media (max-width: 380px) { .hero-copy h1 { font-size: 32px; } .hero-copy .button-row { gap: 16px; } .hero-copy .button { gap: 12px; } }
 </style>

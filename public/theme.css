@@ -1,26 +1,19 @@
 @font-face { font-family:"Noto Serif SC"; src:url("./fonts/noto-serif-sc-subset.woff2") format("woff2"); font-style:normal; font-weight:300; font-display:swap; }
-:root {
+/* 亮色主题暂时停用，保留配色供后续调整。
+:root[data-theme="light"] {
   color-scheme:light;
   --theme-ink:#211d2b; --theme-muted:#696173; --theme-surface:#ffffff; --theme-inset:#f0edf5; --theme-canvas:#faf9fc; --theme-line:#ded9e6;
   --theme-accent:#6540a6; --theme-accent-hover:#4b2a85; --theme-accent-soft:#eee8f8; --theme-mint:#19764f; --theme-rose:#9c3d88;
   --theme-button:#211d2b; --theme-button-hover:#403448; --theme-header:rgba(250,249,252,.94);
   --theme-error:#a52955; --theme-error-soft:#fff0f5; --theme-error-line:#e6b5c6; --theme-success:#19764f; --theme-success-soft:#eaf6ef; --theme-success-line:#a1cfb4;
 }
-:root[data-theme="dark"] {
+*/
+:root, :root[data-theme="dark"] {
   color-scheme:dark;
   --theme-ink:#f0ecf7; --theme-muted:#a49db4; --theme-surface:#0d0b13; --theme-inset:#15121d; --theme-canvas:#07060b; --theme-line:#302938;
   --theme-accent:#b9a2ff; --theme-accent-hover:#d3c3ff; --theme-accent-soft:#20182f; --theme-mint:#8cf2c6; --theme-rose:#e7a3ee;
   --theme-button:#f0ecf7; --theme-button-hover:#ffffff; --theme-header:rgba(7,6,11,.94);
   --theme-error:#f9b4dc; --theme-error-soft:#2b1723; --theme-error-line:#694057; --theme-success:#8cf2c6; --theme-success-soft:#11261d; --theme-success-line:#2e6b50;
-}
-@media(prefers-color-scheme:dark) {
-  :root:not([data-theme]) {
-    color-scheme:dark;
-    --theme-ink:#f0ecf7; --theme-muted:#a49db4; --theme-surface:#0d0b13; --theme-inset:#15121d; --theme-canvas:#07060b; --theme-line:#302938;
-    --theme-accent:#b9a2ff; --theme-accent-hover:#d3c3ff; --theme-accent-soft:#20182f; --theme-mint:#8cf2c6; --theme-rose:#e7a3ee;
-    --theme-button:#f0ecf7; --theme-button-hover:#ffffff; --theme-header:rgba(7,6,11,.94);
-    --theme-error:#f9b4dc; --theme-error-soft:#2b1723; --theme-error-line:#694057; --theme-success:#8cf2c6; --theme-success-soft:#11261d; --theme-success-line:#2e6b50;
-  }
 }
 .theme-picker { position:relative; flex-shrink:0; color:var(--theme-ink); font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
 .theme-picker summary { display:grid; place-items:center; width:40px; height:40px; border:1px solid var(--theme-line); border-radius:50%; cursor:pointer; list-style:none; }

@@ -42,7 +42,7 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 
 方案介绍和演示画面不作为已交付客户案例，价格及可售状态以商城实际记录为准。官网使用 V5 宣传片；`video/` 保留可编辑工程及其引用的历史制作脚本和素材。
 
-官网和商城默认跟随设备的明暗主题，导航栏的外观按钮可选择亮色、暗色或跟随系统。显式选择保存在浏览器 `guangnian-theme` 设置中；同源页面与标签页共用偏好，不同域名和端口各自保存。`public/theme.js`、`public/theme.css` 和 `public/fonts/` 为共享资源源文件，商城覆盖目录内保留相同副本，构建检查会核对一致性。
+官网和商城统一使用暗色主题。亮色配色已注释保留，外观切换暂时停用，旧浏览器偏好和系统主题不会改变当前外观。`public/theme.js`、`public/theme.css` 和 `public/fonts/` 为共享资源源文件，商城覆盖目录内保留相同副本，构建检查会核对一致性。
 
 视觉参考来自用户提供的 [Figma Site](https://repay-smile-39212411.figma.site/)。首页粒子曲面使用 Three.js，支持指针响应、离屏暂停、减少动态效果和静态图回退。极光照片为 Justin Verweire / Unsplash（图片 ID `photo-1775255129476-95a1e9624710`），建筑照片为 Shojol Islam / Unsplash（图片 ID `photo-1711288153255-0a65ab00f2df`），保留画面及页面署名。标题字使用 Noto Serif SC 字形子集，许可证见 `public/fonts/OFL.txt`。
 
