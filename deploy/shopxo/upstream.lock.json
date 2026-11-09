@@ -42,7 +42,7 @@
     "extend/payment/Alipay.php": "2c39ef743bcf4c3c83e1d404b5e89d6f666bafcc49bda500ed0c048289ed0ebf",
     "app/service/OrderService.php": "c9b121f3d1091bd79ac1ea3d361e779e23d68c1e418c1756931e74efde434baa",
     "app/index/controller/Order.php": "2eda8baf298185c0e84560ff1db0f83607999fd8ce16f0630672b6626299b296",
-    "app/index/view/default/public/header.html": "6437604970c46cb883dd67549d765e839569e6ec7a5860887bb739f13068947a",
+    "app/index/view/default/public/header.html": "1df304808024074dc96093021b78e2dd745e07fa81ebeec12fecf06bdcc20d4a",
     "app/index/view/default/public/footer.html": "0433f08823e72a90d28229d3e5e3104dd205f672fc9eae5205a22b7bcb8fee18",
     "app/index/view/default/user/logininfo.html": "0caeefd708225b0d0a2d5c6e7685839f28f33375c64b8e0eb75abf1dbeb7e012",
     "app/index/view/default/user/reginfo.html": "bcd83e1be40843d1b1303ec2d33aedca359020dae2ffcd5a8bc33c18bf50044e",
