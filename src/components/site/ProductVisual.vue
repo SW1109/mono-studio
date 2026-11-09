@@ -36,8 +36,8 @@ const layout = computed(() => {
 
 <style scoped>
 /* 显式宽度避免比例与最小高度反推宽度；窄屏也要完整展示等比机身。 */
-.product-visual { --visual-ink: var(--ink); --visual-muted: var(--muted); --visual-line: var(--line); position: relative; overflow: hidden; display: grid; place-items: center; width: 100%; min-width: 0; min-height: 280px; aspect-ratio: 1.38; background: radial-gradient(ellipse at 80% 10%, rgba(220, 185, 240, .4), transparent 70%), rgba(242, 229, 250, .56); padding: 40px 36px 32px; }
-.visual-caption { position: absolute; left: 24px; top: 18px; font: 8px/1.5 var(--font-mono); letter-spacing: .08em; color: var(--visual-muted); }
+.product-visual { --visual-ink: var(--ink); --visual-muted: var(--muted); --visual-line: var(--line); position: relative; overflow: hidden; display: grid; place-items: center; width: 100%; min-width: 0; min-height: 280px; aspect-ratio: 1.38; background: var(--tone-bg, var(--surface-inset)); padding: 40px 36px 32px; }
+.visual-caption { position: absolute; left: 24px; top: 18px; font: 8px/1.5 var(--font-mono); letter-spacing: 0; color: var(--visual-muted); }
 .visual-footnote { position: absolute; left: 24px; right: 24px; bottom: 14px; display: flex; justify-content: space-between; font-size: 10px; color: var(--visual-muted); }
 .visual-footnote > span { font-size: 15px; color: var(--accent); }
 .visual-browser { width: 100%; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; box-shadow: 3px 5px 20px rgba(0, 0, 0, .08); }
@@ -46,8 +46,8 @@ const layout = computed(() => {
 .visual-browser-bar i { display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
 .visual-website-content { padding: 12px 18px 16px; text-align: center; }
 .visual-mini-brand { display: block; text-align: left; font-size: 11px; color: var(--accent); font-weight: 600; }
-.visual-website-content p { font: 6px/1.5 var(--font-mono); margin: 8px 0; color: var(--muted); letter-spacing: .08em; }
-.visual-website-content > strong { font-size: 22px; line-height: 1.3; letter-spacing: -.06em; white-space: pre-line; display: block; }
+.visual-website-content p { font: 6px/1.5 var(--font-mono); margin: 8px 0; color: var(--muted); letter-spacing: 0; }
+.visual-website-content > strong { font-size: 22px; line-height: 1.3; letter-spacing: 0; white-space: pre-line; display: block; }
 .visual-mini-cta { display: inline-block; border-radius: var(--radius-pill); padding: 4px 9px; margin-top: 10px; background: var(--accent); color: var(--canvas); font-size: 6px; }
 .visual-website-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
 .visual-website-tiles > span { display: grid; place-items: center; height: 28px; font-size: 6px; padding: 5px; background: var(--surface); color: var(--muted); border-radius: 3px; overflow: hidden; }
@@ -65,19 +65,19 @@ const layout = computed(() => {
 .visual-workflow { background: var(--dark); --visual-muted: var(--muted-on-dark); }
 .visual-workflow .visual-caption { color: var(--muted-on-dark); }
 .visual-workflow-content { padding: 18px; }
-.visual-workflow-content p { font: 6px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--muted); margin-bottom: 6px; }
+.visual-workflow-content p { font: 6px/1.5 var(--font-mono); letter-spacing: 0; color: var(--muted); margin-bottom: 6px; }
 .visual-workflow-content > strong { font-size: 17px; display: block; margin-bottom: 16px; }
 .visual-flow-row { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding-block: 10px; color: var(--muted); font-size: 8px; }
 .visual-flow-row > span:first-child { font: 7px/1.5 var(--font-mono); }
 .visual-flow-row svg { width: 12px; height: 12px; color: var(--accent); flex-shrink: 0; }
 .visual-flow-row i { margin-left: auto; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 .visual-mobile { padding-block: 34px 30px; }
-.visual-phone { width: 98px; aspect-ratio: 9 / 19.5; border: 4px solid var(--dark); border-radius: 18px; padding: 17px 7px 15px; position: relative; background: var(--canvas); box-shadow: 3px 5px 20px rgba(0, 0, 0, .12); }
+.visual-phone { width: 98px; aspect-ratio: 9 / 19.5; border: 4px solid #39333f; border-radius: 18px; padding: 17px 7px 15px; position: relative; background: var(--canvas); box-shadow: 3px 5px 20px rgba(0, 0, 0, .12); }
 .visual-phone-camera { position: absolute; width: 24px; height: 5px; top: 4px; left: calc(50% - 12px); background: var(--dark); border-radius: var(--radius-pill); }
 .visual-phone-content { height: 100%; display: flex; flex-direction: column; }
 .visual-phone-name { display: block; font-size: 5px; color: var(--muted); }
 .visual-phone-content > svg { width: 20px; height: 20px; color: var(--accent); margin-block: 14px 8px; }
-.visual-phone-content > strong { font-size: 13px; line-height: 1.4; white-space: pre-line; letter-spacing: -.03em; }
+.visual-phone-content > strong { font-size: 13px; line-height: 1.4; white-space: pre-line; letter-spacing: 0; }
 .visual-phone-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-block: 7px; border-bottom: 1px solid var(--line); font-size: 5px; color: var(--muted); }
 .visual-phone-row > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .visual-phone-row > svg { width: 8px; height: 8px; flex-shrink: 0; }

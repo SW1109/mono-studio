@@ -1,0 +1,41 @@
+@font-face { font-family:"Noto Serif SC"; src:url("./fonts/noto-serif-sc-subset.woff2") format("woff2"); font-style:normal; font-weight:300; font-display:swap; }
+:root {
+  color-scheme:light;
+  --theme-ink:#211d2b; --theme-muted:#696173; --theme-surface:#ffffff; --theme-inset:#f0edf5; --theme-canvas:#faf9fc; --theme-line:#ded9e6;
+  --theme-accent:#6540a6; --theme-accent-hover:#4b2a85; --theme-accent-soft:#eee8f8; --theme-mint:#19764f; --theme-rose:#9c3d88;
+  --theme-button:#211d2b; --theme-button-hover:#403448; --theme-header:rgba(250,249,252,.94);
+  --theme-error:#a52955; --theme-error-soft:#fff0f5; --theme-error-line:#e6b5c6; --theme-success:#19764f; --theme-success-soft:#eaf6ef; --theme-success-line:#a1cfb4;
+}
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --theme-ink:#f0ecf7; --theme-muted:#a49db4; --theme-surface:#0d0b13; --theme-inset:#15121d; --theme-canvas:#07060b; --theme-line:#302938;
+  --theme-accent:#b9a2ff; --theme-accent-hover:#d3c3ff; --theme-accent-soft:#20182f; --theme-mint:#8cf2c6; --theme-rose:#e7a3ee;
+  --theme-button:#f0ecf7; --theme-button-hover:#ffffff; --theme-header:rgba(7,6,11,.94);
+  --theme-error:#f9b4dc; --theme-error-soft:#2b1723; --theme-error-line:#694057; --theme-success:#8cf2c6; --theme-success-soft:#11261d; --theme-success-line:#2e6b50;
+}
+@media(prefers-color-scheme:dark) {
+  :root:not([data-theme]) {
+    color-scheme:dark;
+    --theme-ink:#f0ecf7; --theme-muted:#a49db4; --theme-surface:#0d0b13; --theme-inset:#15121d; --theme-canvas:#07060b; --theme-line:#302938;
+    --theme-accent:#b9a2ff; --theme-accent-hover:#d3c3ff; --theme-accent-soft:#20182f; --theme-mint:#8cf2c6; --theme-rose:#e7a3ee;
+    --theme-button:#f0ecf7; --theme-button-hover:#ffffff; --theme-header:rgba(7,6,11,.94);
+    --theme-error:#f9b4dc; --theme-error-soft:#2b1723; --theme-error-line:#694057; --theme-success:#8cf2c6; --theme-success-soft:#11261d; --theme-success-line:#2e6b50;
+  }
+}
+.theme-picker { position:relative; flex-shrink:0; color:var(--theme-ink); font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
+.theme-picker summary { display:grid; place-items:center; width:40px; height:40px; border:1px solid var(--theme-line); border-radius:50%; cursor:pointer; list-style:none; }
+.theme-picker summary::-webkit-details-marker { display:none; }
+.theme-picker summary:hover,.theme-picker[open] summary { background:var(--theme-inset); border-color:var(--theme-accent); }
+.theme-picker svg { display:block; width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.theme-picker summary svg { display:none; }
+:root:not([data-theme-preference]) .theme-picker .theme-system,
+:root[data-theme-preference="system"] .theme-picker .theme-system,
+:root[data-theme-preference="light"] .theme-picker .theme-light,
+:root[data-theme-preference="dark"] .theme-picker .theme-dark { display:block; }
+.theme-picker-options { position:absolute; right:0; top:calc(100% + 12px); width:176px; padding:8px; background:var(--theme-surface); border:1px solid var(--theme-line); border-radius:8px; box-shadow:0 12px 30px #00000018; z-index:1010; }
+.theme-picker-options label { display:flex; align-items:center; gap:10px; padding:10px; min-height:44px; border-radius:4px; cursor:pointer; margin:0; font-weight:400; color:var(--theme-muted); }
+.theme-picker-options label:has(:checked) { background:var(--theme-accent-soft); color:var(--theme-accent); }
+.theme-picker-options label:hover { background:var(--theme-inset); }
+.theme-picker-options input { width:16px; height:16px; accent-color:var(--theme-accent); margin:0 0 0 auto; }
+.theme-picker :focus-visible { outline:2px solid var(--theme-accent); outline-offset:3px; }
+@media(max-width:380px) { .theme-picker summary { width:36px; height:36px; } }

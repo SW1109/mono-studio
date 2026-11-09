@@ -22,10 +22,10 @@ const checklist = ["项目背景、现有流程与需要解决的问题。", "�
 .contact-layout { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; }
 .consultation-label { font-size: 14px; color: var(--accent); padding-bottom: 20px; }
 .contact-card { padding: 36px; border-radius: var(--radius-card); margin-bottom: 24px; background: var(--glass-bg); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter); }
-.contact-type { font: 11px/1.5 var(--font-mono); letter-spacing: .1em; color: var(--muted); }
+.contact-type { font: 11px/1.5 var(--font-mono); letter-spacing: 0; color: var(--muted); }
 .contact-card h2 { font-size: 28px; margin: 20px 0 16px; }
 .contact-card > p:not(.contact-value) { color: var(--muted); font-size: 16px; }
-.contact-value { display: block; font-size: clamp(20px, 2vw, 28px); font-weight: 600; margin: 28px 0; overflow-wrap: anywhere; user-select: text; letter-spacing: -.02em; }
+.contact-value { display: block; font-size: 28px; font-weight: 600; margin: 28px 0; overflow-wrap: anywhere; user-select: text; letter-spacing: 0; }
 .contact-value:hover { color: var(--accent); }
 .copy-status { min-height: 32px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 .contact-checklist { margin-top: 43px; padding: 36px; align-self: start; border: 1px solid var(--line); border-radius: var(--radius-card); }

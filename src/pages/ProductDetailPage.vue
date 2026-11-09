@@ -71,7 +71,7 @@ const sections = [
 .detail-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 72px; align-items: center; margin-top: 48px; }
 .detail-hero > div { min-width: 0; }
 .detail-kind { margin-bottom: 20px; color: var(--accent); background: var(--accent-soft); border-color: var(--line); }
-.detail-hero h1 { font-size: clamp(34px, 3.7vw, 52px); line-height: 1.3; letter-spacing: -.045em; }
+.detail-hero h1 { font-size: 52px; line-height: 1.3; letter-spacing: 0; }
 .detail-hero h2 { margin-top: 20px; font-size: 24px; line-height: 1.5; }
 .detail-hero .button-row { margin-top: 32px; }
 .platform-list { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px; }

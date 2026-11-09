@@ -9,6 +9,12 @@ const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 const load = filename => readFile(path.join(dist, filename), "utf8");
 const manifest = JSON.parse(await load(".vite/manifest.json"));
 const metadata = JSON.parse(await load("site-build.json"));
+// 两个运行环境共用同一主题，避免官网改色后原生商城仍使用旧副本。
+for (const file of ["theme.js", "theme.css", "fonts/noto-serif-sc-subset.woff2", "fonts/OFL.txt"]) {
+  const source = await readFile(new URL(`../public/${file}`, import.meta.url));
+  assert.ok(source.equals(await readFile(path.join(dist, file))), `构建主题资源不同步：${file}`);
+  assert.ok(source.equals(await readFile(new URL(`../deploy/shopxo/overlay/public/static/mono/${file}`, import.meta.url))), `商城主题资源不同步：${file}`);
+}
 assert.deepEqual(metadata.paths, prerenderPaths, "产物路径与当前内容配置不一致，可能是旧构建。");
 // 缺配置的构建会静默降级：商城入口退回站内占位页、canonical 与 sitemap 不再输出，因此这里直接失败。
 if (!process.env.VITE_ALLOW_UNCONFIGURED_BUILD) {

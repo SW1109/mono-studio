@@ -23,7 +23,6 @@ export function useSiteSeo() {
     htmlAttrs: { lang: "zh-CN" },
     meta: [
       { name: "description", content: description.value },
-      { name: "theme-color", content: route.path === "/" ? "#f6edfc" : "#fcf9ff" },
       { name: "robots", content: noindex.value ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: site.shortName },

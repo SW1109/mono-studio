@@ -1,1 +1,5 @@
 deploy/shopxo/** text eol=lf
+*.png -text
+*.jpg -text
+*.webp -text
+*.woff2 -text

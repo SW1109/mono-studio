@@ -42,6 +42,10 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 
 方案介绍和演示画面不作为已交付客户案例，价格及可售状态以商城实际记录为准。官网使用 V5 宣传片；`video/` 保留可编辑工程及其引用的历史制作脚本和素材。
 
+官网和商城默认跟随设备的明暗主题，导航栏的外观按钮可选择亮色、暗色或跟随系统。显式选择保存在浏览器 `guangnian-theme` 设置中；同源页面与标签页共用偏好，不同域名和端口各自保存。`public/theme.js`、`public/theme.css` 和 `public/fonts/` 为共享资源源文件，商城覆盖目录内保留相同副本，构建检查会核对一致性。
+
+视觉参考来自用户提供的 [Figma Site](https://repay-smile-39212411.figma.site/)。首页粒子曲面使用 Three.js，支持指针响应、离屏暂停、减少动态效果和静态图回退。极光照片为 Justin Verweire / Unsplash（图片 ID `photo-1775255129476-95a1e9624710`），建筑照片为 Shojol Islam / Unsplash（图片 ID `photo-1711288153255-0a65ab00f2df`），保留画面及页面署名。标题字使用 Noto Serif SC 字形子集，许可证见 `public/fonts/OFL.txt`。
+
 ## 配置与隐私
 
 `.env.production` 仅保存公开域名、商城路径和商品 ID，可进入仓库。开发配置以 `.env.example` 为参考写入本机 `.env.local`。生产构建需配置正式站点与商城地址，缺失时构建失败；只有明确需要未配置版本时才使用 `VITE_ALLOW_UNCONFIGURED_BUILD=1`。
@@ -79,7 +83,7 @@ location /cesium/ {
 
 子目录部署时同步修改 `base`、静态目录与 Nginx 路径。正式域名配置后输出 sitemap、robots、llms、canonical、分享图及 JSON-LD；商城商品地图从数据库读取。交易及账号入口标记 `noindex`。这些资源不保证搜索排名或收录。
 
-普通页面不加载 Cesium，只有主动启动三维演示后才加载引擎。动画遵守系统减少动态效果偏好，并在离屏或后台暂停。地图授权、真实浏览器交互、部署后的 HTTP 状态和支付联调仍需按发布范围单独验收。
+普通页面不加载 Cesium，只有主动启动三维演示后才加载地图引擎；首页按需加载粒子动画模块。动画遵守系统减少动态效果偏好，并在离屏或后台暂停。地图授权、真实浏览器交互、部署后的 HTTP 状态和支付联调仍需按发布范围单独验收。
 
 ## 支付行为
 

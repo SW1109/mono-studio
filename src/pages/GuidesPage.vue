@@ -27,7 +27,7 @@ import { serviceGuide } from "../content/guides.js";
 .guide-updated { margin-top:28px; font-size:12px; color:var(--muted); }
 .guide-article { min-width:0; }
 .guide-article section { padding-bottom:44px; margin-bottom:44px; border-bottom:1px solid var(--line); scroll-margin-top:130px; }
-.guide-article h2 { font-size:clamp(24px,2.2vw,32px); line-height:1.45; margin:14px 0 22px; letter-spacing:-.03em; }
+.guide-article h2 { font-size: 32px; line-height:1.45; margin:14px 0 22px; letter-spacing: 0; }
 .guide-article section>p:not(.eyebrow) { color:var(--muted); font-size:16px; line-height:1.95; margin-top:16px; }
 .guide-comparison { overflow-x:auto; margin-top:28px; border:1px solid var(--line); border-radius:16px; }
 .guide-comparison:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }

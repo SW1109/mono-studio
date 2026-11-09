@@ -17,7 +17,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
   <section class="container catalog-intro glass-panel" aria-label="软件展示说明" data-reveal>
     <div class="catalog-intro-copy">
       <span class="icon-tile"><SiteIcon name="layers" /></span>
-      <div><h2>定制方案与适用范围</h2><p>以下为可按需求开发的方案介绍，不是已上线的标准产品或客户案例。功能、平台、费用与交付范围以双方确认的方案为准。可直接选购的技术服务请前往 <SiteNavLink to="/shop/">服务商城 ↗</SiteNavLink>。</p></div>
+      <div><h2>按需求定制</h2><p>以下展示可定制方案及界面示意。功能、费用和交付范围在项目中确认。专项技术服务可前往 <SiteNavLink to="/shop/">服务商城 ↗</SiteNavLink> 选购。</p></div>
     </div>
     <dl class="catalog-counts">
       <div><dt>开发方向</dt><dd>{{ solutions.length }}<small>个方案</small></dd></div>
@@ -50,7 +50,7 @@ const filtered = computed(() => category.value === "全部方案" ? solutions : 
 </template>
 
 <style scoped>
-.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 48px; padding: 32px 40px; background: var(--glass-bg); border-radius: var(--radius-card); margin-bottom: 72px; }
+.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 48px; padding: 32px 0; background: transparent; border: 0; border-block: 1px solid var(--line); margin-bottom: 72px; }
 .catalog-intro-copy { display: flex; gap: 24px; max-width: 730px; }
 .catalog-intro-copy .icon-tile { flex-shrink: 0; }
 .catalog-intro h2 { font-size: 21px; margin-bottom: 12px; }

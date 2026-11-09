@@ -19,10 +19,10 @@ export const site = Object.freeze({
 });
 
 export const process = [
-  { title: "需求分析", description: "梳理使用场景、业务目标与约束条件，确认功能范围及验收要求。" },
-  { title: "方案设计", description: "确定功能模块、技术方案与阶段安排，明确项目交付内容。" },
-  { title: "开发与验证", description: "按阶段完成开发，以可运行版本评审功能、交互与问题修正。" },
-  { title: "交付与迭代", description: "按约定完成部署、资料与源码交接；后续维护及迭代范围另行确认。" },
+  { title: "聊清需求", description: "了解使用场景和现有流程，确认要做的功能与验收要求。" },
+  { title: "确认方案", description: "一起确定页面、技术方案、费用和时间，写清楚交付内容。" },
+  { title: "开发与验证", description: "分阶段提供可运行版本，核对功能，收集反馈并修正问题。" },
+  { title: "上线与交接", description: "按约定部署上线，交接源码和资料，确认后续维护安排。" },
 ];
 
 export const faqs = [

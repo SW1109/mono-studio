@@ -14,7 +14,7 @@ const principles = [
 
 <template>
   <div class="about-opening">
-    <PageHeading class="about-heading" eyebrow="ABOUT GUANGNIAN" title="专注软件设计与研发" current="关于光年" description="光年数智网络科技工作室，提供软件产品研发、定制开发与系统集成服务。" />
+    <PageHeading class="about-heading" eyebrow="ABOUT GUANGNIAN" title="光年数智工作室" current="关于光年" description="做网站、软件和自动化工具，从设计到上线交付。" />
     <section class="about-film-stage" aria-label="光年数智工作室宣传片">
       <StudioFilm />
     </section>
@@ -23,7 +23,6 @@ const principles = [
     <div data-reveal>
       <p class="eyebrow">光年数智网络科技工作室</p>
       <h2>产品设计<br />与工程实践</h2>
-      <p class="intro-signature" aria-hidden="true">Thoughtfully designed.<br />Precisely engineered.</p>
     </div>
     <div class="about-intro-copy glass-panel" data-reveal data-reveal-delay="120">
       <p>光年数智是一家专注软件设计与研发的工作室，业务涵盖企业网站、业务管理系统、小程序、桌面软件与自动化工具。</p>
@@ -50,20 +49,18 @@ const principles = [
 
 <style scoped>
 .about-opening { position: relative; isolation: isolate; }
-.about-opening::before { content: ''; position: absolute; inset: -112px 0 30%; z-index: -1; background: radial-gradient(ellipse at 18% 60%, rgba(213, 178, 237, .22), transparent 50%), radial-gradient(ellipse at 86% 15%, rgba(239, 214, 246, .32), transparent 55%); pointer-events: none; }
 .about-heading { text-align: center; padding-bottom: 44px; }
 .about-heading :deep(.breadcrumbs) { justify-content: center; margin-bottom: 36px; }
-.about-heading :deep(.eyebrow) { justify-content: center; width: fit-content; margin-inline: auto; padding: 7px 18px; border: 1px solid rgba(255, 255, 255, .9); border-radius: var(--radius-pill); background: rgba(255, 255, 255, .65); color: var(--accent); }
-.about-heading :deep(h1) { font-size: clamp(32px, 3.6vw, 50px); max-width: none; font-weight: 400; color: var(--accent); letter-spacing: -.025em; }
+.about-heading :deep(.eyebrow) { justify-content: center; width: fit-content; margin-inline: auto; color: var(--muted); }
+.about-heading :deep(h1) { font-size: 50px; max-width: none; font-weight: 300; color: var(--ink); letter-spacing: 0; }
 .about-heading :deep(.page-description) { margin-inline: auto; font-size: 17px; }
 /* 控制舞台宽度并去掉视频背后的大面积模糊，保持完整 16:9 和全屏观看能力。 */
-.about-film-stage { width: min(1120px, calc(100% - 64px)); margin-inline: auto; padding: 8px; border: 1px solid var(--glass-line); border-radius: 32px; background: var(--glass-bg-strong); box-shadow: var(--glass-shadow); }
-.about-film-stage :deep(.studio-film) { border: 0; border-radius: 28px; background: transparent; }
+.about-film-stage { width: min(1120px, calc(100% - 64px)); margin-inline: auto; border-block: 1px solid var(--line); }
+.about-film-stage :deep(.studio-film) { border: 0; border-radius: 0; background: transparent; }
 .about-film-stage :deep(figcaption) { padding: 22px 28px; }
 .about-intro { display: grid; grid-template-columns: .9fr 1.1fr; gap: 96px; align-items: center; padding-block: 96px; }
-.about-intro h2 { color: var(--accent); font-size: clamp(30px, 3vw, 40px); font-weight: 400; line-height: 1.5; }
-.intro-signature { font: italic 22px/1.6 Georgia, serif; color: var(--muted); margin-top: 30px; }
-.about-intro-copy { padding: 40px; border-radius: var(--radius-card); }
+.about-intro h2 { color: var(--accent); font-size: 40px; font-weight: 400; line-height: 1.5; }
+.about-intro-copy { padding-block: 32px; border: 0; border-block: 1px solid var(--line); background: transparent; }
 .about-intro-copy p { color: var(--muted); font-size: 17px; line-height: 1.95; }
 .about-intro-copy p + p { margin-top: 24px; }
 .principle-note { color: var(--muted); font-size: 14px; }
@@ -74,21 +71,19 @@ const principles = [
 .principle-grid h3 { margin: 28px 0 16px; font-size: 22px; font-weight: 500; }
 .principle-grid p { font-size: 15px; color: var(--muted); line-height: 1.8; }
 .focus-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
-.focus-grid > div { display: flex; flex-direction: column; align-items: start; gap: 24px; padding: 28px; border-radius: 22px; }
+.focus-grid > div { display: flex; flex-direction: column; align-items: start; gap: 24px; padding: 28px; border-radius: var(--radius-card); }
 .focus-grid h3 { font-size: 18px; }
 @media (max-width: 1040px) { .about-intro { gap: 48px; }.focus-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) {
-  .about-opening::before { top: -100px; }
   .about-heading { padding-bottom: 32px; }
   .about-heading :deep(.breadcrumbs) { margin-bottom: 28px; }
   .about-heading :deep(.page-description) { font-size: 16px; }
-  .about-film-stage { width: calc(100% - 24px); padding: 5px; border-radius: 28px; }
-  .about-film-stage :deep(.studio-film) { border-radius: 22px; }
+  .about-film-stage { width: calc(100% - 40px); }
+  .about-heading :deep(h1) { font-size: 36px; }
   .about-film-stage :deep(figcaption) { padding: 16px; }
   .about-intro { grid-template-columns: 1fr; gap: 28px; padding-block: 64px; }
   .about-intro-copy { padding: 28px; }
   .about-intro-copy p { font-size: 16px; }
-  .intro-signature { font-size: 20px; margin-top: 20px; }
   .principle-grid { grid-template-columns: 1fr; gap: 16px; }
   .principle-grid article { padding: 28px; }
   .principle-grid h3 { font-size: 23px; }
