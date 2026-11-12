@@ -59,7 +59,7 @@ import architecture from "../assets/visuals/architecture.jpg";
 .capabilities-heading .section-description { margin-block: 28px; }
 .capability-row { position: relative; display: grid; grid-template-columns: 30px 1fr 44px; gap: 24px; padding-block: 36px; border-top: 1px solid var(--line); }
 .capability-row:last-child { border-bottom: 1px solid var(--line); }
-.capability-row::before { content: ""; position: absolute; inset: -1px 0 auto; height: 1px; background: linear-gradient(90deg, var(--accent), var(--mint), transparent); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--ease-out); }
+.capability-row::before { content: ""; position: absolute; inset: -1px 0 auto; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .4s var(--ease-out); }
 .capability-row:hover::before, .capability-row:focus-visible::before { transform: scaleX(1); }
 .capability-number { color: var(--muted); font: 11px/1.6 var(--font-mono); padding-top: 5px; }
 .capability-label { font: 9px/1.8 var(--font-mono); color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }

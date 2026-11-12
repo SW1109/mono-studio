@@ -44,7 +44,7 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 
 官网和商城统一使用暗色主题。亮色配色已注释保留，外观切换暂时停用，旧浏览器偏好和系统主题不会改变当前外观。`public/theme.js`、`public/theme.css` 和 `public/fonts/` 为共享资源源文件，商城覆盖目录内保留相同副本，构建检查会核对一致性。
 
-视觉参考来自用户提供的 [Figma Site](https://repay-smile-39212411.figma.site/)。首页粒子曲面使用 Three.js，支持指针响应、离屏暂停、减少动态效果和静态图回退。极光照片为 Justin Verweire / Unsplash（图片 ID `photo-1775255129476-95a1e9624710`），建筑照片为 Shojol Islam / Unsplash（图片 ID `photo-1711288153255-0a65ab00f2df`），保留画面及页面署名。标题字使用 Noto Serif SC 字形子集，许可证见 `public/fonts/OFL.txt`。
+视觉以 [Awesome DESIGN.md](https://github.com/VoltAgent/awesome-design-md) 中的 Linear 为主参考，统一近黑底色、分层灰面板、细边框、无衬线字体与少量紫色强调；保留此前 [Figma Site](https://repay-smile-39212411.figma.site/) 参考中的粒子和图片展示。首页粒子曲面使用 Three.js，支持指针响应、离屏暂停、减少动态效果和静态图回退。极光照片为 Justin Verweire / Unsplash（图片 ID `photo-1775255129476-95a1e9624710`），建筑照片为 Shojol Islam / Unsplash（图片 ID `photo-1711288153255-0a65ab00f2df`），保留画面及页面署名。商城 `native.css` 在原生页面样式后加载，覆盖商品、会员中心、订单、购物车、结算及独立弹窗；共享字体资产许可证见 `public/fonts/OFL.txt`。
 
 ## 配置与隐私
 

@@ -10,10 +10,10 @@
 */
 :root, :root[data-theme="dark"] {
   color-scheme:dark;
-  --theme-ink:#f0ecf7; --theme-muted:#a49db4; --theme-surface:#0d0b13; --theme-inset:#15121d; --theme-canvas:#07060b; --theme-line:#302938;
-  --theme-accent:#b9a2ff; --theme-accent-hover:#d3c3ff; --theme-accent-soft:#20182f; --theme-mint:#8cf2c6; --theme-rose:#e7a3ee;
-  --theme-button:#f0ecf7; --theme-button-hover:#ffffff; --theme-header:rgba(7,6,11,.94);
-  --theme-error:#f9b4dc; --theme-error-soft:#2b1723; --theme-error-line:#694057; --theme-success:#8cf2c6; --theme-success-soft:#11261d; --theme-success-line:#2e6b50;
+  --theme-ink:#f7f8f8; --theme-muted:#a0a4ad; --theme-surface:#0f1012; --theme-inset:#18191c; --theme-elevated:#202226; --theme-canvas:#08090b; --theme-line:#292c32; --theme-line-strong:#41454e;
+  --theme-accent:#9ba5ff; --theme-accent-hover:#bdc4ff; --theme-accent-soft:#1c2035; --theme-mint:#91cfb4; --theme-rose:#b0abd6;
+  --theme-button:#5e6ad2; --theme-button-hover:#707de0; --theme-button-text:#ffffff; --theme-header:rgba(8,9,11,.94);
+  --theme-error:#f0a1aa; --theme-error-soft:#2b181e; --theme-error-line:#683540; --theme-success:#91cfb4; --theme-success-soft:#14261e; --theme-success-line:#315b47;
 }
 .theme-picker { position:relative; flex-shrink:0; color:var(--theme-ink); font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; }
 .theme-picker summary { display:grid; place-items:center; width:40px; height:40px; border:1px solid var(--theme-line); border-radius:50%; cursor:pointer; list-style:none; }

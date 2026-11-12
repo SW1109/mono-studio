@@ -7,7 +7,7 @@
     root.dataset.themePreference = "dark";
     root.style.colorScheme = "dark";
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = "#07060b";
+    if (meta) meta.content = "#08090b";
     window.dispatchEvent(new CustomEvent("mono-theme-change", { detail: { theme: "dark", preference: "dark" } }));
   }
   // 在样式和应用加载前确定主题，预渲染页面也不会先闪成另一种颜色。

@@ -7,16 +7,16 @@ body.gn-unified>.body-content-container { padding-top:108px; }
 .gn-unified .gn-container,.gn-unified .am-container { width:calc(100% - 112px); max-width:1280px; }
 .gn-unified a:focus-visible,.gn-unified button:focus-visible,.gn-unified summary:focus-visible { outline:2px solid var(--gn-accent); outline-offset:5px; }
 .gn-site-header { position:fixed; inset:0 0 auto; z-index:1000; background:var(--theme-header); border-bottom:1px solid var(--gn-line); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-.gn-site-header-inner { width:calc(100% - 112px); max-width:1280px; margin:auto; min-height:82px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.gn-site-header-inner { width:calc(100% - 112px); max-width:1280px; margin:auto; min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .gn-site-brand { display:inline-flex; align-items:center; gap:12px; color:var(--gn-ink); flex-shrink:0; }
 .gn-site-brand:hover { color:var(--gn-accent); }
 .gn-site-brand img { width:34px; height:auto; object-fit:contain; }
-.gn-site-brand strong { display:block; font:400 18px/1.65 "Noto Serif SC","Songti SC",STSong,serif; letter-spacing:0; }
+.gn-site-brand strong { display:block; font-size:18px; font-weight:600; line-height:1.65; letter-spacing:0; }
 .gn-site-brand small { display:block; font:7px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace; color:var(--gn-muted); }
 .gn-site-nav { display:flex; align-items:center; gap:10px; }
 .gn-site-nav a { display:inline-flex; align-items:center; padding:10px 12px; min-height:44px; color:var(--gn-muted); font-size:12px; white-space:nowrap; }
 .gn-site-nav a:hover,.gn-site-nav a[aria-current] { color:var(--gn-ink); }
-.gn-site-header .gn-site-contact { display:inline-flex; gap:20px; justify-content:center; align-items:center; min-height:40px; padding:8px 20px; border:1px solid var(--gn-line); border-radius:999px; color:var(--gn-ink); background:transparent; font-size:12px; }
+.gn-site-header .gn-site-contact { display:inline-flex; gap:20px; justify-content:center; align-items:center; min-height:40px; padding:8px 20px; border:1px solid var(--gn-line); border-radius:8px; color:var(--gn-ink); background:transparent; font-size:12px; }
 .gn-site-header .gn-site-contact:hover { border-color:var(--gn-accent); }
 .gn-site-menu { display:none; }
 .gn-site-actions { display:flex; align-items:center; gap:20px; }
@@ -30,7 +30,7 @@ body.gn-unified>.body-content-container { padding-top:108px; }
 .gn-account-links a { min-height:44px; display:inline-flex; align-items:center; color:inherit; }
 .gn-unified .gn-store { background:transparent; }
 .gn-shop-intro { position:relative; padding-block:54px 64px; border-bottom:1px solid var(--gn-line); }
-.gn-shop-intro h1 { margin:20px 0; font:300 64px/1.35 "Noto Serif SC","Songti SC",STSong,serif; letter-spacing:0; }
+.gn-shop-intro h1 { margin:20px 0; font-size:52px; font-weight:600; line-height:1.35; letter-spacing:0; }
 .gn-shop-intro>p { position:relative; z-index:1; }
 .gn-shop-intro>p:not(.gn-eyebrow) { max-width:560px; color:var(--gn-muted); font-size:15px; line-height:1.95; }
 .gn-intro-meta { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:24px; margin-top:28px; color:var(--gn-muted); font-size:11px; }
@@ -44,7 +44,7 @@ body.gn-unified>.body-content-container { padding-top:108px; }
 .gn-site-footer h2 { font-size:13px; font-weight:500; color:var(--gn-ink); margin:0 0 20px; }
 .gn-site-footer p { margin:12px 0; font-size:13px; line-height:1.85; }
 .gn-site-footer-main>div>a:not(.gn-site-brand) { display:block; min-height:34px; padding-block:4px; color:var(--gn-muted); font-size:13px; overflow-wrap:anywhere; }
-.gn-site-footer .gn-footer-display { font:170px/1.1 Georgia,serif; margin:0 auto; padding-bottom:36px; color:var(--gn-ink); overflow:hidden; }
+.gn-site-footer .gn-footer-display { font:500 170px/1.1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0 auto; padding-bottom:36px; color:var(--gn-ink); overflow:hidden; white-space:nowrap; }
 .gn-site-footer-bottom { border-top:1px solid var(--gn-line); padding-block:20px; display:flex; gap:24px; justify-content:space-between; align-items:center; }
 .gn-site-footer-bottom p,.gn-site-footer-bottom a { font-size:10px; }
 .gn-site-footer-bottom>div { display:flex; flex-wrap:wrap; gap:16px; }
@@ -74,22 +74,23 @@ body.gn-unified>.body-content-container { padding-top:108px; }
 .gn-unified .user-login-background-img-content,.gn-unified .user-left-container { display:none; }
 .gn-unified .user-right-container { float:none; width:100%; max-width:480px; margin:16px auto 32px; padding:0; }
 .gn-account-intro { margin-bottom:24px; text-align:center; }
-.gn-account-intro h1 { margin:0 0 12px; color:var(--gn-ink); font:400 32px/1.4 "Noto Serif SC","Songti SC",serif; }
+.gn-account-intro h1 { margin:0 0 12px; color:var(--gn-ink); font-size:30px; font-weight:600; line-height:1.4; }
 .gn-account-intro p { margin:0; color:var(--gn-muted); font-size:14px; line-height:1.85; }
 .gn-unified .user-right-container>.am-radius-lg,.gn-unified .register-container { border:1px solid var(--gn-line); border-radius:8px; background:var(--gn-surface); }
 .gn-unified .gn-price { font-variant-numeric:tabular-nums; }
 .gn-unified .item-inform,.gn-unified .introduce { border:1px solid var(--gn-line); border-radius:8px; background:var(--gn-surface); }
 .gn-unified .item-inform .simple-desc { color:var(--gn-muted); line-height:1.9; }
 .gn-unified .tb-detail-panel-top-price-content { background:var(--theme-inset); border-radius:6px; }
-.gn-unified .buy-submit-container .am-btn { border-radius:999px; }
+.gn-unified .buy-submit-container .am-btn { border-radius:8px; }
 .gn-unified .introduce .content { line-height:1.95; }
 .gn-unified .introduce-main,.gn-unified .introduce-main ul.am-tabs-nav.am-nav.am-nav-tabs,.gn-unified .introduce-main .am-nav-tabs>li>a,.gn-unified .tb-thumb { background:var(--gn-surface); color:var(--gn-ink); border-color:var(--gn-line); }
 .gn-unified .introduce-main .am-tabs-bd,.gn-unified .am-slider { border-color:var(--gn-line); }
 .gn-unified .introduce-main .am-nav-tabs>li.am-active>a { color:var(--gn-accent); }
 .gn-unified .theme-signin-left { background:var(--gn-surface); }
 .gn-unified.index-goods-index:has(.gn-contract-pay) .theme-options:has(.operate-number-container) { display:none !important; }
-@media(max-width:1160px) { .gn-site-nav { gap:0; } .gn-site-nav a { padding-inline:10px; } .gn-site-header-inner { gap:16px; } .gn-site-footer .gn-footer-display { font-size:136px; } }
+@media(max-width:1160px) { .gn-site-nav { gap:0; } .gn-site-nav a { padding-inline:10px; } .gn-site-header-inner { gap:16px; } .gn-site-footer .gn-footer-display { font-size:112px; } }
 @media(max-width:1040px) { .gn-site-nav,.gn-site-header .gn-site-contact { display:none; } .gn-site-menu { display:block; } .gn-site-menu summary { cursor:pointer; list-style:none; font-size:13px; color:var(--gn-muted); padding:12px 8px; } .gn-site-menu summary::-webkit-details-marker { display:none; } .gn-site-menu nav { position:absolute; top:100%; left:0; right:0; padding:16px; border:1px solid var(--gn-line); background:var(--gn-surface); } .gn-site-menu nav a { display:flex; justify-content:space-between; padding:13px 16px; color:var(--gn-ink); font-size:15px; } }
 @media(max-width:700px) { body.gn-unified>.body-content-container { padding-top:96px; } .gn-site-header-inner { min-height:72px; width:calc(100% - 40px); } .gn-unified .gn-container,.gn-unified .am-container { width:calc(100% - 40px); } .gn-commerce-bar { padding-block:4px 14px; margin-bottom:22px; gap:12px; } .gn-commerce-bar nav { gap:18px; } .gn-commerce-bar nav a { font-size:13px; } .gn-account-links { gap:8px; font-size:12px; } .gn-shop-intro { padding-block:32px 40px; } .gn-shop-intro h1 { font-size:42px; } .gn-shop-intro>p:not(.gn-eyebrow) { font-size:14px; } .gn-shop-art { inset:0 -20px 0 30%; width:calc(70% + 20px); height:100%; opacity:.22; } .gn-intro-meta { gap:12px; font-size:10px; } .gn-site-footer-main { grid-template-columns:1fr 1fr; gap:32px; padding-block:40px; } .gn-site-footer-main>div:first-child { grid-column:1/-1; } .gn-site-footer-bottom { flex-direction:column; align-items:flex-start; gap:4px; } .gn-unified .user-right-container { margin:12px auto 24px; } .gn-site-footer .gn-footer-display { font-size:72px; } }
-@media(max-width:380px) { .gn-site-footer .gn-footer-display { font-size:60px; } }
+@media(max-width:700px) { .gn-site-footer .gn-footer-display { font-size:56px; } }
+@media(max-width:380px) { .gn-site-footer .gn-footer-display { font-size:44px; } }
 @media(prefers-reduced-motion:reduce) { .gn-unified * { scroll-behavior:auto; transition:none; animation:none; } }

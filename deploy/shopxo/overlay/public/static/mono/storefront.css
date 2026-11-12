@@ -1,5 +1,5 @@
-/* 与官网共用墨色底与紫绿点缀，原生账号和订单保留 ShopXO 交互。 */
-html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accent:var(--theme-accent); --gn-purple:var(--theme-accent); --gn-line:var(--theme-line); --gn-surface:var(--theme-surface); --color-main:var(--gn-accent); --color-main-light:var(--theme-accent-soft); --color-main-hover:var(--theme-accent-hover); --color-price:var(--gn-accent); --color-button-primary:var(--theme-button); --color-button-primary-hover:var(--theme-button-hover); --color-button-primary-text:var(--theme-canvas); }
+/* 官网与商城共享语义色，原生账号和订单保留 ShopXO 交互。 */
+html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accent:var(--theme-accent); --gn-purple:var(--theme-accent); --gn-line:var(--theme-line); --gn-surface:var(--theme-surface); --color-main:var(--gn-accent); --color-main-light:var(--theme-accent-soft); --color-main-hover:var(--theme-accent-hover); --color-price:var(--gn-accent); --color-button-primary:var(--theme-button); --color-button-primary-hover:var(--theme-button-hover); --color-button-primary-text:var(--theme-button-text); }
 .gn-store { color:var(--gn-ink); background:var(--theme-canvas); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; font-size:15px; line-height:1.65; }
 .gn-store *, .gn-store *::before, .gn-store *::after { box-sizing:border-box; }
 .gn-store h1,.gn-store h2,.gn-store h3,.gn-store p { margin:0; }
@@ -14,7 +14,7 @@ html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accen
 .gn-brand-sub { margin-left:10px; padding-left:11px; border-left:1px solid var(--gn-line); color:var(--gn-muted); font-size:13px; font-weight:400; letter-spacing:0; }
 .gn-navigation { display:flex; gap:30px; align-items:center; font-size:14px; }
 .gn-navigation a[aria-current],.gn-navigation a:hover { color:var(--gn-accent); }
-.gn-store .gn-button { display:inline-flex; min-height:48px; align-items:center; justify-content:center; gap:28px; border:1px solid var(--gn-ink); border-radius:999px; background:var(--gn-ink); color:var(--theme-canvas); padding:12px 24px; font-weight:500; transition:background .2s; }
+.gn-store .gn-button { display:inline-flex; min-height:48px; align-items:center; justify-content:center; gap:20px; border:1px solid var(--theme-button); border-radius:8px; background:var(--theme-button); color:var(--theme-button-text); padding:12px 24px; font-weight:500; transition:background .2s; }
 .gn-store .gn-button:hover { background:var(--theme-button-hover); border-color:var(--theme-button-hover); }
 .gn-store .gn-button-small { min-height:40px; padding:8px 18px; font-size:13px; }
 .gn-hero { display:grid; grid-template-columns:1.2fr 1fr; gap:88px; align-items:center; padding-block:88px 80px; }
@@ -153,7 +153,7 @@ html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accen
 .gn-contract-check-text { flex:1; min-width:0; }
 .gn-contract-check a { color:var(--gn-accent); text-decoration:underline; text-underline-offset:3px; }
 .gn-contract-actions { display:grid; gap:10px; margin-top:2px; }
-.gn-contract-button { display:inline-flex; width:100%; min-height:50px; align-items:center; justify-content:center; border:1px solid var(--gn-ink); border-radius:999px; background:var(--gn-ink); color:var(--gn-surface) !important; padding:12px 24px; font-size:15px; font-weight:500; cursor:pointer; transition:background .2s,opacity .2s; }
+.gn-contract-button { display:inline-flex; width:100%; min-height:50px; align-items:center; justify-content:center; border:1px solid var(--theme-button); border-radius:8px; background:var(--theme-button); color:var(--theme-button-text) !important; padding:12px 24px; font-size:15px; font-weight:500; cursor:pointer; transition:background .2s,opacity .2s; }
 .gn-contract-button:hover { background:var(--theme-button-hover); border-color:var(--theme-button-hover); }
 .gn-contract-button:disabled { opacity:.6; cursor:wait; }
 .gn-contract-status { margin:0; font-size:12.5px; line-height:1.7; color:var(--gn-muted); text-align:center; }

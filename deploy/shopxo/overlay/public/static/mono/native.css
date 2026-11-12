@@ -1,0 +1,187 @@
+/* 在原生页面样式之后加载；独立弹窗也使用 gn-themed，避免只适配带导航的页面。 */
+body.gn-themed {
+  --body-bg-color:var(--theme-canvas);
+  --border-radius:6px;
+  --border-radius-lg:8px;
+  --color-main:var(--theme-accent);
+  --color-main-light:var(--theme-accent-soft);
+  --color-main-hover:var(--theme-accent-hover);
+  --color-price:var(--theme-ink);
+  --color-red:var(--theme-error);
+  --color-green:var(--theme-success);
+  --color-yellow:#dfc18a;
+  --color-blue:var(--theme-accent);
+  --color-button-primary:var(--theme-button);
+  --color-button-primary-hover:var(--theme-button-hover);
+  --color-button-primary-text:var(--theme-button-text);
+  color:var(--theme-ink);
+  background:var(--theme-canvas);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.gn-themed a { color:inherit; }
+.gn-themed a:hover { color:var(--theme-accent); }
+.gn-themed :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible { outline:2px solid var(--theme-accent) !important; outline-offset:3px; }
+.gn-themed :is(h1,h2,h3,h4,h5,h6) { color:var(--theme-ink); letter-spacing:0; }
+.gn-themed :is(.am-color-333,.am-color-black,.am-text-black) { color:var(--theme-ink) !important; }
+.gn-themed :is(.am-color-666,.am-color-grey-dark,.am-color-999,.am-color-grey,.am-color-ccc,.am-color-grey-light,.am-text-grey,.am-text-gray,.am-text-secondary) { color:var(--theme-muted) !important; }
+.gn-themed :is(.am-color-price,.am-text-price) { color:var(--theme-ink) !important; }
+.gn-themed .am-text-danger { color:var(--theme-error) !important; }
+.gn-themed :is(.am-background-white,.am-background-grey,.am-background-gray,.am-background-grey-f5,.am-background-grey-f9) { background:var(--theme-surface) !important; }
+.gn-themed :is(.am-border-color-grey,.am-border-color-gray,.am-border-color-grey-f5,.am-border-color-grey-f9) { border-color:var(--theme-line) !important; }
+.gn-themed :is(.am-border,.am-border-grey,.am-border-grey-light,.am-border-grey-dark,.am-border-d6,.am-border-d,.am-border-c,.am-border-f8,.am-border-top-grey,.am-border-right-grey,.am-border-bottom-grey,.am-border-left-grey) { border-color:var(--theme-line); }
+.gn-themed :is(.am-divider,hr,.am-panel,.am-panel-hd,.am-list>li,.am-tabs-bd,.am-nav-tabs,.am-table td,.am-table th) { border-color:var(--theme-line); }
+.gn-themed :is(.am-panel,.am-list>li,.am-tabs-bd,.am-dropdown-content,.am-modal-dialog,.am-popup,.am-popup-hd,.am-popup-bd,.am-offcanvas-bar,.am-selected-list,.chosen-container .chosen-drop) { background:var(--theme-surface); color:var(--theme-ink); }
+.gn-themed :is(.am-panel-hd,.am-table thead,.am-popup-hd) { background:var(--theme-inset); color:var(--theme-ink); }
+.gn-themed :is(.am-panel,.am-dropdown-content,.am-popup,.am-modal-dialog) { box-shadow:none; border-radius:8px; }
+.gn-themed :is(.am-close,.am-popup-title,.am-modal-hd,.am-selected-list li,.chosen-container .chosen-results li) { color:var(--theme-ink); }
+.gn-themed :is(.am-popup-hd,.am-modal-hd,.am-modal-footer,.am-modal-btn) { border-color:var(--theme-line); }
+.gn-themed :is(.am-modal-btn:hover,.am-selected-list li:hover,.chosen-container .chosen-results li.highlighted) { background:var(--theme-inset); color:var(--theme-accent); }
+.gn-themed :is(.am-alert-primary,.am-alert-secondary,.am-alert-warning) { background:var(--theme-inset); color:var(--theme-ink); border-color:var(--theme-line); }
+.gn-themed .am-alert-success { background:var(--theme-success-soft); color:var(--theme-success); border-color:var(--theme-success-line); }
+.gn-themed .am-alert-danger { background:var(--theme-error-soft); color:var(--theme-error); border-color:var(--theme-error-line); }
+.gn-themed :is(.am-badge-primary,.am-badge-secondary) { background:var(--theme-accent-soft); color:var(--theme-accent); }
+.gn-themed .am-badge-danger { background:var(--theme-error-soft); color:var(--theme-error); }
+.gn-themed .am-badge-success { background:var(--theme-success-soft); color:var(--theme-success); }
+.gn-themed .am-badge-warning { background:#302619; color:#dfc18a; }
+.gn-themed .am-btn { border-radius:6px; box-shadow:none; font-weight:500; }
+.gn-themed .am-btn-link { color:var(--theme-accent); }
+.gn-themed .am-btn-primary { background:var(--theme-button); border-color:var(--theme-button); color:var(--theme-button-text); }
+.gn-themed .am-btn-primary:is(:hover,:focus,:active) { background:var(--theme-button-hover); border-color:var(--theme-button-hover); color:var(--theme-button-text); }
+.gn-themed :is(.am-btn-default,.am-btn-secondary) { background:var(--theme-inset); border-color:var(--theme-line-strong); color:var(--theme-ink); }
+.gn-themed :is(.am-btn-default,.am-btn-secondary):is(:hover,:focus) { background:var(--theme-elevated); border-color:var(--theme-muted); color:var(--theme-ink); }
+.gn-themed .am-btn-danger { background:var(--theme-error-soft); border-color:var(--theme-error-line); color:var(--theme-error); }
+.gn-themed .am-btn-success { background:var(--theme-success-soft); border-color:var(--theme-success-line); color:var(--theme-success); }
+.gn-themed .am-btn-warning { background:var(--theme-inset); border-color:var(--theme-line-strong); color:var(--theme-ink); }
+.gn-themed .am-btn:is(:disabled,.am-disabled) { opacity:.5; cursor:not-allowed; }
+.gn-themed :is(.am-form-field,.am-input-group-label,.am-form input:not([type=checkbox]):not([type=radio]):not([type=hidden]),textarea,select,.chosen-container-single .chosen-single) { background:var(--theme-inset); color:var(--theme-ink); border-color:var(--theme-line-strong); box-shadow:none; border-radius:6px; }
+.gn-themed :is(input,textarea)::placeholder { color:var(--theme-muted); opacity:1; }
+.gn-themed :is(input,textarea,select):disabled { color:var(--theme-muted) !important; background:var(--theme-inset) !important; }
+.gn-themed :is(input,textarea):read-only { color:var(--theme-muted); }
+.gn-themed :is(input[type=checkbox],input[type=radio]) { accent-color:var(--theme-button); }
+.gn-themed .am-table { color:var(--theme-ink); background:transparent; }
+.gn-themed .am-table-striped>tbody>tr:nth-child(odd)>td { background:var(--theme-inset); }
+.gn-themed .am-table-hover>tbody>tr:hover>td { background:var(--theme-elevated); }
+.gn-themed .form-table-search,.gn-themed .am-table-scrollable-horizontal>.am-table>thead>tr>th { background:var(--theme-inset); color:var(--theme-ink); }
+.gn-themed .am-table-scrollable-horizontal>.am-table tr td:is(.am-grid-fixed-left,.am-grid-fixed-right),.gn-themed .am-table-scrollable-horizontal>.am-table-striped>tbody>tr:nth-child(odd)>td:is(.am-grid-fixed-left,.am-grid-fixed-right) { background:var(--theme-inset); }
+.gn-themed .am-table-scrollable-horizontal>.am-table tr :is(.am-grid-fixed-left,.am-grid-fixed-right) { box-shadow:none; border-color:var(--theme-line); }
+.gn-themed .chosen-container-multi .chosen-choices { background:var(--theme-surface); border-color:var(--theme-line-strong); color:var(--theme-ink); border-radius:6px; }
+.gn-themed .chosen-container-multi .chosen-choices li.search-field input[type=text] { color:var(--theme-muted); }
+.gn-themed .chosen-container-multi .chosen-choices li.search-choice { color:var(--theme-accent); background:var(--theme-accent-soft); border-color:var(--theme-line-strong); box-shadow:none; }
+.gn-themed .am-pagination>li>a { color:var(--theme-muted); background:var(--theme-inset); border-color:var(--theme-line); border-radius:6px; }
+.gn-themed .am-pagination>.am-active>a { color:var(--theme-button-text); background:var(--theme-button); border-color:var(--theme-button); }
+.gn-themed .am-pagination>.am-disabled>a { color:var(--theme-muted); background:var(--theme-surface); opacity:.5; }
+.gn-themed :is(.am-nav-tabs>li>a,.user-center-admin-nav>li>a) { color:var(--theme-muted); background:transparent; }
+.gn-themed :is(.am-nav-tabs>li.am-active>a,.user-center-admin-nav>li.am-active>a) { color:var(--theme-ink); background:var(--theme-surface); border-color:var(--theme-line); }
+.gn-themed :is(.am-img-thumbnail,.am-thumbnail) { padding:0; background:var(--theme-inset); border-color:var(--theme-line); border-radius:6px; }
+.gn-themed .table-no { color:var(--theme-muted); }
+.gn-themed .table-no :is(.tips-name,.tips-msg,i) { color:var(--theme-muted); }
+
+/* 商品价格与购买区有自己的背景图片，不能只覆盖通用白底工具类。 */
+.gn-themed .tb-detail-panel-base .tb-detail-panel-top-price-content { background:var(--theme-inset); border:1px solid var(--theme-line); border-radius:8px; }
+.gn-themed :is(.item-inform .title,.tb-detail-hd h1,.goods-detail-title,.tb-detail-price-content .goods-sale-price-value,.tb-detail-price-content .symbol) { color:var(--theme-ink); }
+.gn-themed :is(.tb-detail-panel-base .items dt,.tm-indcon .tm-label,.tm-indcon .tm-count,.goods-qrcode,.theme-options,.specpara-title,.buy-nav-opt a,.buy-nav-opt em,.stock,.goods-attr li) { color:var(--theme-muted); }
+.gn-themed .tb-detail-price-content .goods-sale-price-value { font-size:32px; font-weight:600; font-variant-numeric:tabular-nums; }
+.gn-themed :is(.buy-submit-container,.buy-nav,.buy-submit-top,.theme-poptit,.theme-popover,.theme-signin-left,.theme-signin-right,.system-goods-detail .theme-signin-right) { background:var(--theme-surface); border-color:var(--theme-line); color:var(--theme-ink); }
+.gn-themed .buy-submit-container { padding:0; }
+.gn-themed .buy-submit-container .am-btn { min-height:44px; border-radius:8px; }
+.gn-themed .operate-number-container { border:1px solid var(--theme-line-strong); border-radius:6px; overflow:hidden; }
+.gn-themed .operate-number-container :is(button,input) { height:36px; background:var(--theme-inset); color:var(--theme-ink); border:0; border-radius:0; box-shadow:none; }
+.gn-themed .operate-number-container button { min-width:36px; }
+.gn-themed .operate-number-container button:hover { background:var(--theme-elevated); }
+.gn-themed .operate-number-input { appearance:textfield; -moz-appearance:textfield; }
+.gn-themed .operate-number-input::-webkit-inner-spin-button,.gn-themed .operate-number-input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+.gn-themed .theme-signin-left .sku-line { color:var(--theme-ink); background:var(--theme-inset); border-color:var(--theme-line-strong); border-radius:6px; }
+.gn-themed .theme-signin-left .sku-line:is(.selected,:hover) { color:var(--theme-accent); background:var(--theme-accent-soft); border-color:var(--theme-accent); box-shadow:none; }
+.gn-themed :is(.sku-items-disabled,.sku-dont-choose) { color:var(--theme-muted) !important; background:var(--theme-surface) !important; border-color:var(--theme-line) !important; opacity:.55; }
+.gn-themed :is(.introduce-main .am-sticky-placeholder .am-nav-tabs>li.am-active span,.introduce-main .am-nav-tabs>li.am-active>a) { color:var(--theme-ink); }
+.gn-themed :is(.theme-signin-right .img-info,.system-goods-detail .theme-signin-right .img-info) { background:var(--theme-inset); border-color:var(--theme-line); }
+.gn-themed .system-goods-detail .theme-signin-right .theme-signin-popup-stock { color:var(--theme-muted); }
+.gn-themed .gn-contract-pay { background:var(--theme-surface); box-shadow:none; }
+
+/* 会员导航的上游白底带 important，只在对应导航中覆盖同级优先级。 */
+.gn-themed .user-content .user-content-body { background:var(--theme-surface); border:1px solid var(--theme-line); border-radius:8px; }
+.gn-themed .user-offcanvas-bar { border:1px solid var(--theme-line); border-radius:8px; }
+.gn-themed .user-sidebar-list li,.gn-themed .user-sidebar-list li a:hover,.gn-themed .user-sidebar .am-active a { background:transparent !important; }
+.gn-themed .user-sidebar-list>li { border-color:var(--theme-line); }
+.gn-themed .user-offcanvas-bar .am-list>li>a { color:var(--theme-ink); font-size:14px; font-weight:500; }
+.gn-themed .user-offcanvas-bar .am-list>li li>a { color:var(--theme-muted); font-size:13px; padding-block:10px; }
+.gn-themed .user-sidebar .am-active>a { color:var(--theme-accent) !important; background:var(--theme-accent-soft) !important; border-radius:6px; }
+.gn-themed .user-offcanvas-bar .am-list>li>a>i { color:var(--theme-muted); font-size:18px; }
+.gn-themed .user-offcanvas-bar .am-list a:hover { color:var(--theme-accent); }
+.gn-themed .user-center .user-base { background:var(--theme-inset); animation:none; border-bottom:1px solid var(--theme-line); padding:28px 24px; }
+.gn-themed .user-center .user-base :is(p,span,a) { color:var(--theme-ink); }
+.gn-themed .user-base-left .items a { color:var(--theme-muted); font-size:13px; }
+.gn-themed .user-center ul.user-base-icon { background:var(--theme-surface); border:1px solid var(--theme-line); border-radius:6px; }
+.gn-themed .user-base-icon li p:first-child { font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; }
+.gn-themed .user-base-icon li p:last-child { color:var(--theme-muted); font-size:12px; }
+.gn-themed :is(.order-nav,.various .goods-detail:not(:last-child)) { border-color:var(--theme-line); }
+.gn-themed .order-base a { color:var(--theme-muted); }
+.gn-themed .order-base a:hover { color:var(--theme-accent); }
+.gn-themed .order-base li i { color:var(--theme-ink); font-size:26px; }
+.gn-themed .various .am-panel-default { border-color:var(--theme-line); border-radius:8px; }
+.gn-themed .various .am-panel-default>.am-panel-hd { background:var(--theme-inset); color:var(--theme-ink); border-color:var(--theme-line); padding:14px 16px; }
+.gn-themed :is(.am-title-left-border,.various .am-gallery-title,.various .goods-title) { color:var(--theme-ink); }
+.gn-themed .am-title-left-border { border-color:var(--theme-line-strong); }
+.gn-themed .various .goods-base ul li { color:var(--theme-muted); }
+.gn-themed .various .line-price { color:var(--theme-ink); font-family:inherit; font-weight:600; }
+.gn-themed .various .goods-browse-list .am-gallery-item img { width:100%; aspect-ratio:3/2; object-fit:contain; border-radius:6px; }
+.gn-themed .various .am-gallery-overlay .am-gallery-desc { background:var(--theme-inset); color:var(--theme-ink); }
+.gn-themed .user-menu { background:var(--theme-inset); color:var(--theme-ink); border:1px solid var(--theme-line-strong); box-shadow:none; opacity:1; }
+
+/* 订单、购物车与结算复用原生结构和操作，只调整信息层级。 */
+.gn-themed :is(.order-goods>table>thead,.order-goods>table>tbody>tr>td,.order-goods>table>tbody>tr>td .line-price,.order-goods>table>tbody>tr>td .total-price) { color:var(--theme-ink); border-color:var(--theme-line); }
+.gn-themed .order-goods>table>thead>tr>th { color:var(--theme-muted); border-color:var(--theme-line); }
+.gn-themed :is(.items-detail .am-view-map,.order-extraction-take .extraction-take-arrow) { background:var(--theme-inset); color:var(--theme-accent); }
+.gn-themed .order-state .am-alert-primary { color:var(--theme-accent); background:var(--theme-accent-soft); }
+.gn-themed ul.progress li i.step { background:var(--theme-line-strong); }
+.gn-themed ul.progress li .digital { background:var(--theme-surface); border-color:var(--theme-line-strong); }
+.gn-themed :is(.goods-table,.order-goods,.order-list,.cart-list,.link-list,.business-item,.order-submit-container,.nav-buy,.pay-way,.payment-list) { color:var(--theme-ink); border-color:var(--theme-line); }
+.gn-themed :is(.nav-buy,.nav-buy .pay-sum,.link-list .mobile-address,.link-list .mobile-address .control,.am-form-popup-submit) { background:var(--theme-surface); border-color:var(--theme-line); color:var(--theme-ink); }
+.gn-themed :is(.payment-list li,.business-item,.link-list .item,.address-list li,.address-cart .address-content) { background:var(--theme-surface); border-color:var(--theme-line); }
+.gn-themed ul.address-list li.address-default.address-cart { background:var(--theme-line-strong); }
+.gn-themed :is(.payment-list li.selected,.payment-list li.active,.address-list li.address-default) { border-color:var(--theme-accent); }
+.gn-themed :is(.link-list .item .item-title,.business-item .title,.goods-base .title,.extraction-address-container .am-popup-title) { color:var(--theme-ink); }
+.gn-themed :is(.goods-attr,.goods-attr li,.goods-spec,.goods-base .attribute,.link-list .item .item-desc,.cart-goods-spec-edit) { color:var(--theme-muted); }
+.gn-themed .cart-content table tr td .cart-price .line-price { color:var(--theme-muted); }
+.gn-themed :is(.am-breadcrumb>li,.am-breadcrumb>li>a,.photo-bottom .common-goods-favor-submit-event) { color:var(--theme-muted); }
+.gn-themed .user-content-body .user-center-admin-nav>li>a { color:var(--theme-muted) !important; }
+.gn-themed .user-content-body .user-center-admin-nav .am-active>a { color:var(--theme-ink) !important; }
+.gn-themed .user-content-body .user-center-admin-nav { border-color:var(--theme-line); }
+.gn-themed :is(.am-modal-dialog,.theme-popover,.am-popup) { border:1px solid var(--theme-line-strong); }
+.gn-themed .am-modal-dialog a:not(.am-btn) { color:var(--theme-accent); }
+@media(min-width:1025px) {
+  .gn-themed .user-sidebar { width:200px; }
+  .gn-themed .user-content { padding-left:24px; }
+}
+@media(max-width:700px) {
+  .gn-themed .tb-detail-price-content .goods-sale-price-value { font-size:28px; }
+  .gn-themed .user-center .user-base { padding:24px 16px; }
+  .gn-themed .user-center .center-content { padding-inline:14px; }
+  .gn-themed .various .am-panel-default>.am-panel-hd { padding:12px; }
+  .gn-themed .order-base li i { font-size:22px; }
+  .gn-themed .order-base li a { font-size:12px; }
+  .gn-themed .user-content .user-content-body { min-width:0; }
+  .gn-themed .user-main { min-width:0; }
+  /* 窄屏将操作列排在商品后，横向滚动时不再遮挡订单号和金额。 */
+  .gn-themed.index-order-index .form-table-data-list { display:block; width:max-content; }
+  .gn-themed.index-order-index .user-main { padding-inline:0; }
+  .gn-themed.index-order-index .form-table-data-list>thead,.gn-themed.index-order-index .form-table-data-list>tbody { display:block; }
+  .gn-themed.index-order-index .form-table-data-list tr { display:flex; }
+  .gn-themed.index-order-index .form-table-data-list tr>* { display:block; flex:0 0 180px; order:3; min-width:0; max-width:none; }
+  .gn-themed.index-order-index .form-table-data-list tr>*:first-child { flex-basis:32px; order:0; min-width:32px !important; max-width:32px !important; padding-inline:8px; }
+  .gn-themed.index-order-index .form-table-data-list tr>*:nth-child(2) { flex-basis:calc(100vw - 176px); order:1; overflow-wrap:anywhere; }
+  .gn-themed.index-order-index .form-table-data-list tr>*.am-operate-grid { flex-basis:76px; order:2; position:static; padding-inline:8px; }
+  .gn-themed.index-order-index .form-table-data-list .am-text-truncate { white-space:normal; overflow-wrap:anywhere; }
+  .gn-themed.index-order-index .form-table-data-list td:nth-child(2)>.am-margin-top-sm { font-size:12px; }
+  .gn-themed.index-order-index .form-table-data-list .warehouse-item-container { float:none; display:block; margin-top:8px; }
+}
+@media(max-width:640px) {
+  .gn-themed .buy-nav { height:64px; padding:6px 12px; border-top:1px solid var(--theme-line); }
+  .gn-themed .buy-nav .buy-submit-container { height:50px; padding:3px 0; border:0; }
+  .gn-themed .buy-nav .buy-submit-container .am-btn { height:44px; line-height:42px; font-size:13px; border-radius:6px; }
+  .gn-themed .buy-nav .buy-nav-opt,.gn-themed .buy-nav .nav-icon { height:50px; line-height:50px; border:0; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .gn-themed *, .gn-themed *::before, .gn-themed *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+}

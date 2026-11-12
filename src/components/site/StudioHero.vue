@@ -58,8 +58,8 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
 .hero-layout { min-height: min(850px, 90svh); padding-top: 166px; display: flex; flex-direction: column; justify-content: center; }
 .hero-copy { padding-block: 32px 64px; }
 .hero-kicker { margin-bottom: 30px; font-size: 10px; }
-.hero-copy h1 { font-family: var(--font-display); font-size: 88px; font-weight: 300; line-height: 1.25; letter-spacing: 0; }
-.hero-copy h1 > span { background: linear-gradient(105deg, var(--accent), var(--rose) 60%, var(--mint)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.hero-copy h1 { font-family: var(--font-display); font-size: 76px; font-weight: 600; line-height: 1.28; letter-spacing: 0; }
+.hero-copy h1 > span { font-size: 48px; font-weight: 500; color: var(--muted); }
 .hero-description { font-size: 16px; color: var(--muted); line-height: 1.95; margin-top: 32px; }
 .hero-copy .button-row { margin-top: 36px; gap: 32px; }
 .hero-service-link { color: var(--ink); font-size: 14px; }
@@ -70,13 +70,14 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
 .hero-specs dd { font-size: 13px; }
 .hero-scroll { display: flex; align-items: center; gap: 12px; font: 9px/1.6 var(--font-mono); color: var(--muted); min-height: 44px; }
 .hero-scroll > span:last-child { margin-left: 8px; font-size: 16px; }
-@media (min-width: 1440px) { .hero-copy h1 { font-size: 100px; } }
+@media (min-width: 1440px) { .hero-copy h1 { font-size: 80px; } }
 @media (min-width: 761px) and (max-height: 800px) { .hero-layout { min-height: calc(100svh - 24px); padding-top: 110px; } .hero-copy { padding-block: 30px 50px; } .hero-copy h1 { font-size: 72px; } }
 @media (max-width: 1120px) { .hero-copy h1 { font-size: 72px; } .hero-scroll { display: none; } .particle-field { left: 25%; } }
 @media (max-width: 760px) {
   .hero-layout { min-height: min(840px, 94svh); padding-top: 144px; }
   .hero-copy { padding-block: 20px 180px; }
   .hero-copy h1 { font-size: 44px; line-height: 1.4; }
+  .hero-copy h1 > span { font-size: 30px; }
   .hero-kicker { font-size: 9px; margin-bottom: 24px; }
   .hero-description { font-size: 14px; margin-top: 24px; }
   .hero-copy .button-row { gap: 20px; margin-top: 28px; }
@@ -88,5 +89,5 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
   .hero-specs dt { font-size: 9px; }
   .hero-specs dd { font-size: 11px; }
 }
-@media (max-width: 380px) { .hero-copy h1 { font-size: 32px; } .hero-copy .button-row { gap: 16px; } .hero-copy .button { gap: 12px; } }
+@media (max-width: 380px) { .hero-copy h1 { font-size: 36px; } .hero-copy h1 > span { font-size: 25px; } .hero-copy .button-row { gap: 16px; } .hero-copy .button { gap: 12px; } }
 </style>
