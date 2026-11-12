@@ -54,7 +54,7 @@ for (const route of prerenderPaths) {
   for (const url of initial) assert.ok(!heavy(url), `${route} 在启动前加载了引擎或引擎样式：${url}`);
   for (const url of initial) {
     if (!url.startsWith(metadata.base)) continue;
-    const file = url.slice(metadata.base.length);
+    const file = new URL(url, "https://build.local").pathname.slice(metadata.base.length);
     const key = keysByFile.get(file);
     if (key) for (const dependency of staticClosure([key])) assert.ok(!heavy(dependency), `${route} 的预加载资源间接依赖引擎：${dependency}`);
     if (!/^https?:/.test(url)) await stat(path.join(dist, file));

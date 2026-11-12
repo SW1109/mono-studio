@@ -5,17 +5,18 @@
      {{if !empty($static_path_data['theme_import_css']) and is_array($static_path_data['theme_import_css'])}}
          {{foreach $static_path_data.theme_import_css as $v}}
 -            <link rel="stylesheet" type="text/css" href="{{$public_host}}static/{{$v}}?v={{$static_cache_version}}" />
-+            <link rel="stylesheet" type="text/css" href="{{$public_host}}static/{{$v}}?v={{$static_cache_version}}-20261112-studio" />
++            <link rel="stylesheet" type="text/css" href="{{$public_host}}static/{{$v}}?v={{$static_cache_version}}-20261112-layout" />
          {{/foreach}}
      {{/if}}
      {{if !empty($static_path_data['module_css'])}}
-@@ -208,9 +208,16 @@
+@@ -208,9 +208,17 @@
          {{/if}}
      </script>
 +    <meta name="theme-color" content="#08090b" />
-+    <script src="{{$public_host}}static/mono/theme.js?v=20261112-studio"></script>
-+    <link rel="stylesheet" href="{{$public_host}}static/mono/theme.css?v=20261112-studio" />
-+    <link rel="stylesheet" href="{{$public_host}}static/mono/native.css?v=20261112-studio" />
++    <script src="{{$public_host}}static/mono/theme.js?v=20261112-layout"></script>
++    <script defer src="{{$public_host}}static/mono/commerce.js?v=20261112-layout"></script>
++    <link rel="stylesheet" href="{{$public_host}}static/mono/theme.css?v=20261112-layout" />
++    <link rel="stylesheet" href="{{$public_host}}static/mono/native.css?v=20261112-layout" />
  </head>
 -<body class="{{$page_unique_mark}} {{if in_array(MiniAppEnv(), MyConfig('shopxo.mini_app_type_list'))}} mini-app-env{{/if}}">
 +<body class="gn-themed {{if (!isset($page_pure) or $page_pure neq 1) and (!isset($is_header) or $is_header eq 1)}}gn-unified {{/if}}{{$page_unique_mark}} {{if in_array(MiniAppEnv(), MyConfig('shopxo.mini_app_type_list'))}} mini-app-env{{/if}}">

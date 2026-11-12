@@ -27,6 +27,6 @@ $mono_shop_active = in_array($controller_name, ['index', 'goods', 'search', 'cat
     </div>
 </header>
 <div class="gn-commerce-bar gn-container" id="gn-commerce-content" tabindex="-1">
-    <nav aria-label="商品与订单"><a href="{{:MyUrl('index/index/index')}}" {{if $mono_shop_active}}aria-current="page"{{/if}}>商品购买</a><a href="{{:MyUrl('index/order/index')}}" {{if $mono_order_active}}aria-current="page"{{/if}}>我的订单</a></nav>
+    <nav aria-label="商品与订单"><a href="{{:MyUrl('index/index/index')}}" {{if $controller_name eq 'index' or $controller_name eq 'goods' or $controller_name eq 'search' or $controller_name eq 'category'}}aria-current="page"{{/if}}>服务商城</a><a href="{{:MyUrl('index/order/index')}}" {{if $mono_order_active}}aria-current="page"{{/if}}>我的订单</a><a href="{{:MyUrl('index/cart/index')}}" {{if $controller_name eq 'cart'}}aria-current="page"{{/if}}>购物车</a></nav>
     <div class="gn-account-links">{{if empty($user)}}<a href="{{:MyUrl('index/user/logininfo')}}">登录</a><span aria-hidden="true">/</span><a href="{{:MyUrl('index/user/reginfo')}}">注册</a>{{else /}}<a href="{{:MyUrl('index/user/index')}}">{{$user.user_name_view}}</a><a href="{{:MyUrl('index/user/logout')}}">退出</a>{{/if}}</div>
 </div>

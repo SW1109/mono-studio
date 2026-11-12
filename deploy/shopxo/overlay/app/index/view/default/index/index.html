@@ -4,27 +4,36 @@ $mono_catalogue = json_decode(file_get_contents(ROOT.'mono-service-catalog.json'
 $mono_website = rtrim(MyC('mono_website_origin', 'https://guangnian.xin'), '/');
 $mono_contract = is_file(ROOT.'mono-contract-payment.json') ? json_decode(file_get_contents(ROOT.'mono-contract-payment.json'), true) : null;
 $mono_contract_goods_id = is_array($mono_contract) && !empty($mono_contract['goodsId']) ? intval($mono_contract['goodsId']) : 0;
+$mono_goods_count = 0;
+foreach (($goods_floor_list ?? []) as $mono_floor) {
+    $mono_goods_count += count($mono_floor['goods'] ?? []);
+}
 {{/php}}
 <div class="gn-store">
     <a class="gn-skip" href="#services">跳转到服务商品</a>
     <main>
-        <section class="gn-shop-intro gn-container"><img class="gn-shop-art" src="{{$public_host}}static/mono/aurora.jpg" alt="" width="1920" height="1280"><p class="gn-eyebrow">GUANGNIAN / SERVICES</p><h1>技术服务商城</h1><p>网站开发、接口对接、页面优化与数据整理。<br>先看清范围和交付内容，再选适合你的服务。</p><div class="gn-intro-meta"><span>远程人工服务</span><span>源码与交付记录</span><span>同一账号查看订单</span></div></section>
+        <section class="gn-shop-intro"><img class="gn-shop-art" src="{{$public_host}}static/mono/aurora.jpg" alt="山林上方的极光" width="1920" height="1280"><div class="gn-container gn-shop-intro-content"><p class="gn-eyebrow">光年数智 / 技术服务</p><h1>为具体问题，<br>找到合适的服务。</h1><p>网站开发、接口集成、页面优化与数据整理。<br>看清服务范围，按约定交付。</p><div class="gn-intro-meta"><span>远程人工实施</span><span>源码与资料交接</span><a href="{{:MyUrl('index/order/index')}}">查看我的订单 ↗</a></div></div></section>
         {{if !empty(MyC('common_shop_notice'))}}<div class="gn-container"><div class="gn-notice" role="note"><span class="gn-notice-label">商城公告</span><p>{{:MyC('common_shop_notice')}}</p></div></div>{{/if}}
         <section class="gn-catalog gn-container" id="services" aria-labelledby="gn-catalog-title">
-            <div class="gn-section-heading"><div><p class="gn-eyebrow">SELECT A SERVICE</p><h2 id="gn-catalog-title">可选服务</h2></div><a class="gn-text-link" href="{{:MyUrl('index/search/index')}}">全部商品 <span aria-hidden="true">↗</span></a></div>
-            <div class="gn-grid">
+            <div class="gn-section-heading"><div><p class="gn-eyebrow">服务目录 / {{$mono_goods_count}} 项</p><h2 id="gn-catalog-title">选择你需要的服务</h2></div><form class="gn-catalog-search" method="post" action="{{:MyUrl('index/search/index')}}"><label for="gn-service-search">搜索服务</label><div><input id="gn-service-search" type="search" name="wd" placeholder="请输入服务关键词"><button type="submit" aria-label="搜索服务" title="搜索服务"><i class="iconfont icon-search" aria-hidden="true"></i></button></div></form></div>
+            <div class="gn-catalog-layout">
+                <aside class="gn-catalog-aside"><h3>服务分类</h3><nav aria-label="服务分类">{{foreach $goods_floor_list as $mono_index=>$floor}}{{if !empty($floor['goods'])}}<a href="#gn-floor-{{$mono_index}}">{{$floor.name}}<span>{{:count($floor['goods'])}}</span></a>{{/if}}{{/foreach}}</nav><div class="gn-catalog-help"><p>需要定制开发？</p><a href="{{$mono_website}}/contact/">联系工作室 <span aria-hidden="true">↗</span></a><a href="{{$mono_website}}/guides/">服务选购指南 <span aria-hidden="true">↗</span></a></div></aside>
+                <div class="gn-catalog-products">
                 {{if !empty($goods_floor_list)}}
-                    {{foreach $goods_floor_list as $floor}}
+                    {{foreach $goods_floor_list as $mono_index=>$floor}}
                         {{if !empty($floor['goods'])}}
+                            <section class="gn-service-group" id="gn-floor-{{$mono_index}}" aria-labelledby="gn-floor-heading-{{$mono_index}}"><h3 class="gn-group-title" id="gn-floor-heading-{{$mono_index}}">{{$floor.name}}<span>{{:count($floor['goods'])}} 项服务</span></h3><div class="gn-grid">
                             {{foreach $floor.goods as $goods}}
-                                <article class="gn-product">
+                                <article class="gn-product {{if $mono_contract_goods_id > 0 && intval($goods.id) == $mono_contract_goods_id}}gn-product-contract{{/if}}">
                                     <a class="gn-product-image" href="{{$goods.goods_url}}" tabindex="-1" aria-hidden="true"><img src="{{$goods.images}}" alt="" loading="lazy" width="1200" height="800" decoding="async"></a>
                                     <div class="gn-product-content"><p class="gn-product-category">{{$floor.name}}</p><h3><a href="{{$goods.goods_url}}">{{$goods.title}}</a>{{if $mono_contract_goods_id > 0 && intval($goods.id) == $mono_contract_goods_id}}<span class="gn-contract-badge">合同付款</span>{{/if}}</h3><p class="gn-product-description">{{$goods.simple_desc}}</p><div class="gn-product-footer"><span class="gn-price">{{if $mono_contract_goods_id > 0 && intval($goods.id) == $mono_contract_goods_id}}按合同金额{{else /}}<span>¥</span>{{$goods.price}}{{/if}}</span><a class="gn-product-link" href="{{$goods.goods_url}}">查看详情 <span aria-hidden="true">↗</span></a></div></div>
                                 </article>
                             {{/foreach}}
+                            </div></section>
                         {{/if}}
                     {{/foreach}}
                 {{/if}}
+                </div>
             </div>
             {{if empty($goods_floor_list)}}<p class="gn-empty">服务商品正在准备中，请通过光年官网联系我们。</p>{{/if}}
         </section>
