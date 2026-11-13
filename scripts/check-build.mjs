@@ -5,7 +5,9 @@ import path from "node:path";
 import { prerenderPaths, publicPaths, noindexPaths } from "../src/content/paths.js";
 import { products } from "../src/content/products.js";
 import { guideArticles, guidePath } from "../src/content/guideArticles.js";
-import { guideMarkdown } from "./lib/search-assets.mjs";
+import { guideMarkdown, caseStudyMarkdown } from "./lib/search-assets.mjs";
+import { caseStudies, caseStudyPath } from "../src/content/caseStudies.js";
+import { site } from "../src/content/site.js";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 const load = filename => readFile(path.join(dist, filename), "utf8");
@@ -50,6 +52,7 @@ for (const file of staticClosure([keysByFile.get(main.file)])) {
 for (const route of prerenderPaths) {
   const filename = route === "/" ? "index.html" : `${route.slice(1)}index.html`;
   const html = await load(filename);
+  const study = caseStudies.find(item => route === caseStudyPath(item));
   assert.match(html, /<h1[\s>]/, `${route} 没有预渲染主标题。`);
   assert.equal([...html.matchAll(/<h1[\s>]/g)].length, 1, `${route} 应有且仅有一个主标题。`);
   assert.match(html, /光年数智/, `${route} 缺少品牌正文。`);
@@ -96,8 +99,9 @@ for (const route of prerenderPaths) {
   if (metadata.origin && publicPaths.includes(route)) {
     assert.equal([...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*>/g)].length, 1, `${route} 规范链接应只有一份。`);
     assert.equal(structured.length, 1, `${route} 缺少结构化数据。`);
-    assert.ok(structured[0]["@graph"].some(item => item["@type"] === "Organization"));
-    assert.match(html, /social-card\.png/, `${route} 缺少分享图。`);
+    const organization = structured[0]["@graph"].find(item => item["@type"] === "Organization");
+    assert.equal(organization?.identifier?.value, site.identity.creditCode, `${route} 主体标识与页面来源不一致。`);
+    assert.ok(html.includes(study?.image || "social-card.png"), `${route} 缺少对应分享图。`);
     assert.doesNotMatch(html, /content="noindex/, `${route} 公开页面被误设为 noindex。`);
     const pageTitle = html.match(/<title>([^<]+)<\/title>/)[1];
     const pageDescription = descriptions[0][0].match(/content="([^"]+)"/)[1];
@@ -128,6 +132,21 @@ for (const route of prerenderPaths) {
     assert.ok((await load("llms-full.txt")).includes(guide.answer), `${route} 缺少文本摘要。`);
     assert.ok((await load("guides/index.html")).includes(`${metadata.base}${route.slice(1)}`), `${route} 缺少指南目录入口。`);
   }
+  if (route === "/about/") assert.match(html, /id="studio-facts"/, "工作室信息必须显示在可见页面中。");
+  if (study) {
+    const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+    const content = [study.title, study.lead, study.caption, study.boundary, ...study.sections.flatMap(section => [section.title, ...section.paragraphs, ...(section.items || [])]), ...study.checks.flatMap(check => [check.title, check.detail])];
+    for (const text of content) assert.ok(visible.includes(text), `${route} 未预渲染实施记录：${text}`);
+    assert.match(visible, /自有项目/, `${route} 必须说明项目归属。`);
+    for (const image of [study.image, ...(study.gallery ? [study.gallery.image] : [])]) await stat(path.join(dist, image));
+    const article = structured[0]?.["@graph"].find(item => item["@type"] === "Article");
+    assert.equal(article?.headline, study.title);
+    assert.equal(article?.dateModified, study.updatedAt);
+    assert.deepEqual(article?.citation.map(item => item.url), study.references.map(item => item.href), `${route} 引用资料与正文不一致。`);
+    assert.equal(await load(`${route.slice(1)}index.md`), caseStudyMarkdown(study, `${metadata.origin}${metadata.base}`));
+    assert.ok((await load("llms-full.txt")).includes(study.boundary), `${route} 文本资料遗漏核对范围。`);
+    assert.ok((await load("projects/index.html")).includes(`${metadata.base}${route.slice(1)}`), `${route} 缺少列表入口。`);
+  }
   // JSON-LD 不能比正文多描述问答，避免只给爬虫展示额外营销内容。
   for (const graph of structured) for (const entry of graph["@graph"] || []) {
     if (entry["@type"] !== "FAQPage") continue;
@@ -147,14 +166,16 @@ if (metadata.origin) {
   const robots = await load("robots.txt");
   for (const route of noindexPaths) assert.ok(!robots.includes(`Disallow: ${metadata.base}${route.slice(1)}`), "爬虫必须能读取页面上的 noindex。");
   const directory = await load("llms.txt");
+  assert.ok(directory.includes(site.identity.creditCode), "AI 文本目录与工作室主体信息不一致。");
   assert.ok(directory.includes(`${metadata.origin}${metadata.base}guides/`));
   if (metadata.commerce.configured) assert.ok(robots.includes(`${metadata.commerce.origin}${metadata.commerce.basePath}?s=sitemap/index`));
   const sitemap = await load("sitemap.xml");
   assert.ok(!sitemap.includes("/404/"));
   for (const route of publicPaths) assert.ok(sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`));
   for (const route of noindexPaths) assert.ok(!sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`), `${route} 不应进入站点地图。`);
-  for (const guide of guideArticles) {
-    assert.ok(directory.includes(`${metadata.origin}${metadata.base}${guidePath(guide).slice(1)}`));
+  for (const guide of [...guideArticles, ...caseStudies]) {
+    const contentPath = caseStudies.includes(guide) ? caseStudyPath(guide) : guidePath(guide);
+    assert.ok(directory.includes(`${metadata.origin}${metadata.base}${contentPath.slice(1)}`));
     assert.ok(sitemap.includes(`<lastmod>${guide.updatedAt}</lastmod>`));
   }
   assert.match((await load("indexnow.txt")).trim(), /^[a-f0-9]{32}$/, "IndexNow 公开验证文件格式错误。");

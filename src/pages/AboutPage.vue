@@ -4,6 +4,8 @@ import ContactBanner from "../components/site/ContactBanner.vue";
 import { services } from "../content/services.js";
 import SiteIcon from "../components/site/SiteIcon.vue";
 import StudioFilm from "../components/site/StudioFilm.vue";
+import StudioIdentity from "../components/site/StudioIdentity.vue";
+import { studioFaqs } from "../content/site.js";
 const principles = [
   { number: "01", title: "需求分析", description: "梳理使用场景、角色与核心流程，明确功能范围、约束条件及验收要求。" },
   { number: "02", title: "架构与交互", description: "按模块组织功能与数据流，统一界面与交互规则，兼顾操作效率和后续维护。" },
@@ -29,6 +31,7 @@ const principles = [
       <p>项目工作包括需求分析、界面与交互设计、功能开发、测试验证以及部署交接。服务范围和验收要求在项目方案中明确约定。</p>
     </div>
   </section>
+  <StudioIdentity />
   <section class="section section-soft">
     <div class="container">
       <div class="section-heading" data-reveal><div><p class="eyebrow">WHAT WE BELIEVE</p><h2>项目实施原则</h2></div><span class="principle-note">清晰的过程，可核对的成果。</span></div>
@@ -44,6 +47,7 @@ const principles = [
     <div class="section-heading" data-reveal><div><p class="eyebrow">OUR FOCUS</p><h2>研发与服务方向</h2><p class="section-description">围绕网站、移动端、桌面应用与自动化，提供设计、开发及系统对接服务。</p></div></div>
     <div class="focus-grid"><div v-for="service in services" :key="service.id" class="glass-panel" data-reveal><span class="icon-tile"><SiteIcon :name="service.icon" /></span><h3>{{ service.title }}</h3></div></div>
   </section>
+  <section class="section container about-questions"><div class="section-heading"><div><p class="eyebrow">了解工作室</p><h2>服务与项目说明</h2></div></div><div class="faq-list"><details v-for="faq in studioFaqs" :key="faq.question"><summary>{{ faq.question }}<span aria-hidden="true">+</span></summary><p>{{ faq.answer }}</p></details></div></section>
   <ContactBanner />
 </template>
 

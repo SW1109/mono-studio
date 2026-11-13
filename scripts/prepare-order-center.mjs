@@ -85,7 +85,7 @@ export async function prepareOrderCenter({ archive, output = join(projectRoot, "
       services: serviceOffers,
     };
     await writeFile(join(destination, "mono-service-catalog.json"), JSON.stringify(catalogue, null, 2) + "\n");
-    await writeFile(join(destination, "mono-site-navigation.json"), JSON.stringify({ name: site.name, navigation: site.navigation, email: site.email, wechat: site.wechat, records: site.records }, null, 2) + "\n");
+    await writeFile(join(destination, "mono-site-navigation.json"), JSON.stringify({ name: site.name, shortName: site.shortName, description: site.description, identity: site.identity, navigation: site.navigation, email: site.email, wechat: site.wechat, records: site.records }, null, 2) + "\n");
     await copyFile(join(deploymentRoot, "README.md"), join(destination, "MONO-STUDIO-SETUP.md"));
     await copyFile(join(deploymentRoot, "nginx-security.conf"), join(destination, "MONO-NGINX-SECURITY.conf"));
     await copyFile(join(deploymentRoot, "nginx-storefront.conf"), join(destination, "MONO-NGINX-STOREFRONT.conf"));

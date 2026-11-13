@@ -1,5 +1,9 @@
 # 光年数智网络科技工作室
 
+官方网站：[guangnian.xin](https://guangnian.xin/)。工作室提供网站、业务系统、小程序、桌面工具与自动化开发服务，经营类型为个体工商户，统一社会信用代码为 `92370100MAKQ0BDMX6`。联系方式与经营信息见[工作室信息](https://guangnian.xin/about/#studio-facts)。
+
+本仓库记录工作室自有官网与服务商城的实现。[项目实录](https://guangnian.xin/projects/)对应同一个项目中的官网商城整合、合同付款与支付宝回调、搜索内容建设三个部分，附线上截图、实现依据和验证范围；软件方案中的界面示意单独标注。
+
 Vue 3 + Vite + Vue Router + Vite SSG 官网，公开页面在构建时输出 HTML 正文。ShopXO 商城挂载在同域 `/shop/`，负责商品、会员、订单和支付宝支付；官网不另建交易系统。
 
 ## 开发与构建
@@ -31,6 +35,7 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 | `/services/` | 服务范围、交付内容与常见问题 |
 | `/products/`、`/products/:slug/` | 可定制方案与现有工具详情 |
 | `/guides/`、`/guides/:slug/` | 服务选购、官网建设、源码验收与表格自动化指南 |
+| `/projects/`、`/projects/:slug/` | 自有官网与商城的项目实施记录、截图与依据 |
 | `/about/`、`/contact/` | 工作室介绍与联系方式 |
 | `/lab/` | 用户主动启动的 Cesium 三维演示 |
 | `/shop/` | 原生商城商品、登录与结账 |
@@ -83,7 +88,7 @@ location /cesium/ {
 
 子目录部署时同步修改 `base`、静态目录与 Nginx 路径。正式域名配置后输出 sitemap、robots、llms、canonical、分享图及 JSON-LD；商城商品地图从数据库读取。交易及账号入口标记 `noindex`。这些资源不保证搜索排名或收录。
 
-指南正文维护于 `src/content/guideArticles.js`，文章页面、Article / FAQ / Breadcrumb 标记、Markdown 版本及 `llms-full.txt` 由同一内容源生成。新指南会自动加入预渲染与 sitemap；发布日期和修改日期只在内容实际发布或修改时更新。`llms.txt` 和 Markdown 是补充阅读格式，搜索与 AI 引用仍以可访问、可验证的公开正文为基础。
+指南正文维护于 `src/content/guideArticles.js`，项目实录维护于 `src/content/caseStudies.js`，工作室经营信息维护于 `src/content/site.js`。页面、Article / FAQ / Breadcrumb 标记、Markdown 版本及 `llms-full.txt` 共用内容源。新指南和实录自动加入预渲染与 sitemap；发布日期和修改日期只在内容实际发布或修改时更新。项目截图保存在 `public/projects/`，拍摄于 2026-11-13 的公开线上页面，不包含后台、账号或交易资料。`llms.txt` 和 Markdown 是补充阅读格式，搜索与 AI 引用仍以可访问、可验证的公开正文为基础。
 
 合同项目付款属于交易入口，使用 `noindex`，不进入商品 sitemap 或服务报价结构化数据；商城展示和付款功能保留。普通在售服务的价格继续读取数据库，不在 AI 文本文件中复制静态价格。
 

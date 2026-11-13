@@ -6,6 +6,8 @@ import { prerenderPaths, publicPaths } from "./src/content/paths.js";
 import { serviceGuide } from "./src/content/guides.js";
 import { guideArticles, guidePath } from "./src/content/guideArticles.js";
 import { searchTextAssets } from "./scripts/lib/search-assets.mjs";
+import { caseStudies, caseStudyPath } from "./src/content/caseStudies.js";
+import { site } from "./src/content/site.js";
 
 function publishMetadata(origin, base, orderCenter) {
   return {
@@ -13,7 +15,7 @@ function publishMetadata(origin, base, orderCenter) {
     generateBundle() {
       this.emitFile({ type: "asset", fileName: "site-build.json", source: JSON.stringify({ base, paths: prerenderPaths, origin, commerce: { provider: "shopxo", configured: Boolean(orderCenter), ...orderCenter } }, null, 2) });
       if (!origin) return;
-      const modified = new Map([["/guides/", serviceGuide.updatedAt], ...guideArticles.map(guide => [guidePath(guide), guide.updatedAt])]);
+      const modified = new Map([["/guides/", serviceGuide.updatedAt], ["/about/", site.identity.updatedAt], ["/service-terms/", site.identity.updatedAt], ["/projects/", site.identity.updatedAt], ...guideArticles.map(guide => [guidePath(guide), guide.updatedAt]), ...caseStudies.map(study => [caseStudyPath(study), study.updatedAt])]);
       const urls = publicPaths.map(path => `<url><loc>${origin}${base.replace(/\/$/, "")}${path}</loc>${modified.has(path) ? `<lastmod>${modified.get(path)}</lastmod>` : ""}</url>`).join("");
       this.emitFile({ type: "asset", fileName: "sitemap.xml", source: `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>` });
       const productSitemap = orderCenter ? `${orderCenter.origin}${orderCenter.basePath}?s=sitemap/index` : "";

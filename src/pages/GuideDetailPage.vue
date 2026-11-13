@@ -8,12 +8,14 @@ import { orderCenter } from "../config/orderCenter.js";
 import GuideLinks from "../components/site/GuideLinks.vue";
 import SiteNavLink from "../components/site/SiteNavLink.vue";
 import NotFoundPage from "./NotFoundPage.vue";
+import { caseStudies, caseStudyPath } from "../content/caseStudies.js";
 
 const route = useRoute();
 const guide = computed(() => findGuide(route.params.slug));
 const related = computed(() => guideArticles.filter(item => guide.value?.related.includes(item.slug)));
 const solutions = computed(() => products.filter(item => guide.value?.solutionSlugs.includes(item.slug)));
 const offerUrl = computed(() => guide.value?.offerId && orderCenter?.products[guide.value.offerId]);
+const relatedProjects = computed(() => caseStudies.filter(item => item.guideSlugs.includes(guide.value?.slug)));
 </script>
 
 <template>
@@ -31,6 +33,7 @@ const offerUrl = computed(() => guide.value?.offerId && orderCenter?.products[gu
         <section id="answer" class="guide-detail-answer"><h2>先看结论</h2><p>{{ guide.answer }}</p></section>
         <section v-for="section in guide.sections" :id="section.id" :key="section.id"><h2>{{ section.title }}</h2><p v-for="paragraph in section.paragraphs" :key="paragraph">{{ paragraph }}</p><ul v-if="section.items"><li v-for="item in section.items" :key="item">{{ item }}</li></ul></section>
         <section id="questions"><h2>常见问题</h2><div class="faq-list"><details v-for="faq in guide.faqs" :key="faq.question"><summary>{{ faq.question }}<span aria-hidden="true">+</span></summary><p>{{ faq.answer }}</p></details></div></section>
+        <section v-if="relatedProjects.length" id="project-examples" class="guide-detail-next"><h2>在本站项目中如何落地</h2><p>下面记录工作室自有官网与商城的实际实施过程，可对照页面和源码查看。</p><ul><li v-for="item in relatedProjects" :key="item.slug"><RouterLink :to="caseStudyPath(item)">{{ item.title }}</RouterLink></li></ul></section>
         <section class="guide-detail-next"><h2>结合你的项目确认范围</h2><p>带上页面清单、业务流程或脱敏样例，沟通需要完成的工作与交付方式。</p><ul><li v-for="solution in solutions" :key="solution.slug"><RouterLink :to="productPath(solution)">{{ solution.name }}</RouterLink></li></ul><div class="button-row"><a v-if="offerUrl" class="button button-primary" :href="offerUrl">查看对应服务与价格</a><SiteNavLink v-else class="button button-primary" to="/shop/">查看服务商品</SiteNavLink><RouterLink class="text-link" to="/contact/">联系工作室</RouterLink><RouterLink class="text-link" to="/service-terms/">交付与售后条款</RouterLink></div></section>
       </div>
     </div>

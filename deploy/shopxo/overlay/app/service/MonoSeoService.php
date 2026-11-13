@@ -37,6 +37,11 @@ class MonoSeoService
             ['@type'=>$isHome ? 'CollectionPage' : 'WebPage', '@id'=>$canonical.'#webpage', 'url'=>$canonical, 'name'=>$title, 'description'=>$description, 'inLanguage'=>'zh-CN', 'about'=>['@id'=>$organizationId], 'isPartOf'=>['@id'=>$origin.'/#website']],
         ];
         $graph[] = ['@type'=>'WebSite', '@id'=>$origin.'/#website', 'url'=>$origin.'/', 'name'=>$site['name'], 'inLanguage'=>'zh-CN', 'publisher'=>['@id'=>$organizationId]];
+        if (!empty($site['identity']['creditCode'])) {
+            $graph[0]['identifier'] = ['@type'=>'PropertyValue', 'propertyID'=>'统一社会信用代码', 'value'=>$site['identity']['creditCode']];
+        }
+        if (!empty($site['shortName'])) { $graph[0]['alternateName'] = $site['shortName']; }
+        if (!empty($site['description'])) { $graph[0]['description'] = $site['description']; }
         if ($isHome) {
             // 与当前首页共用楼层数据及 FAQ 文件，不复制数据库价格或生成隐藏商品。
             $items = [];

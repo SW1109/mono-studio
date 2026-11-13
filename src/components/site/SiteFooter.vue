@@ -13,8 +13,9 @@ import recordIcon from "../../assets/gongan-beian.png";
         <RouterLink class="brand" to="/" :aria-label="`${site.name}首页`"><img :src="mark" width="141" height="142" loading="lazy" alt="" /><span><strong>光年数智</strong><small>GUANGNIAN · DIGITAL</small></span></RouterLink>
         <p>软件设计与研发<br />网站 · 业务系统 · 自动化</p>
         <p class="footer-wordmark">SOFTWARE DESIGN &amp; ENGINEERING.</p>
+        <RouterLink class="footer-identity" to="/about/#studio-facts">{{ site.identity.businessType }}<br />统一社会信用代码<br /><span>{{ site.identity.creditCode }}</span></RouterLink>
       </div>
-      <div><h2>网站导航</h2><nav aria-label="页脚导航"><SiteNavLink v-for="item in site.navigation.slice(1)" :key="item.to" :to="item.to">{{ item.label }}</SiteNavLink></nav></div>
+      <div><h2>网站导航</h2><nav aria-label="页脚导航"><SiteNavLink v-for="item in site.navigation.slice(1)" :key="item.to" :to="item.to">{{ item.label }}</SiteNavLink><RouterLink to="/projects/">项目实录</RouterLink></nav></div>
       <div class="footer-contact">
         <h2>联系合作</h2>
         <a :href="`mailto:${site.email}`">{{ site.email }}</a>
@@ -31,3 +32,9 @@ import recordIcon from "../../assets/gongan-beian.png";
     <div class="container footer-bottom"><p>© {{ new Date().getFullYear() }} {{ site.name }}</p><div class="footer-records"><a v-for="record in site.records" :key="record.href" :href="record.href" target="_blank" rel="noopener noreferrer"><img v-if="record.police" :src="recordIcon" width="14" height="14" alt="" loading="lazy" />{{ record.label }}</a></div></div>
   </footer>
 </template>
+
+<style scoped>
+.footer-identity { display: inline-block; font-size: 12px; line-height: 1.9; color: var(--muted); margin-top: 20px; overflow-wrap: anywhere; }
+.footer-identity span { font-family: var(--font-mono); }
+.footer-identity:hover { color: var(--ink); }
+</style>

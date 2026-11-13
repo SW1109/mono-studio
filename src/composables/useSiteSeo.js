@@ -5,24 +5,27 @@ import { site } from "../content/site.js";
 import { findProduct } from "../content/products.js";
 import { findGuide } from "../content/guideArticles.js";
 import { serviceGuide } from "../content/guides.js";
+import { findCaseStudy } from "../content/caseStudies.js";
 import { buildSearchGraph, serializeStructuredData } from "../content/search.js";
 
 export function useSiteSeo() {
   const route = useRoute();
   const product = computed(() => route.path.startsWith("/products/") ? findProduct(route.params.slug) : undefined);
   const guide = computed(() => route.path.startsWith("/guides/") ? findGuide(route.params.slug) : undefined);
+  const study = computed(() => route.path.startsWith("/projects/") ? findCaseStudy(route.params.slug) : undefined);
   const unknownProduct = computed(() => route.path.startsWith("/products/") && route.params.slug && !product.value);
   const unknownGuide = computed(() => route.path.startsWith("/guides/") && route.params.slug && !guide.value);
-  const noindex = computed(() => Boolean(route.meta.noindex || unknownProduct.value || unknownGuide.value));
+  const unknownStudy = computed(() => route.path.startsWith("/projects/") && route.params.slug && !study.value);
+  const noindex = computed(() => Boolean(route.meta.noindex || unknownProduct.value || unknownGuide.value || unknownStudy.value));
   const origin = String(import.meta.env.VITE_SITE_URL || "").replace(/\/$/, "");
   const base = import.meta.env.BASE_URL;
   const path = computed(() => route.path.endsWith("/") ? route.path : `${route.path}/`);
-  const title = computed(() => unknownProduct.value || unknownGuide.value ? "页面未找到" : guide.value?.title || (product.value ? `${product.value.name}${product.value.kind === "solution" ? " · 定制开发方案" : ""}` : route.meta.title));
-  const description = computed(() => guide.value?.summary || product.value?.summary || route.meta.description || site.description);
+  const title = computed(() => unknownProduct.value || unknownGuide.value || unknownStudy.value ? "页面未找到" : study.value?.title || guide.value?.title || (product.value ? `${product.value.name}${product.value.kind === "solution" ? " · 定制开发方案" : ""}` : route.meta.title));
+  const description = computed(() => study.value?.summary || guide.value?.summary || product.value?.summary || route.meta.description || site.description);
   const canonical = computed(() => origin && !noindex.value ? `${origin}${base.replace(/\/$/, "")}${path.value}` : undefined);
-  const graph = computed(() => noindex.value ? null : buildSearchGraph({ origin, base, path: path.value, title: title.value, description: description.value, product: product.value, guide: guide.value }));
-  const article = computed(() => guide.value || (path.value === "/guides/" ? serviceGuide : undefined));
-  const image = origin ? `${origin}${base}social-card.png` : undefined;
+  const graph = computed(() => noindex.value ? null : buildSearchGraph({ origin, base, path: path.value, title: title.value, description: description.value, product: product.value, guide: guide.value, study: study.value }));
+  const article = computed(() => study.value || guide.value || (path.value === "/guides/" ? serviceGuide : undefined));
+  const image = computed(() => origin ? `${origin}${base}${study.value?.image || "social-card.png"}` : undefined);
   useHead(() => ({
     title: path.value === "/" ? `${site.shortName} | ${title.value}` : `${title.value} | ${site.shortName}`,
     htmlAttrs: { lang: "zh-CN" },
@@ -39,9 +42,9 @@ export function useSiteSeo() {
       { name: "twitter:description", content: description.value },
       ...(article.value ? [{ name: "author", content: site.name }, { property: "article:modified_time", content: article.value.updatedAt }, ...(article.value.publishedAt ? [{ property: "article:published_time", content: article.value.publishedAt }] : [])] : []),
       ...(canonical.value ? [{ property: "og:url", content: canonical.value }] : []),
-      ...(image ? [{ property: "og:image", content: image }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { property: "og:image:alt", content: "光年数智 · 软件开发与技术服务" }, { name: "twitter:image", content: image }] : []),
+      ...(image.value ? [{ property: "og:image", content: image.value }, { property: "og:image:width", content: study.value ? "1440" : "1200" }, { property: "og:image:height", content: study.value ? "1000" : "630" }, { property: "og:image:alt", content: study.value?.imageAlt || "光年数智 · 软件开发与技术服务" }, { name: "twitter:image", content: image.value }] : []),
     ],
-    link: canonical.value ? [{ rel: "canonical", href: canonical.value }, ...(guide.value ? [{ rel: "alternate", type: "text/markdown", href: `${canonical.value}index.md`, title: guide.value.title }] : [])] : [],
+    link: canonical.value ? [{ rel: "canonical", href: canonical.value }, ...(guide.value || study.value ? [{ rel: "alternate", type: "text/markdown", href: `${canonical.value}index.md`, title: title.value }] : [])] : [],
     script: graph.value ? [{ key: "site-structured-data", type: "application/ld+json", innerHTML: serializeStructuredData(graph.value) }] : [],
   }));
 }
