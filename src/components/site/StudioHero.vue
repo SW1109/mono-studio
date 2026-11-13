@@ -3,7 +3,6 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import SiteNavLink from "./SiteNavLink.vue";
 import SolutionShowcase from "./SolutionShowcase.vue";
 import poster from "../../assets/visuals/particle-poster.webp";
-import lightPoster from "../../assets/visuals/particle-poster-light.webp";
 
 const field = ref(null);
 const canvas = ref(null);
@@ -24,7 +23,7 @@ onBeforeUnmount(() => { unmounted = true; dispose?.(); });
 
 <template>
   <section ref="field" class="studio-hero" aria-labelledby="studio-hero-title" data-motion-scene>
-    <div class="particle-field" aria-hidden="true"><img class="particle-poster-dark" :src="poster" width="1026" height="786" alt="" /><img class="particle-poster-light" :src="lightPoster" width="1026" height="786" alt="" /><canvas ref="canvas"></canvas></div>
+    <div class="particle-field" aria-hidden="true"><img class="particle-poster-dark" :src="poster" width="1026" height="786" fetchpriority="high" decoding="async" alt="" /><canvas ref="canvas"></canvas></div>
     <div class="container hero-layout">
       <div class="hero-copy">
         <div class="hero-title-group">

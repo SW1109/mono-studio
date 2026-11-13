@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { prerenderPaths, publicPaths, noindexPaths } from "../src/content/paths.js";
 import { products } from "../src/content/products.js";
+import { guideArticles, guidePath } from "../src/content/guideArticles.js";
+import { guideMarkdown } from "./lib/search-assets.mjs";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 const load = filename => readFile(path.join(dist, filename), "utf8");
@@ -39,6 +41,8 @@ function staticClosure(keys) {
 }
 
 let firstLoadBytes = 0;
+const pageTitles = new Set();
+const pageDescriptions = new Set();
 for (const file of staticClosure([keysByFile.get(main.file)])) {
   assert.ok(!heavy(file), `全局主入口静态依赖了重型资源：${file}`);
   firstLoadBytes += (await stat(path.join(dist, file))).size;
@@ -47,6 +51,7 @@ for (const route of prerenderPaths) {
   const filename = route === "/" ? "index.html" : `${route.slice(1)}index.html`;
   const html = await load(filename);
   assert.match(html, /<h1[\s>]/, `${route} 没有预渲染主标题。`);
+  assert.equal([...html.matchAll(/<h1[\s>]/g)].length, 1, `${route} 应有且仅有一个主标题。`);
   assert.match(html, /光年数智/, `${route} 缺少品牌正文。`);
   assert.match(html, /<title>[^<]+<\/title>/, `${route} 缺少页面标题。`);
   assert.doesNotMatch(html, /<!--(?:app-html|app-head)-->/, `${route} 遗留预渲染占位内容。`);
@@ -93,11 +98,35 @@ for (const route of prerenderPaths) {
     assert.equal(structured.length, 1, `${route} 缺少结构化数据。`);
     assert.ok(structured[0]["@graph"].some(item => item["@type"] === "Organization"));
     assert.match(html, /social-card\.png/, `${route} 缺少分享图。`);
+    assert.doesNotMatch(html, /content="noindex/, `${route} 公开页面被误设为 noindex。`);
+    const pageTitle = html.match(/<title>([^<]+)<\/title>/)[1];
+    const pageDescription = descriptions[0][0].match(/content="([^"]+)"/)[1];
+    assert.ok(!pageTitles.has(pageTitle), `${route} 标题与其他页面重复。`);
+    assert.ok(!pageDescriptions.has(pageDescription), `${route} 描述与其他页面重复。`);
+    pageTitles.add(pageTitle);
+    pageDescriptions.add(pageDescription);
   }
   if (route === "/guides/") {
     assert.match(html, /<table[\s>]/, "选购对照应在无 JavaScript 的 HTML 中可读。");
     assert.match(html, /id="selection"/);
     assert.match(html, /Excel 数据整理自动化/);
+  }
+  const guide = guideArticles.find(item => route === guidePath(item));
+  if (guide) {
+    const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+    for (const content of [guide.title, guide.summary, guide.answer, ...guide.sections.flatMap(section => [section.title, ...section.paragraphs, ...(section.items || [])])]) {
+      assert.ok(visible.includes(content), `${route} 缺少可见文章内容：${content}`);
+    }
+    assert.match(html, /property="og:type" content="article"/, `${route} 应使用文章分享类型。`);
+    const article = structured[0]?.["@graph"].find(item => item["@type"] === "Article");
+    assert.equal(article?.datePublished, guide.publishedAt);
+    assert.equal(article?.dateModified, guide.updatedAt);
+    assert.ok(article?.author?.url.endsWith("/about/"), `${route} 缺少可核验作者入口。`);
+    const breadcrumb = structured[0]["@graph"].find(item => item["@type"] === "BreadcrumbList");
+    assert.equal(breadcrumb.itemListElement.length, 3);
+    assert.equal(await load(`${route.slice(1)}index.md`), guideMarkdown(guide, `${metadata.origin}${metadata.base}`), `${route} Markdown 与正文来源不同步。`);
+    assert.ok((await load("llms-full.txt")).includes(guide.answer), `${route} 缺少文本摘要。`);
+    assert.ok((await load("guides/index.html")).includes(`${metadata.base}${route.slice(1)}`), `${route} 缺少指南目录入口。`);
   }
   // JSON-LD 不能比正文多描述问答，避免只给爬虫展示额外营销内容。
   for (const graph of structured) for (const entry of graph["@graph"] || []) {
@@ -123,5 +152,11 @@ if (metadata.origin) {
   const sitemap = await load("sitemap.xml");
   assert.ok(!sitemap.includes("/404/"));
   for (const route of publicPaths) assert.ok(sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`));
+  for (const route of noindexPaths) assert.ok(!sitemap.includes(`${metadata.origin}${metadata.base.replace(/\/$/, "")}${route}`), `${route} 不应进入站点地图。`);
+  for (const guide of guideArticles) {
+    assert.ok(directory.includes(`${metadata.origin}${metadata.base}${guidePath(guide).slice(1)}`));
+    assert.ok(sitemap.includes(`<lastmod>${guide.updatedAt}</lastmod>`));
+  }
+  assert.match((await load("indexnow.txt")).trim(), /^[a-f0-9]{32}$/, "IndexNow 公开验证文件格式错误。");
 }
 console.log(`构建检查通过：${prerenderPaths.length} 个预渲染页面；启动资源无 3D 引擎；主入口静态 JS/CSS ${(firstLoadBytes / 1024).toFixed(1)} KiB（不含页面动态块与图片）。`);

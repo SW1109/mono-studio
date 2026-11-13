@@ -18,6 +18,8 @@ class MonoSeoService
     {
         $isHome = strtolower($controller) === 'index' && strtolower($action) === 'index';
         $isGoods = strtolower($controller) === 'goods' && strtolower($action) === 'index' && !empty($goods['id']);
+        // 合同入口的占位价格并非服务报价，不能作为可售商品供搜索或 AI 引用。
+        if ($isGoods && MonoContractService::IsContractGoods($goods['id'], $goods['coding'] ?? '')) { $isGoods = false; }
         $result = ['indexable' => $isHome || $isGoods, 'canonical' => '', 'json' => '', 'image' => '', 'title' => '', 'description' => ''];
         if (!$result['indexable']) { return $result; }
         $origin = self::Origin();
@@ -40,7 +42,7 @@ class MonoSeoService
             $items = [];
             foreach ($floors as $floor) {
                 foreach (($floor['goods'] ?? []) as $item) {
-                    if (empty($item['id']) || isset($items[$item['id']])) { continue; }
+                    if (empty($item['id']) || isset($items[$item['id']]) || MonoContractService::IsContractGoods($item['id'], $item['coding'] ?? '')) { continue; }
                     $items[$item['id']] = ['@type'=>'ListItem', 'position'=>count($items)+1, 'name'=>$item['title'], 'url'=>self::GoodsUrl((int)$item['id'])];
                 }
             }

@@ -3,10 +3,13 @@ import { RouterLink } from "vue-router";
 import PageHeading from "../components/site/PageHeading.vue";
 import SiteNavLink from "../components/site/SiteNavLink.vue";
 import { serviceGuide } from "../content/guides.js";
+import { guideArticles } from "../content/guideArticles.js";
+import GuideLinks from "../components/site/GuideLinks.vue";
 </script>
 
 <template>
   <PageHeading eyebrow="SERVICE GUIDE" :title="serviceGuide.title" current="服务选购指南" :description="serviceGuide.summary" />
+  <div class="container"><GuideLinks :articles="guideArticles" title="按你的项目，继续了解" /></div>
   <div class="container guide-layout">
     <aside class="guide-navigation"><p class="eyebrow">购买之前</p><nav aria-label="指南目录"><a v-for="(section, index) in serviceGuide.sections" :key="section.id" :href="`#${section.id}`"><span>0{{ index + 1 }}</span>{{ section.title }}</a></nav><p class="guide-updated">更新于 <time :datetime="serviceGuide.updatedAt">{{ serviceGuide.updatedAt }}</time></p></aside>
     <article class="guide-article">

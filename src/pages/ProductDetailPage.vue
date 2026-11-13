@@ -7,10 +7,13 @@ import ProductVisual from "../components/site/ProductVisual.vue";
 import ContactBanner from "../components/site/ContactBanner.vue";
 import SolutionDetails from "../components/site/SolutionDetails.vue";
 import NotFoundPage from "./NotFoundPage.vue";
+import GuideLinks from "../components/site/GuideLinks.vue";
+import { guideArticles } from "../content/guideArticles.js";
 
 const route = useRoute();
 const product = computed(() => findProduct(route.params.slug));
 const isSolution = computed(() => product.value?.kind === "solution");
+const relatedGuides = computed(() => guideArticles.filter(guide => guide.solutionSlugs.includes(product.value?.slug)));
 const sections = [
   { id: "overview", title: "方案概览" },
   { id: "scenarios", title: "适用场景" },
@@ -61,6 +64,7 @@ const sections = [
     </section>
 
     <SolutionDetails v-if="isSolution" :details="product.details" />
+    <div v-if="relatedGuides.length" class="container"><GuideLinks :articles="relatedGuides" title="相关项目指南" /></div>
     <ContactBanner :title="isSolution ? '业务需求沟通\n与定制方案评估' : '产品功能咨询\n与适用场景确认'" :description="isSolution ? '提供使用人员、现有流程与核心功能要求，便于评估技术方案、开发范围及实施安排。' : '咨询具体功能、支持平台、获取方式与配置要求，确认产品是否适用于当前工作场景。'" :to="productInquiry(product)" :button-label="isSolution ? '沟通这个方案' : '咨询这款产品'" />
   </template>
   <NotFoundPage v-else />

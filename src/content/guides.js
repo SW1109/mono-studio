@@ -1,5 +1,5 @@
 export const serviceGuide = Object.freeze({
-  updatedAt: "2026-10-28",
+  updatedAt: "2026-11-13",
   title: "软件技术服务选购指南",
   summary: "从服务范围、报价组成、源码交付、排期与售后五个方面，说明如何选择适合的软件开发与技术支持服务。",
   sections: [

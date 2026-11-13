@@ -2,13 +2,14 @@ import { site, faqs } from "./site.js";
 import { serviceGuide } from "./guides.js";
 import { services } from "./services.js";
 import { products, productPath } from "./products.js";
+import { guideArticles, guidePath } from "./guideArticles.js";
 
 // JSON-LD 会出现在 HTML 的 script 中，转义标签边界，避免内容被解析为可执行标记。
 export function serializeStructuredData(value) {
   return JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, character => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`);
 }
 
-export function buildSearchGraph({ origin, base = "/", path, title, description, product }) {
+export function buildSearchGraph({ origin, base = "/", path, title, description, product, guide }) {
   if (!origin) return null;
   const root = `${origin}${base}`;
   const canonical = `${origin}${base.replace(/\/$/, "")}${path}`;
@@ -23,7 +24,7 @@ export function buildSearchGraph({ origin, base = "/", path, title, description,
     {
       "@type": "Organization", "@id": organizationId, name: site.name, alternateName: site.shortName,
       url: root, logo: `${root}favicon.png`, description: site.description, email: site.email,
-      contactPoint: { "@type": "ContactPoint", email: site.email, contactType: "customer service", availableLanguage: "Chinese" },
+      contactPoint: { "@type": "ContactPoint", email: site.email, url: `${root}contact/`, contactType: "customer service", availableLanguage: "Chinese" },
     },
     { "@type": "WebSite", "@id": websiteId, url: root, name: site.shortName, inLanguage: "zh-CN", publisher: { "@id": organizationId } },
     page,
@@ -31,6 +32,7 @@ export function buildSearchGraph({ origin, base = "/", path, title, description,
   if (path !== "/") {
     const crumbs = [{ "@type": "ListItem", position: 1, name: "首页", item: root }];
     if (product) crumbs.push({ "@type": "ListItem", position: 2, name: "软件产品与定制方案", item: `${root}products/` });
+    if (guide) crumbs.push({ "@type": "ListItem", position: 2, name: serviceGuide.title, item: `${root}guides/` });
     crumbs.push({ "@type": "ListItem", position: crumbs.length + 1, name: product?.name || title, item: canonical });
     graph.push({ "@type": "BreadcrumbList", "@id": `${canonical}#breadcrumb`, itemListElement: crumbs });
     page.breadcrumb = { "@id": `${canonical}#breadcrumb` };
@@ -52,7 +54,7 @@ export function buildSearchGraph({ origin, base = "/", path, title, description,
     graph.push({ "@type": "Service", "@id": id, name: product.name, description: product.summary, url: canonical, provider: { "@id": organizationId } });
     page.mainEntity = { "@id": id };
   }
-  const questions = path === "/services/" ? faqs : path === "/contact/" ? faqs.slice(0, 3) : path === "/guides/" ? serviceGuide.faqs : product?.kind === "solution" ? product.details.faq : [];
+  const questions = guide?.faqs || (path === "/services/" ? faqs : path === "/contact/" ? faqs.slice(0, 3) : path === "/guides/" ? serviceGuide.faqs : product?.kind === "solution" ? product.details.faq : []);
   if (questions.length) {
     // 保留页面主体，FAQ 作为独立节点，避免用问答覆盖服务或目录的 mainEntity。
     const faqId = `${canonical}#faq`;
@@ -63,7 +65,22 @@ export function buildSearchGraph({ origin, base = "/", path, title, description,
     page.dateModified = serviceGuide.updatedAt;
     page.author = { "@id": organizationId };
     page.mainEntity = { "@id": `${canonical}#guide` };
-    graph.push({ "@type": "Article", "@id": `${canonical}#guide`, headline: serviceGuide.title, description: serviceGuide.summary, inLanguage: "zh-CN", author: { "@id": organizationId }, publisher: { "@id": organizationId }, dateModified: serviceGuide.updatedAt, mainEntityOfPage: { "@id": page["@id"] } });
+    graph.push({ "@type": "Article", "@id": `${canonical}#guide`, headline: serviceGuide.title, description: serviceGuide.summary, inLanguage: "zh-CN", author: { "@id": organizationId }, publisher: { "@id": organizationId }, image: `${root}social-card.png`, dateModified: serviceGuide.updatedAt, mainEntityOfPage: { "@id": page["@id"] } });
+    graph.push({ "@type": "ItemList", "@id": `${canonical}#articles`, name: "项目选购与交付指南", numberOfItems: guideArticles.length, itemListElement: guideArticles.map((item, index) => ({ "@type": "ListItem", position: index + 1, name: item.title, url: `${origin}${base.replace(/\/$/, "")}${guidePath(item)}` })) });
+    page.hasPart = [...(page.hasPart || []), { "@id": `${canonical}#articles` }];
+  }
+  if (guide) {
+    const articleId = `${canonical}#article`;
+    page.mainEntity = { "@id": articleId };
+    page.dateModified = guide.updatedAt;
+    graph.push({
+      "@type": "Article", "@id": articleId, url: canonical, headline: guide.title,
+      description: guide.summary, abstract: guide.answer, articleSection: guide.category,
+      inLanguage: "zh-CN", image: `${root}social-card.png`,
+      author: { "@type": "Organization", "@id": organizationId, name: site.name, url: `${root}about/` },
+      publisher: { "@id": organizationId }, datePublished: guide.publishedAt, dateModified: guide.updatedAt,
+      mainEntityOfPage: { "@id": page["@id"] },
+    });
   }
   return { "@context": "https://schema.org", "@graph": graph };
 }

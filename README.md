@@ -30,7 +30,7 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 | `/` | 工作室、服务、产品与合作流程 |
 | `/services/` | 服务范围、交付内容与常见问题 |
 | `/products/`、`/products/:slug/` | 可定制方案与现有工具详情 |
-| `/guides/` | 服务选购、源码、排期与验收指南 |
+| `/guides/`、`/guides/:slug/` | 服务选购、官网建设、源码验收与表格自动化指南 |
 | `/about/`、`/contact/` | 工作室介绍与联系方式 |
 | `/lab/` | 用户主动启动的 Cesium 三维演示 |
 | `/shop/` | 原生商城商品、登录与结账 |
@@ -82,6 +82,14 @@ location /cesium/ {
 ```
 
 子目录部署时同步修改 `base`、静态目录与 Nginx 路径。正式域名配置后输出 sitemap、robots、llms、canonical、分享图及 JSON-LD；商城商品地图从数据库读取。交易及账号入口标记 `noindex`。这些资源不保证搜索排名或收录。
+
+指南正文维护于 `src/content/guideArticles.js`，文章页面、Article / FAQ / Breadcrumb 标记、Markdown 版本及 `llms-full.txt` 由同一内容源生成。新指南会自动加入预渲染与 sitemap；发布日期和修改日期只在内容实际发布或修改时更新。`llms.txt` 和 Markdown 是补充阅读格式，搜索与 AI 引用仍以可访问、可验证的公开正文为基础。
+
+合同项目付款属于交易入口，使用 `noindex`，不进入商品 sitemap 或服务报价结构化数据；商城展示和付款功能保留。普通在售服务的价格继续读取数据库，不在 AI 文本文件中复制静态价格。
+
+`public/indexnow.txt` 是 **公开的站点归属验证文件**，不是账号密钥。发布后可按 [IndexNow 协议](https://www.indexnow.org/documentation) 向 `https://api.indexnow.org/indexnow` 提交本次变化的规范 URL，`keyLocation` 为正式域名下的 `/indexnow.txt`。成功接收（200）和等待密钥验证（202）均不代表已经收录；不要重复提交未变化的全站地址。交易页退出索引时可单独提交其公开 URL，不能提交订单号或带个人信息的地址。
+
+Google Search Console、Bing Webmaster Tools、百度搜索资源平台需由站点所有者登录并完成站点验证，再提交官网与商城两份 sitemap、查看真实索引和搜索表现。验证文件或 DNS 记录使用平台实际提供的值，不能自行编造；账号口令和访问令牌不进入源码或构建产物。
 
 普通页面不加载 Cesium，只有主动启动三维演示后才加载地图引擎；首页按需加载粒子动画模块。动画遵守系统减少动态效果偏好，并在离屏或后台暂停。地图授权、真实浏览器交互、部署后的 HTTP 状态和支付联调仍需按发布范围单独验收。
 

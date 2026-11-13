@@ -8,6 +8,8 @@ import SiteIcon from "../components/site/SiteIcon.vue";
 import ProductCard from "../components/site/ProductCard.vue";
 import SiteNavLink from "../components/site/SiteNavLink.vue";
 import ContactBanner from "../components/site/ContactBanner.vue";
+import GuideLinks from "../components/site/GuideLinks.vue";
+import { guideArticles } from "../content/guideArticles.js";
 import aurora from "../assets/visuals/aurora.jpg";
 import architecture from "../assets/visuals/architecture.jpg";
 </script>
@@ -52,6 +54,7 @@ import architecture from "../assets/visuals/architecture.jpg";
     <figure class="about-image" data-reveal><img :src="architecture" width="1280" height="1920" loading="lazy" decoding="async" alt="自然光穿过方形天窗，照亮建筑空间" /><figcaption>Shojol Islam / Unsplash</figcaption></figure>
     <div data-reveal><p class="eyebrow">关于光年</p><h2>直接沟通。<br />认真做完。</h2><p class="section-description">光年数智是一家独立软件工作室，做网站、业务系统和自动化工具。</p><p class="section-description">你可以直接和开发者讨论业务、确认界面、核对版本。从第一张原型到最后一次交接，把项目落实到具体工作里。</p><RouterLink class="text-link" to="/about/">认识工作室 <span aria-hidden="true">↗</span></RouterLink></div>
   </section>
+  <div class="container"><GuideLinks :articles="guideArticles" /></div>
   <ContactBanner title="聊聊你的项目。" />
 </template>
 
