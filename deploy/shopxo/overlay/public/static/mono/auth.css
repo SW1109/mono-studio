@@ -35,7 +35,6 @@
 .gn-themed .user-form-content-container .agreement label { color:inherit; }
 .gn-themed .user-form-content-container .agreement a { color:var(--theme-accent); }
 .gn-themed .user-forgetpwd-content-container .user-form-container { padding:0; background:transparent; }
-.gn-themed .user-forgetpwd-content-container>.am-tabs-bd>div:last-child:not(.am-tab-panel) { padding:0 !important; margin:24px 0 0 !important; }
 .gn-themed .user-login-modal-container { width:100%; max-width:480px; margin:auto; background:var(--theme-surface); }
 .gn-themed #user-verify-win .am-modal-dialog { width:min(400px,calc(100vw - 32px)); margin-inline:auto; }
 .gn-themed #user-verify-win .am-modal-hd { padding:20px 52px 16px 24px; border-bottom:1px solid var(--theme-line); color:var(--theme-ink); font-size:18px; text-align:left; }

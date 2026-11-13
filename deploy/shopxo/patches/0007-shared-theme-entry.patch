@@ -50,6 +50,22 @@
              <div class="user-form-container am-radius-lg am-background-white">
                  <div class="am-tabs am-margin-0 am-tabs-border user-form-content-container user-forgetpwd-content-container" data-am-tabs="{noSwipe: 1}">
                      <ul class="am-tabs-nav am-nav am-nav-tabs">
+@@ -63,13 +64,13 @@
+                                 <!-- form end -->
+                             </div>
+                         </div>
+-                        <div class="am-padding-horizontal-lg am-padding-vertical-xs am-margin-bottom-sm am-nbfc">
++                    </div>
++                        <div class="bottom-container am-nbfc">
+                             <div class="bottom-content am-padding-0">
+                                 <span>{{:MyLang('user.forget_password_top_login_tips')}}</span>
+                                 <a href="{{:MyUrl('index/user/logininfo')}}" class="am-btn-xs am-color-main">{{:MyLang('user.login_ahora_login_title')}}</a>
+                             </div>
+                         </div>
+-                    </div>
+                 </div>
+             </div>
+         </div>
 @@ -81,4 +82,4 @@
  {{:ModuleInclude('user/images_verify', ['type'=>'user_forget'])}}
  <!-- verify win end -->

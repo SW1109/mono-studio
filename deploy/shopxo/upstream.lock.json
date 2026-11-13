@@ -53,7 +53,7 @@
     "app/index/view/default/goods/module/middle_base/right.html": "cdd1c9c37143fa67d73966d5aba1d08b983c17cac33ecc0a86136e41c1242e34",
     "app/index/view/default/goods/module/middle_base/right/panel_base.html": "a926cdbf95128862ce57f6ef2222ebf57ea6eef87a7b268cec1eb4094a66ecde",
     "app/index/view/default/goods/module/bottom_base/right.html": "3855c89f8c2fe485af09bf765f1806c54a0e6f3087d336544e0d2bf58e40ccf9",
-    "app/index/view/default/user/forgetpwdinfo.html": "0d31a5ca553a08d8316391a1fabec6a1c15aa1216b8cf278f742e212355cce84"
+    "app/index/view/default/user/forgetpwdinfo.html": "0ae19daf55f1907fd62da1adb6ec53eb40752bdc872950ef2f827a8331b5dfb8"
   },
   "overlayFiles": {
     "app/index/view/default/public/tips_payment_pending.html": "85aa2317a0c1b74620d559a43a09f3a50bfe63518250c64797766452175dc9e7",
@@ -99,7 +99,7 @@
     "public/static/mono/native.css": "b5d9f7a455a9576546995467d89c0d78f48e2ccff24ba902f2f657ab03696bd3",
     "app/index/view/default/order/index.html": "4ab3d7c7e86ec4ab46a2322084ca8a2f04d9071d12e882b89c770055913f0560",
     "public/static/mono/commerce.js": "ec4189a010f920e5f1db1f175b15487c797245bf006fbed23370ee17b809431e",
-    "public/static/mono/auth.css": "7c76c179e1c55540aabcdae1bcee5a3b1adf180518906f6f83f5ead83a7e0764",
+    "public/static/mono/auth.css": "c4bfe4a5e6fb465af0f938c903b654ef792c171cfddb6d4b70aa7e686f65641a",
     "public/static/mono/forms.js": "826a82ebcf21df03709c55bf4d5c8c93f76d7c73b68b5e5ed542eb0e065f6703",
     "app/index/view/default/public/mono_theme.html": "7ce14995824b51f5b5bef8852847ec0c81ae39afa688bc7dbfca2e8ee35836fd"
   },
