@@ -6,6 +6,7 @@ import { resolve, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { site } from "../src/content/site.js";
 import { serviceOffers, servicePurchaseFaqs } from "../src/content/serviceOffers.js";
+import { readSharedTheme, sharedThemeFiles, storefrontThemeFiles, themeVersion } from "./lib/theme-assets.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const deploymentRoot = join(projectRoot, "deploy/shopxo");
@@ -31,6 +32,10 @@ async function verifyFiles(directory, files) {
 
 export async function prepareOrderCenter({ archive, output = join(projectRoot, "artifacts/order-center/shopxo") } = {}) {
   const lock = JSON.parse(await readFile(join(deploymentRoot, "upstream.lock.json"), "utf8"));
+  const sharedTheme = await readSharedTheme();
+  for (const file of sharedThemeFiles) {
+    if (lock.sharedThemeFiles?.[file] !== sharedTheme.files[file]) throw new Error(`共享主题摘要不匹配：public/${file}`);
+  }
   const destination = resolve(output);
   const temporary = await mkdtemp(join(tmpdir(), "mono-shopxo-source-"));
   let created = false;
@@ -65,6 +70,30 @@ export async function prepareOrderCenter({ archive, output = join(projectRoot, "
       await copyFile(source, join(destination, path));
     }
     await verifyFiles(destination, lock.overlayFiles || {});
+    // 官网 public/ 是共享主题唯一源，商城输出副本由准备流程生成，源码目录不再手工维护第二份。
+    for (const file of sharedThemeFiles) {
+      const target = join(destination, "public/static/mono", file);
+      await mkdir(dirname(target), { recursive: true });
+      await copyFile(join(projectRoot, "public", file), target);
+    }
+    const themeFiles = { ...sharedTheme.files };
+    for (const file of storefrontThemeFiles) {
+      const relative = `public/static/mono/${file}`;
+      if (!lock.overlayFiles[relative]) throw new Error(`缺少商城主题资源：${relative}`);
+      themeFiles[file] = lock.overlayFiles[relative];
+    }
+    const theme = { version: themeVersion({ upstream: lock.commit, ...themeFiles }), sharedVersion: sharedTheme.version, files: themeFiles };
+    await writeFile(join(destination, "mono-theme-assets.json"), JSON.stringify(theme, null, 2) + "\n");
+    const header = await readFile(join(destination, "app/index/view/default/public/header.html"), "utf8");
+    const themeEntry = await readFile(join(destination, "app/index/view/default/public/mono_theme.html"), "utf8");
+    if (header.split("ModuleInclude('public/mono_theme')").length !== 2 || header.indexOf("ModuleInclude('public/mono_theme')") < header.indexOf("plugins_common_header_css_data")) throw new Error("商城主题入口必须唯一，且位于原生和插件样式之后。");
+    const entries = [...themeEntry.matchAll(/static\/mono\/([^?"\s]+)\?v=/g)].map(match => match[1]);
+    const expected = ["theme.js", "theme.css", "shell.css", "storefront.css", "native.css", "auth.css", "forms.js", "commerce.js"];
+    if (JSON.stringify(entries) !== JSON.stringify(expected)) throw new Error("商城主题资源加载顺序不符合公共入口约定。");
+    const shell = await readFile(join(destination, "public/static/mono/shell.css"), "utf8");
+    if (/\.am-form|\.am-btn-primary|\.am-material-label/.test(shell)) throw new Error("shell.css 只负责站点布局，表单和按钮样式应集中在 native.css / auth.css。");
+    const storefront = await readFile(join(destination, "public/static/mono/storefront.css"), "utf8");
+    if (/\.user-(login|register|form|right)-/.test(storefront)) throw new Error("商品样式不能重复维护账号表单布局，应使用 auth.css。");
     if (lock.upgrade) {
       const source = join(deploymentRoot, lock.upgrade.path);
       if (sha256(await readFile(source)) !== lock.upgrade.sha256) throw new Error("数据库增量迁移脚本摘要不匹配。");
@@ -93,7 +122,7 @@ export async function prepareOrderCenter({ archive, output = join(projectRoot, "
     const manifest = {
       preparedAt: new Date().toISOString(), repository: lock.repository, commit: lock.commit,
       ref: lock.ref, archiveSha256: lock.archiveSha256, patches: lock.patches, upgrade: lock.upgrade,
-      files: lock.patchedFiles, overlayFiles: lock.overlayFiles, upstreamFiles: lock.sourceFiles, phpSyntaxCheck: syntaxCheck, runtimeVerified: false,
+      files: lock.patchedFiles, overlayFiles: lock.overlayFiles, sharedThemeFiles: sharedTheme.files, themeVersion: theme.version, upstreamFiles: lock.sourceFiles, phpSyntaxCheck: syntaxCheck, runtimeVerified: false,
       merchantConfigured: false, productionApproved: false, containsMerchantSecrets: false,
     };
     await writeFile(join(destination, "mono-source-manifest.json"), JSON.stringify(manifest, null, 2) + "\n");

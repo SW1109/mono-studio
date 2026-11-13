@@ -1,0 +1,59 @@
+--- a/app/index/view/default/public/header.html
++++ b/app/index/view/default/public/header.html
+@@ -48,7 +48,9 @@
+     {{/if}}
+     {{if !empty($static_path_data['theme_import_css']) and is_array($static_path_data['theme_import_css'])}}
+         {{foreach $static_path_data.theme_import_css as $v}}
+-            <link rel="stylesheet" type="text/css" href="{{$public_host}}static/{{$v}}?v={{$static_cache_version}}-20261112-layout" />
++            {{if !in_array($v, ['mono/storefront.css', 'mono/shell.css'])}}
++                <link rel="stylesheet" type="text/css" href="{{$public_host}}static/{{$v}}?v={{$static_cache_version}}" />
++            {{/if}}
+         {{/foreach}}
+     {{/if}}
+     {{if !empty($static_path_data['module_css'])}}
+@@ -209,11 +211,7 @@
+             {{/foreach}}
+         {{/if}}
+     </script>
+-    <meta name="theme-color" content="#08090b" />
+-    <script src="{{$public_host}}static/mono/theme.js?v=20261112-layout"></script>
+-    <script defer src="{{$public_host}}static/mono/commerce.js?v=20261112-layout"></script>
+-    <link rel="stylesheet" href="{{$public_host}}static/mono/theme.css?v=20261112-layout" />
+-    <link rel="stylesheet" href="{{$public_host}}static/mono/native.css?v=20261112-layout" />
++    {{:ModuleInclude('public/mono_theme')}}
+ </head>
+ <body class="gn-themed {{if (!isset($page_pure) or $page_pure neq 1) and (!isset($is_header) or $is_header eq 1)}}gn-unified {{/if}}{{$page_unique_mark}} {{if in_array(MiniAppEnv(), MyConfig('shopxo.mini_app_type_list'))}} mini-app-env{{/if}}">
+ <div class="body-content-container">
+@@ -276,4 +274,4 @@
+                     {{/foreach}}
+                 {{/if}}
+             {{/if}}
+-        {{/if}}
+\ No newline at end of file
++        {{/if}}
+--- a/app/index/view/default/user/forgetpwdinfo.html
++++ b/app/index/view/default/user/forgetpwdinfo.html
+@@ -11,7 +11,7 @@
+ ])}}
+ 
+ <!-- conntent start  -->
+-<div class="am-g theme-data-edit-event" data-module="user_forget" {{if !empty($user_forgetpwd_left_data['bg_color'])}}style="background-color:{{$user_forgetpwd_left_data.bg_color}};"{{/if}}>
++<div class="am-g theme-data-edit-event" data-module="user_forget">
+ 	<div class="am-container user-forgetpwd-container">
+ 		<div class="am-hide-sm-only am-u-md-7 am-u-lg-8 am-vertical-align am-text-center user-left-container">
+ 			{{if !empty($user_forgetpwd_left_data['images'])}}
+@@ -22,6 +22,7 @@
+ 		</div>
+ 
+         <div class="am-u-sm-12 am-u-md-5 am-u-lg-4 user-right-container">
++            <div class="gn-account-intro"><h1>{{:MyLang('user.forget_password_nav_title')}}</h1><p>通过已绑定的手机号或邮箱重置密码。</p></div>
+             <div class="user-form-container am-radius-lg am-background-white">
+                 <div class="am-tabs am-margin-0 am-tabs-border user-form-content-container user-forgetpwd-content-container" data-am-tabs="{noSwipe: 1}">
+                     <ul class="am-tabs-nav am-nav am-nav-tabs">
+@@ -81,4 +82,4 @@
+ {{:ModuleInclude('user/images_verify', ['type'=>'user_forget'])}}
+ <!-- verify win end -->
+ 
+-{{:ModuleInclude('public/footer')}}
+\ No newline at end of file
++{{:ModuleInclude('public/footer')}}

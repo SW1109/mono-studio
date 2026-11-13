@@ -1,0 +1,63 @@
+/* 登录、注册、找回密码和内嵌登录共用布局；字段外观和状态统一由 native.css 适配。 */
+.gn-themed :is(.user-login-container,.user-register-container,.user-login-background-img-container) { background:transparent; }
+.gn-themed :is(.user-login-background-img-content,.user-left-container) { display:none; }
+.gn-themed :is(.user-login-background-img-container,.user-forgetpwd-container) { min-height:0; padding-block:32px 48px; }
+.gn-themed .user-register-container { padding:32px 0 48px; }
+.gn-themed :is(.user-login-container,.user-forgetpwd-container) .user-right-container,.gn-themed .user-register-container .register-container { float:none; width:100%; max-width:480px; min-width:0; margin:0 auto !important; padding:0; border:0; background:transparent; }
+.gn-themed :is(.user-login-container,.user-forgetpwd-container) .user-right-container { padding:0 !important; }
+.gn-themed .gn-account-intro { margin-bottom:28px; text-align:center; }
+.gn-themed .gn-account-intro h1 { margin:0 0 12px; color:var(--theme-ink); font-family:var(--theme-font-display); font-size:30px; font-weight:600; line-height:1.4; }
+.gn-themed .gn-account-intro p { margin:0; color:var(--theme-muted); font-size:14px; line-height:1.85; }
+.gn-themed .user-right-container>.am-radius-lg,.gn-themed .register-container>.am-radius-lg { padding:0; border:1px solid var(--theme-line); border-radius:var(--theme-radius-panel); background:var(--theme-surface); box-shadow:none; }
+.gn-themed .user-form-content-container { min-height:0; margin:0; padding:24px; color:var(--theme-ink); }
+.gn-themed .user-form-content-container>.am-tabs-bd { margin:0; padding:0; border:0; background:transparent; overflow:hidden; }
+.gn-themed .user-form-content-container>.am-tabs-bd>.am-tab-panel { padding:24px 4px 4px; }
+.gn-themed .user-form-content-container>ul.am-tabs-nav.am-nav.am-nav-tabs { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); margin:0; padding:0; border:0; border-bottom:1px solid var(--theme-line); background:transparent; }
+.gn-themed .user-form-content-container>.am-nav-tabs::before,.gn-themed .user-form-content-container>.am-nav-tabs::after { display:none; }
+.gn-themed .user-form-content-container>.am-nav-tabs>.bar { display:none; }
+.gn-themed .user-form-content-container>.am-nav-tabs>li { float:none; width:auto; max-width:none; min-width:0; margin:0; display:block; border:0; }
+.gn-themed .user-form-content-container>ul.am-tabs-nav.am-nav.am-nav-tabs>li>a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:12px 8px !important; margin:0; border:0; border-radius:0; background:transparent; color:var(--theme-muted); font-size:14px; font-weight:400; line-height:1.6; white-space:normal; overflow:visible; text-overflow:clip; text-align:center; }
+.gn-themed .user-form-content-container>ul.am-tabs-nav.am-nav.am-nav-tabs>li>a:hover { color:var(--theme-ink); background:var(--theme-inset); }
+.gn-themed .user-form-content-container>ul.am-tabs-nav.am-nav.am-nav-tabs>li.am-active>a { color:var(--theme-ink); background:transparent; border:0; box-shadow:inset 0 -2px var(--theme-accent); font-weight:500; }
+.gn-themed .user-form-content-container>.am-nav-tabs>li::before,.gn-themed .user-form-content-container>.am-nav-tabs>li::after,.gn-themed .user-form-content-container>.am-nav-tabs>li>a::before,.gn-themed .user-form-content-container>.am-nav-tabs>li>a::after { display:none; }
+.gn-themed .user-form-content-container form.am-form { padding:0; margin:0; overflow:visible; background:transparent; }
+.gn-themed .user-form-content-container form.am-form>.am-form-group { padding:0; margin:0 0 20px !important; }
+.gn-themed .user-form-content-container form.am-form>.am-form-group:last-child { margin-bottom:0 !important; }
+.gn-themed .user-form-content-container form.am-form>.am-form-group:has(>button[type=submit]) { margin-top:24px !important; }
+.gn-themed .user-form-content-container form.am-form button[type=submit] { min-height:var(--theme-action-height); border-radius:var(--theme-radius-panel); font-size:14px; }
+.gn-themed .user-form-content-container .bottom-container { position:static; width:auto; margin:24px 0 0; padding:0 !important; }
+.gn-themed .user-form-content-container .bottom-container>div { padding:0 !important; margin:12px 0 0; }
+.gn-themed .user-form-content-container .bottom-content { padding:0; color:var(--theme-muted); font-size:14px; line-height:1.8; }
+.gn-themed .user-form-content-container .bottom-content span { color:var(--theme-muted); }
+.gn-themed .user-form-content-container .bottom-content a { display:inline-block; min-height:32px; font-size:14px; }
+.gn-themed .user-form-content-container .bottom-container .am-fr a { display:inline-flex; align-items:center; min-height:36px; }
+.gn-themed .user-form-content-container .agreement { color:var(--theme-muted); font-size:13px; line-height:1.9; margin-top:20px !important; overflow-wrap:anywhere; }
+.gn-themed .user-form-content-container .agreement label { color:inherit; }
+.gn-themed .user-form-content-container .agreement a { color:var(--theme-accent); }
+.gn-themed .user-forgetpwd-content-container .user-form-container { padding:0; background:transparent; }
+.gn-themed .user-forgetpwd-content-container>.am-tabs-bd>div:last-child:not(.am-tab-panel) { padding:0 !important; margin:24px 0 0 !important; }
+.gn-themed .user-login-modal-container { width:100%; max-width:480px; margin:auto; background:var(--theme-surface); }
+.gn-themed #user-verify-win .am-modal-dialog { width:min(400px,calc(100vw - 32px)); margin-inline:auto; }
+.gn-themed #user-verify-win .am-modal-hd { padding:20px 52px 16px 24px; border-bottom:1px solid var(--theme-line); color:var(--theme-ink); font-size:18px; text-align:left; }
+.gn-themed #user-verify-win .am-modal-hd .am-close { width:44px; height:44px; top:8px; right:8px; line-height:44px; color:var(--theme-muted); opacity:1; }
+.gn-themed #user-verify-win .am-modal-bd { padding:8px 24px 24px; margin:0; background:var(--theme-surface); }
+.gn-themed #user-verify-win .am-modal-bd .am-form-input-material { min-width:0; width:100%; }
+.gn-themed #user-verify-win .am-modal-bd .am-form-input-material .am-position-verify { position:relative; inset:auto; width:auto; }
+.gn-themed #user-verify-win-img { margin:0; padding:0; max-width:100%; border-color:var(--theme-line-strong); }
+.gn-themed #user-verify-win .form-verify-tips { display:none; }
+.gn-themed #user-verify-win .user-verify-win-submit { width:100%; min-height:var(--theme-control-height); margin-top:24px; }
+@media(max-width:700px) {
+  .gn-themed :is(.user-login-background-img-container,.user-forgetpwd-container) { padding-block:20px 32px; }
+  .gn-themed .user-register-container { padding-block:20px 32px; }
+  .gn-themed .user-form-content-container { padding:20px; }
+  .gn-themed .gn-account-intro h1 { font-size:26px; }
+  .gn-themed .gn-account-intro p { font-size:13px; }
+  .gn-themed .user-login-modal-container .user-form-content-container { padding:20px 16px; }
+}
+@media(max-width:380px) {
+  .gn-themed .user-form-content-container { padding:16px; }
+  .gn-themed .user-form-content-container>.am-nav-tabs>li>a { padding-inline:4px !important; font-size:13px; }
+  .gn-themed .user-form-content-container .am-form-input-material { column-gap:8px; }
+  .gn-themed .user-form-content-container .am-position-verify,.gn-themed .user-form-content-container .form-verify { min-width:108px; }
+  .gn-themed .user-form-content-container .am-position-verify img { width:108px; height:auto; }
+}

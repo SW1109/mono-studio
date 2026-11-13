@@ -7,8 +7,5 @@
   "theme_style": {
     "color_footer_masking": "#000"
   },
-  "import_css": [
-    "mono/storefront.css",
-    "mono/shell.css"
-  ]
+  "import_css": []
 }

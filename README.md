@@ -47,7 +47,9 @@ npm run preview -- --host 127.0.0.1 --port 4176 --strictPort
 
 方案介绍和演示画面不作为已交付客户案例，价格及可售状态以商城实际记录为准。官网使用 V5 宣传片；`video/` 保留可编辑工程及其引用的历史制作脚本和素材。
 
-官网和商城统一使用暗色主题。亮色配色已注释保留，外观切换暂时停用，旧浏览器偏好和系统主题不会改变当前外观。`public/theme.js`、`public/theme.css` 和 `public/fonts/` 为共享资源源文件，商城覆盖目录内保留相同副本，构建检查会核对一致性。
+官网和商城统一使用暗色主题。亮色配色已注释保留，外观切换暂时停用，旧浏览器偏好和系统主题不会改变当前外观。颜色、字体、圆角和控件尺寸统一维护于 `public/theme.css`，启动逻辑在 `public/theme.js`。商城共享资源由 `orders:prepare` 从 `public/` 生成，覆盖目录不再维护第二份。官网构建与商城准备按文件内容生成资源版本，编辑主题后无需手动修改缓存日期。
+
+商城公共头只通过 `public/mono_theme.html` 加载主题，顺序为共享变量、站点布局、商品目录、原生控件适配、账号布局。`shell.css` 只维护导航和页脚，`native.css` 适配原生控件及业务页面，`auth.css` 维护登录、注册、找回密码与登录弹窗；`forms.js` 只补充标签关系和可访问性，不接管账号、验证码或提交。更新共享资源后同步 `upstream.lock.json` 的 `sharedThemeFiles` 摘要；准备流程会校验唯一入口、加载顺序和源文件摘要。发布时一起部署生成的 `mono-theme-assets.json`，以及对应资源和公共模板。
 
 视觉以 [Awesome DESIGN.md](https://github.com/VoltAgent/awesome-design-md) 中的 Linear 为主参考，统一近黑底色、分层灰面板、细边框、无衬线字体与少量紫色强调；保留此前 [Figma Site](https://repay-smile-39212411.figma.site/) 参考中的粒子和图片展示。首页粒子曲面使用 Three.js，支持指针响应、离屏暂停、减少动态效果和静态图回退。极光照片为 Justin Verweire / Unsplash（图片 ID `photo-1775255129476-95a1e9624710`），建筑照片为 Shojol Islam / Unsplash（图片 ID `photo-1711288153255-0a65ab00f2df`），保留画面及页面署名。商城 `native.css` 在原生页面样式后加载，覆盖商品、会员中心、订单、购物车、结算及独立弹窗；共享字体资产许可证见 `public/fonts/OFL.txt`。
 

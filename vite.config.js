@@ -8,11 +8,19 @@ import { guideArticles, guidePath } from "./src/content/guideArticles.js";
 import { searchTextAssets } from "./scripts/lib/search-assets.mjs";
 import { caseStudies, caseStudyPath } from "./src/content/caseStudies.js";
 import { site } from "./src/content/site.js";
+import { readSharedTheme } from "./scripts/lib/theme-assets.mjs";
 
-function publishMetadata(origin, base, orderCenter) {
+function publishMetadata(origin, base, orderCenter, theme) {
   return {
     name: "studio-publish-metadata",
+    transformIndexHtml() {
+      return [
+        { tag: "script", attrs: { src: `${base}theme.js?v=${theme.version}`, "data-mono-theme": "bootstrap" }, injectTo: "head-prepend" },
+        { tag: "link", attrs: { rel: "stylesheet", href: `${base}theme.css?v=${theme.version}`, "data-mono-theme": "tokens" }, injectTo: "head-prepend" },
+      ];
+    },
     generateBundle() {
+      this.emitFile({ type: "asset", fileName: "theme-assets.json", source: JSON.stringify(theme, null, 2) });
       this.emitFile({ type: "asset", fileName: "site-build.json", source: JSON.stringify({ base, paths: prerenderPaths, origin, commerce: { provider: "shopxo", configured: Boolean(orderCenter), ...orderCenter } }, null, 2) });
       if (!origin) return;
       const modified = new Map([["/guides/", serviceGuide.updatedAt], ["/about/", site.identity.updatedAt], ["/service-terms/", site.identity.updatedAt], ["/projects/", site.identity.updatedAt], ...guideArticles.map(guide => [guidePath(guide), guide.updatedAt]), ...caseStudies.map(study => [caseStudyPath(study), study.updatedAt])]);
@@ -25,8 +33,9 @@ function publishMetadata(origin, base, orderCenter) {
   };
 }
 
-export default defineConfig(({ mode, command }) => {
+export default defineConfig(async ({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
+  const theme = await readSharedTheme();
   const orderCenter = createShopxoOrderCenter(env.VITE_SHOPXO_ORIGIN, env.VITE_SHOPXO_PRODUCTS, { allowLocalPreview: command === "serve" && mode !== "production", basePath: env.VITE_SHOPXO_BASE_PATH || "/" });
   const base = env.VITE_BASE_PATH || "/";
   if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base)) throw new Error("VITE_BASE_PATH 必须是以 / 开头和结尾的部署路径，如 / 或 /studio/。");
@@ -40,7 +49,7 @@ export default defineConfig(({ mode, command }) => {
     plugins: [
       vue(),
       cesiumAssets(),
-      publishMetadata(origin, base, orderCenter),
+      publishMetadata(origin, base, orderCenter, theme),
     ],
     build: {
       manifest: true,

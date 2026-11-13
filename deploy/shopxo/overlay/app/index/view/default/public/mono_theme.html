@@ -1,0 +1,15 @@
+{{php}}
+$mono_theme_manifest = ROOT.'mono-theme-assets.json';
+$mono_theme = is_file($mono_theme_manifest) ? json_decode(file_get_contents($mono_theme_manifest), true) : [];
+$mono_shared_version = $mono_theme['sharedVersion'] ?? $static_cache_version;
+$mono_storefront_version = $mono_theme['version'] ?? $static_cache_version;
+{{/php}}
+<meta name="theme-color" content="#08090b" />
+<script src="{{$public_host}}static/mono/theme.js?v={{$mono_shared_version}}" data-mono-theme="bootstrap"></script>
+<link rel="stylesheet" href="{{$public_host}}static/mono/theme.css?v={{$mono_shared_version}}" data-mono-theme="tokens" />
+<link rel="stylesheet" href="{{$public_host}}static/mono/shell.css?v={{$mono_storefront_version}}" data-mono-theme="shell" />
+<link rel="stylesheet" href="{{$public_host}}static/mono/storefront.css?v={{$mono_storefront_version}}" data-mono-theme="storefront" />
+<link rel="stylesheet" href="{{$public_host}}static/mono/native.css?v={{$mono_storefront_version}}" data-mono-theme="native" />
+<link rel="stylesheet" href="{{$public_host}}static/mono/auth.css?v={{$mono_storefront_version}}" data-mono-theme="auth" />
+<script defer src="{{$public_host}}static/mono/forms.js?v={{$mono_storefront_version}}" data-mono-theme="forms"></script>
+<script defer src="{{$public_host}}static/mono/commerce.js?v={{$mono_storefront_version}}" data-mono-theme="commerce"></script>

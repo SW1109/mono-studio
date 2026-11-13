@@ -14,7 +14,8 @@
     "patches/0003-search-metadata.patch",
     "patches/0004-missing-goods-status.patch",
     "patches/0005-contract-payment.patch",
-    "patches/0006-alipay-callback-verification.patch"
+    "patches/0006-alipay-callback-verification.patch",
+    "patches/0007-shared-theme-entry.patch"
   ],
   "sourceFiles": {
     "extend/payment/Alipay.php": "e12421083ef774e54ca6149f2bf3b7dfc5ae5f646ac50a245a41b9d97cb75dcf",
@@ -36,13 +37,14 @@
     "app/service/BuyService.php": "5ceb345a14f1ae6552545f26c03b5b8ee32d2c5650e47d6d39d42b3fae67d2d1",
     "app/index/view/default/goods/module/middle_base/right.html": "a81c5b620e4c87d06bb2739ee83d0b9517d9f3f374856e76713db119bdedf1b1",
     "app/index/view/default/goods/module/middle_base/right/panel_base.html": "fa6f332f2af1e7f0cfc3ce7275f12fbb0daef8e12c7881f0cab04ac500f781a8",
-    "app/index/view/default/goods/module/bottom_base/right.html": "d46efb064df4be671169b27c5f2b8e220c8eb5fbb6ee36c3887b03202ecfdf12"
+    "app/index/view/default/goods/module/bottom_base/right.html": "d46efb064df4be671169b27c5f2b8e220c8eb5fbb6ee36c3887b03202ecfdf12",
+    "app/index/view/default/user/forgetpwdinfo.html": "e64782594a8c41d627ccb398b483e80d91fd8050912807c353136eda7c7277a5"
   },
   "patchedFiles": {
     "extend/payment/Alipay.php": "2c39ef743bcf4c3c83e1d404b5e89d6f666bafcc49bda500ed0c048289ed0ebf",
     "app/service/OrderService.php": "c9b121f3d1091bd79ac1ea3d361e779e23d68c1e418c1756931e74efde434baa",
     "app/index/controller/Order.php": "2eda8baf298185c0e84560ff1db0f83607999fd8ce16f0630672b6626299b296",
-    "app/index/view/default/public/header.html": "52065d6511fad7d07ceb4cd40247379fb863a82f6c01f993e76c6f6fd4a18d0a",
+    "app/index/view/default/public/header.html": "7d54daf140b6ceb646207dc056280172868e74de35f1b5af9aa3b9dd16f95070",
     "app/index/view/default/public/footer.html": "0433f08823e72a90d28229d3e5e3104dd205f672fc9eae5205a22b7bcb8fee18",
     "app/index/view/default/user/logininfo.html": "0caeefd708225b0d0a2d5c6e7685839f28f33375c64b8e0eb75abf1dbeb7e012",
     "app/index/view/default/user/reginfo.html": "bcd83e1be40843d1b1303ec2d33aedca359020dae2ffcd5a8bc33c18bf50044e",
@@ -50,22 +52,23 @@
     "app/service/BuyService.php": "248a1ca69e7f4f0ac4602116b97c8ca61bb5bd9ea36f01363929db0a26b9efd3",
     "app/index/view/default/goods/module/middle_base/right.html": "cdd1c9c37143fa67d73966d5aba1d08b983c17cac33ecc0a86136e41c1242e34",
     "app/index/view/default/goods/module/middle_base/right/panel_base.html": "a926cdbf95128862ce57f6ef2222ebf57ea6eef87a7b268cec1eb4094a66ecde",
-    "app/index/view/default/goods/module/bottom_base/right.html": "3855c89f8c2fe485af09bf765f1806c54a0e6f3087d336544e0d2bf58e40ccf9"
+    "app/index/view/default/goods/module/bottom_base/right.html": "3855c89f8c2fe485af09bf765f1806c54a0e6f3087d336544e0d2bf58e40ccf9",
+    "app/index/view/default/user/forgetpwdinfo.html": "0d31a5ca553a08d8316391a1fabec6a1c15aa1216b8cf278f742e212355cce84"
   },
   "overlayFiles": {
     "app/index/view/default/public/tips_payment_pending.html": "85aa2317a0c1b74620d559a43a09f3a50bfe63518250c64797766452175dc9e7",
-    "app/index/view/default/config.json": "6b83036da182de7c018864f551b4cd23030953ae8e0877fd3cbed09af13c7ab4",
+    "app/index/view/default/config.json": "28edac2be54fbf3e19b0036505c4c4be40754b10fa1d6b69e0b98f7b196648c4",
     "app/index/view/default/index/index.html": "6fb9644a91c9c8f340b7cc9d718a394564e75f7c5d3f725c81b2ac55648fdb37",
     "public/static/mono/api-integration.svg": "5b010c3b9390980a6ad9b3bd4d34e11223ea49a619644a5028e8032aeedcba48",
     "public/static/mono/logo.svg": "4c16cbf2a724ef2e81c65bc07aeb13daab4345a9699ceb563e0f89bb8fbf2dcd",
     "public/static/mono/page-improvement.svg": "c107919af39cb5a5a158e26566d8946490a71477f6b6006210cd43d7c3a30eab",
-    "public/static/mono/storefront.css": "774059a368e64e75fc5b688d71e1b5b4460a9ace3e6902231e16a58c5e273c6d",
+    "public/static/mono/storefront.css": "6a63c75c41cb57ccc2f6cc478da0e6e8e3b944744d3b8e8d1686b78b85241cad",
     "public/static/mono/technical-review.svg": "e12fcca36422bd4e1e17637209fc04c310325eb474095779a8ebf782e9e39473",
     "MONO-STUDIO-PAYMENTS.php": "94d8f4c3de3466106307bfc095c0d9aa15391bd2715b3bf5d41ca47b1c05d261",
     "public/static/mono/brand-mark.png": "2ae5e3d7fe77ebb8cb7fc0fa4f235b82157bce6ebac003fb85a75c38ce4927b6",
     "app/index/view/default/public/mono_footer.html": "d8d1dbe21f7cfe3d0e2a8a877b3cd30a1aaa90f03a273dbd38ef2a4e6ce679f4",
     "app/index/view/default/public/mono_header.html": "e68d19d08e4b8b816490011673d36c0ad3bf01c13dcc551cd4eec7299cb7b1cc",
-    "public/static/mono/shell.css": "a4d6d311b25d81384ed7e0628be9f925a9da090166d89c91e70aa1b1755139de",
+    "public/static/mono/shell.css": "c6434258a39045382c9c6cb726bad109bf5c84e99ed3423f86ef1ab449f7bc51",
     "app/index/view/default/public/nav_search.html": "4a44df3ad0214f025a3bd08f74735b55e54e4e832ba9741689df71ea213f53d3",
     "app/index/view/default/public/header_nav.html": "4a44df3ad0214f025a3bd08f74735b55e54e4e832ba9741689df71ea213f53d3",
     "app/index/view/default/public/goods_category.html": "4a44df3ad0214f025a3bd08f74735b55e54e4e832ba9741689df71ea213f53d3",
@@ -93,17 +96,22 @@
     "public/static/mono/website-starter.svg": "296234e8debf931c8f7a4ba44e6c06be352a631130adcf051a6f3d7cf12126e6",
     "public/static/mono/website-starter.webp": "db854537b99843305d9d3f3cd656beef80043b2aa766f1f88688a15b427c4914",
     "public/static/mono/aurora.jpg": "24c6dd4e8d1d8672323e5d455614cb1e44697ed921bd45f9999b529c9664d53e",
-    "public/static/mono/fonts/OFL.txt": "5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6",
-    "public/static/mono/fonts/noto-serif-sc-subset.woff2": "0b3cdbba4e023d9b0a335f0502fc67db494924ef8b4e0aa9a5f3aa09e5f6a266",
-    "public/static/mono/theme.css": "447339871abd28031c6fa3e8f5a5e9446f8d58ba954425040548794c2d5c79ee",
-    "public/static/mono/theme.js": "e3d6c4ad3122864d94daed05b710902cea1b892180402d5170d5b8bddaeedbba",
-    "public/static/mono/native.css": "d9894c9916a8118622722a201c0e03e45c7bd2e6e026d20870558c30ba5eda2c",
+    "public/static/mono/native.css": "b5d9f7a455a9576546995467d89c0d78f48e2ccff24ba902f2f657ab03696bd3",
     "app/index/view/default/order/index.html": "4ab3d7c7e86ec4ab46a2322084ca8a2f04d9071d12e882b89c770055913f0560",
-    "public/static/mono/commerce.js": "ec4189a010f920e5f1db1f175b15487c797245bf006fbed23370ee17b809431e"
+    "public/static/mono/commerce.js": "ec4189a010f920e5f1db1f175b15487c797245bf006fbed23370ee17b809431e",
+    "public/static/mono/auth.css": "8f19af1290fe76c193f750ca6b9075e20531652cd2874aad02cded8ae067d268",
+    "public/static/mono/forms.js": "826a82ebcf21df03709c55bf4d5c8c93f76d7c73b68b5e5ed542eb0e065f6703",
+    "app/index/view/default/public/mono_theme.html": "7ce14995824b51f5b5bef8852847ec0c81ae39afa688bc7dbfca2e8ee35836fd"
   },
   "upgrade": {
     "path": "upgrades/6.9.1-to-6.9.2.php",
     "output": "MONO-STUDIO-UPGRADE-6.9.2.php",
     "sha256": "aeaa2520960fecdbdc549f9354ab409ff57ac3e750216e4989d082471e07762f"
+  },
+  "sharedThemeFiles": {
+    "theme.js": "e3d6c4ad3122864d94daed05b710902cea1b892180402d5170d5b8bddaeedbba",
+    "theme.css": "17ff816fd5ef0622832951c914952780c430511baca7a700b43e3417384a969b",
+    "fonts/noto-serif-sc-subset.woff2": "0b3cdbba4e023d9b0a335f0502fc67db494924ef8b4e0aa9a5f3aa09e5f6a266",
+    "fonts/OFL.txt": "5e0da210fb04058a8c0087985d2d456b931c2579811a49655721d3cf0c36b6d6"
   }
 }

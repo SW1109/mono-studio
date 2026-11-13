@@ -1,6 +1,5 @@
 /* 官网与商城共享语义色，原生账号和订单保留 ShopXO 交互。 */
-html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accent:var(--theme-accent); --gn-purple:var(--theme-accent); --gn-line:var(--theme-line); --gn-surface:var(--theme-surface); --color-main:var(--gn-accent); --color-main-light:var(--theme-accent-soft); --color-main-hover:var(--theme-accent-hover); --color-price:var(--gn-accent); --color-button-primary:var(--theme-button); --color-button-primary-hover:var(--theme-button-hover); --color-button-primary-text:var(--theme-button-text); }
-.gn-store { color:var(--gn-ink); background:var(--theme-canvas); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; font-size:15px; line-height:1.65; }
+.gn-store { color:var(--gn-ink); background:var(--theme-canvas); font-family:var(--theme-font-body); font-size:15px; line-height:1.65; }
 .gn-store *, .gn-store *::before, .gn-store *::after { box-sizing:border-box; }
 .gn-store h1,.gn-store h2,.gn-store h3,.gn-store p { margin:0; }
 .gn-store a { color:inherit; text-decoration:none; }
@@ -206,27 +205,3 @@ html:root { --gn-ink:var(--theme-ink); --gn-muted:var(--theme-muted); --gn-accen
 .gn-unified.index-goods-index:has(.gn-contract-pay) .parameters-content-detail > li > span:last-child { color:var(--gn-ink); font-size:13.5px; font-weight:500; line-height:1.6; }
 @media(min-width:560px) { .gn-unified.index-goods-index:has(.gn-contract-pay) .parameters-content-detail { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:700px) { .gn-unified.index-goods-index:has(.gn-contract-pay) .tb-detail-panel-top-price-content { padding:16px 14px 38px !important; } }
-
-/* 登录/注册页：主题预留的左侧广告位没有图片时不再占位，表单靠近顶部并单列居中 */
-.user-login-container, .user-register-container { padding-top:24px !important; }
-.user-login-container .user-login-background-img-container { min-height:0 !important; }
-.user-login-container .user-left-container { display:none !important; }
-.user-login-container .user-right-container { width:100% !important; float:none !important; padding-left:0 !important; padding-right:0 !important; }
-.user-login-container .am-container, .user-register-container .am-container { max-width:600px; }
-.user-login-container .am-background-white.am-radius-lg, .user-register-container .register-container > .am-background-white { padding:8px 20px 20px; border:1px solid var(--gn-line); border-radius:8px; box-shadow:0 18px 40px rgba(95,56,131,.08); }
-@media(max-width:640px) { .user-login-container, .user-register-container { padding-top:12px !important; } .user-login-container .am-background-white.am-radius-lg, .user-register-container .register-container > .am-background-white { padding:6px 14px 16px; } }
-
-/* 文章与协议页：主题默认正文 14px/var(--gn-muted) 且小标题无层级，这里统一为可读排版 */
-.article-content { padding-block:8px 40px; }
-.article-header .am-article-title { font-size:26px; font-weight:600; line-height:1.4; letter-spacing:0; color:var(--gn-ink); }
-.am-article.richtext { color:var(--gn-ink); font-size:15px; line-height:1.95; }
-.am-article.richtext p { margin:0 0 14px; color:var(--gn-ink); font-size:15px; line-height:1.95; }
-.am-article.richtext h2,.am-article.richtext h3,.am-article.richtext h4 { margin:26px 0 10px; color:var(--gn-ink); font-weight:600; line-height:1.5; }
-.am-article.richtext h2 { font-size:20px; }
-.am-article.richtext h3 { font-size:17px; }
-.am-article.richtext h4 { font-size:15.5px; }
-.am-article.richtext ul,.am-article.richtext ol { margin:0 0 16px; padding-left:22px; color:var(--gn-ink); }
-.am-article.richtext li { margin:6px 0; line-height:1.85; }
-.am-article.richtext a { color:var(--gn-accent); text-decoration:underline; text-underline-offset:3px; }
-.am-article.richtext strong { color:var(--gn-ink); }
-@media(max-width:700px) { .article-header .am-article-title { font-size:22px; } .am-article.richtext,.am-article.richtext p { font-size:14.5px; } }

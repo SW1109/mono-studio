@@ -1,4 +1,6 @@
 deploy/shopxo/** text eol=lf
+# Unified diff context retains upstream tabs and blank lines.
+deploy/shopxo/patches/*.patch whitespace=-blank-at-eol,-space-before-tab
 public/theme.js text eol=lf
 public/theme.css text eol=lf
 public/fonts/OFL.txt text eol=lf

@@ -48,6 +48,10 @@ php MONO-STUDIO-SITE-CONFIG.php --apply --backup=/private/database.sql.gz
 
 官网导航和联系方式从 `src/content/site.js` 生成到 `mono-site-navigation.json`，修改后重新准备并同步。商品 sitemap、canonical 和结构化数据从商城数据库读取；账号、订单及结账页面使用 `noindex`。
 
+共享主题的唯一源是官网 `public/theme.css`、`public/theme.js` 及其字体资源。准备流程将其复制到商城输出目录，并生成 `mono-theme-assets.json` 的内容版本；不要在 `overlay/` 中重新创建共享主题副本。`0007-shared-theme-entry.patch` 将自有主题集中在公共头末尾，标准页面和独立弹窗使用同一入口。`native.css` 负责原生控件适配，`auth.css` 负责账号布局，`shell.css` 只维护站点导航及页脚，不能重复定义表单和按钮主题。
+
+主题发布前检查登录、注册、密码找回、内嵌登录、图形验证码弹窗的空值、输入、焦点和错误状态；再检查商品、账号中心、订单和支付弹窗。验证码发送、账号写入和真实支付分别验收，界面回归不代替这些业务验证。
+
 ## 合同付款与费率
 
 合同商品只走专用表单：上传合同、填写合同编号和金额，再进入商城原生支付宝收银台。标准商品购买和购物车流程会拒绝缺少合同凭据的请求。

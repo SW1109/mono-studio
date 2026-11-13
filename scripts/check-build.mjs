@@ -8,16 +8,21 @@ import { guideArticles, guidePath } from "../src/content/guideArticles.js";
 import { guideMarkdown, caseStudyMarkdown } from "./lib/search-assets.mjs";
 import { caseStudies, caseStudyPath } from "../src/content/caseStudies.js";
 import { site } from "../src/content/site.js";
+import { readSharedTheme, sharedThemeFiles } from "./lib/theme-assets.mjs";
 
 const dist = fileURLToPath(new URL("../dist/", import.meta.url));
 const load = filename => readFile(path.join(dist, filename), "utf8");
 const manifest = JSON.parse(await load(".vite/manifest.json"));
 const metadata = JSON.parse(await load("site-build.json"));
-// 两个运行环境共用同一主题，避免官网改色后原生商城仍使用旧副本。
-for (const file of ["theme.js", "theme.css", "fonts/noto-serif-sc-subset.woff2", "fonts/OFL.txt"]) {
+const sharedTheme = await readSharedTheme();
+const storefrontLock = JSON.parse(await readFile(new URL("../deploy/shopxo/upstream.lock.json", import.meta.url), "utf8"));
+assert.deepEqual(JSON.parse(await load("theme-assets.json")), sharedTheme, "主题资源版本未随源文件更新。");
+assert.deepEqual(storefrontLock.sharedThemeFiles, sharedTheme.files, "商城与官网必须使用同一份共享主题摘要。");
+// 商城共享资源由准备流程生成，避免重新引入另一份需要手工同步的主题。
+for (const file of sharedThemeFiles) {
   const source = await readFile(new URL(`../public/${file}`, import.meta.url));
   assert.ok(source.equals(await readFile(path.join(dist, file))), `构建主题资源不同步：${file}`);
-  assert.ok(source.equals(await readFile(new URL(`../deploy/shopxo/overlay/public/static/mono/${file}`, import.meta.url))), `商城主题资源不同步：${file}`);
+  assert.ok(!Object.hasOwn(storefrontLock.overlayFiles, `public/static/mono/${file}`), `共享主题不应在商城覆盖目录重复维护：${file}`);
 }
 assert.deepEqual(metadata.paths, prerenderPaths, "产物路径与当前内容配置不一致，可能是旧构建。");
 // 缺配置的构建会静默降级：商城入口退回站内占位页、canonical 与 sitemap 不再输出，因此这里直接失败。
@@ -52,6 +57,8 @@ for (const file of staticClosure([keysByFile.get(main.file)])) {
 for (const route of prerenderPaths) {
   const filename = route === "/" ? "index.html" : `${route.slice(1)}index.html`;
   const html = await load(filename);
+  for (const file of ["theme.css", "theme.js"]) assert.ok(html.includes(`${metadata.base}${file}?v=${sharedTheme.version}`), `${route} 未使用当前共享主题版本：${file}`);
+  assert.equal([...html.matchAll(/data-mono-theme="tokens"/g)].length, 1, `${route} 应只有一个主题入口。`);
   const study = caseStudies.find(item => route === caseStudyPath(item));
   assert.match(html, /<h1[\s>]/, `${route} 没有预渲染主标题。`);
   assert.equal([...html.matchAll(/<h1[\s>]/g)].length, 1, `${route} 应有且仅有一个主标题。`);
