@@ -25,13 +25,18 @@ export function useSiteMotion(root) {
       if (preference.matches || !element.animate) return;
 
       const delay = Math.min(180, Math.max(0, Number(element.dataset.revealDelay) || 0));
-      const animation = element.animate([
-        { opacity: 0, transform: "translate3d(0, 24px, 0)" },
-        { opacity: 1, transform: "translate3d(0, 0, 0)" },
-      ], { duration: 1100, delay, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "backwards" });
-      animations.set(animation, element);
-      if (document.hidden) animation.pause();
-      animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
+      // data-reveal="lines"：标题逐行从遮罩中升起（与首页一致）；其余元素上浮淡入。
+      const lines = element.dataset.reveal === "lines" ? [...element.querySelectorAll(".line-inner")] : [];
+      const targets = lines.length ? lines : [element];
+      const frames = lines.length
+        ? [{ clipPath: "inset(100% 0% 0% 0%)", transform: "translate3d(0, 60%, 0)" }, { clipPath: "inset(0% 0% 0% 0%)", transform: "translate3d(0, 0, 0)" }]
+        : [{ opacity: 0, transform: "translate3d(0, 40px, 0) scale(.985)" }, { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" }];
+      targets.forEach((target, index) => {
+        const animation = target.animate(frames, { duration: lines.length ? 1400 : 1200, delay: delay + index * 120, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "backwards" });
+        animations.set(animation, element);
+        if (document.hidden) animation.pause();
+        animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
+      });
     };
 
     const syncMotion = () => {

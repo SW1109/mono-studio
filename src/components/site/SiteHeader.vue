@@ -4,6 +4,7 @@ import { RouterLink, useRoute } from "vue-router";
 import SiteNavLink from "./SiteNavLink.vue";
 import { site } from "../../content/site.js";
 import mark from "../../assets/brand-mark.png";
+import { getLenis } from "../../composables/smoothScroll.js";
 
 const route = useRoute();
 const menu = ref(null);
@@ -17,6 +18,7 @@ function handleDesktopChange(event) {
 
 function restoreScroll() {
   if (menuOpen.value) document.body.style.overflow = previousOverflow;
+  if (menuOpen.value) getLenis()?.start();
   menuOpen.value = false;
 }
 function closeMenu() {
@@ -27,6 +29,7 @@ function openMenu() {
   previousOverflow = document.body.style.overflow;
   menuOpen.value = true;
   document.body.style.overflow = "hidden";
+  getLenis()?.stop();
   menu.value?.showModal();
 }
 watch(() => route.fullPath, closeMenu);
